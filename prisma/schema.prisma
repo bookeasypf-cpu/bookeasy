@@ -28,6 +28,7 @@ model User {
   bookings      Booking[]       @relation("ClientBookings")
   reviews       Review[]
   notifications Notification[]
+  xpTransactions XpTransaction[]
 
   @@map("users")
 }
@@ -108,9 +109,12 @@ model Merchant {
   services     Service[]
   availability WeeklySchedule[]
   bookings     Booking[]       @relation("MerchantBookings")
-  reviews      Review[]
-  photos       MerchantPhoto[]
-  blockedSlots BlockedSlot[]
+  reviews        Review[]
+  photos         MerchantPhoto[]
+  blockedSlots   BlockedSlot[]
+  xpRewards      XpReward[]
+  xpTransactions XpTransaction[]
+  xpPerBooking   Int             @default(10)
 
   @@index([city])
   @@index([sectorId])
@@ -208,10 +212,11 @@ model Booking {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  client   User     @relation("ClientBookings", fields: [clientId], references: [id])
-  merchant Merchant @relation("MerchantBookings", fields: [merchantId], references: [id])
-  service  Service  @relation(fields: [serviceId], references: [id])
-  review   Review?
+  client         User            @relation("ClientBookings", fields: [clientId], references: [id])
+  merchant       Merchant        @relation("MerchantBookings", fields: [merchantId], references: [id])
+  service        Service         @relation(fields: [serviceId], references: [id])
+  review         Review?
+  xpTransactions XpTransaction[]
 
   @@index([clientId])
   @@index([merchantId, date])
@@ -259,4 +264,65 @@ model Notification {
 
   @@index([userId, isRead])
   @@map("notifications")
+}
+
+// ─────────────────────────────────────────────
+// XP / LOYALTY PROGRAM
+// ─────────────────────────────────────────────
+
+model XpTransaction {
+  id         String   @id @default(cuid())
+  userId     String
+  merchantId String
+  bookingId  String?
+  amount     Int      // positif = gagné, négatif = dépensé ou révoqué
+  type       String   // EARNED, REVOKED, REDEEMED
+  reason     String?  // ex: "Réservation confirmée", "Annulation", "Échange récompense"
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  booking  Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@index([userId, merchantId])
+  @@index([bookingId])
+  @@map("xp_transactions")
+}
+
+model XpReward {
+  id          String   @id @default(cuid())
+  merchantId  String
+  name        String   // ex: "10% de réduction", "Coupe gratuite"
+  description String?
+  xpCost      Int      // Combien d'XP pour obtenir la récompense
+  type        String   @default("DISCOUNT") // DISCOUNT, FREE_SERVICE, GIFT
+  value       Float?   // ex: 10 pour 10% de réduction, ou prix du service offert
+  isActive    Boolean  @default(true)
+  maxUses     Int?     // null = illimité
+  usedCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  merchant    Merchant      @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  redemptions XpRedemption[]
+
+  @@index([merchantId, isActive])
+  @@map("xp_rewards")
+}
+
+model XpRedemption {
+  id        String   @id @default(cuid())
+  rewardId  String
+  userId    String
+  code      String   @unique // Code unique pour utiliser la récompense
+  status    String   @default("ACTIVE") // ACTIVE, USED, EXPIRED
+  usedAt    DateTime?
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+
+  reward XpReward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([code])
+  @@map("xp_redemptions")
 }

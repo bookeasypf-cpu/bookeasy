@@ -11,6 +11,7 @@ import {
   Calendar,
   Star,
   BarChart3,
+  Gift,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/dashboard/bookings", icon: CalendarDays, label: "Rendez-vous" },
   { href: "/dashboard/calendar", icon: Calendar, label: "Calendrier" },
   { href: "/dashboard/reviews", icon: Star, label: "Avis" },
+  { href: "/dashboard/loyalty", icon: Gift, label: "Fidélité XP" },
   { href: "/dashboard/analytics", icon: BarChart3, label: "Statistiques" },
 ];
 

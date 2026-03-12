@@ -68,7 +68,7 @@ export async function createBooking(data: {
     // Create notification for merchant
     const merchant = await prisma.merchant.findUnique({
       where: { id: data.merchantId },
-      select: { userId: true },
+      select: { userId: true, xpPerBooking: true },
     });
 
     if (merchant) {
@@ -81,6 +81,20 @@ export async function createBooking(data: {
           metadata: JSON.stringify({ bookingId: booking.id }),
         },
       });
+
+      // Award XP to client
+      if (merchant.xpPerBooking > 0) {
+        await prisma.xpTransaction.create({
+          data: {
+            userId: user.id,
+            merchantId: data.merchantId,
+            bookingId: booking.id,
+            amount: merchant.xpPerBooking,
+            type: "EARNED",
+            reason: `Réservation : ${service.name}`,
+          },
+        });
+      }
     }
 
     revalidatePath("/my-bookings");
@@ -122,6 +136,27 @@ export async function cancelBooking(bookingId: string, reason?: string) {
       cancelReason: reason || null,
     },
   });
+
+  // Revoke XP if any were earned for this booking
+  const earnedXp = await prisma.xpTransaction.findFirst({
+    where: {
+      bookingId,
+      type: "EARNED",
+    },
+  });
+
+  if (earnedXp) {
+    await prisma.xpTransaction.create({
+      data: {
+        userId: booking.clientId,
+        merchantId: booking.merchantId,
+        bookingId,
+        amount: -earnedXp.amount,
+        type: "REVOKED",
+        reason: `Annulation : ${booking.service.name}`,
+      },
+    });
+  }
 
   // Notify the other party
   const notifyUserId = isMerchant ? booking.clientId : booking.merchant.userId;

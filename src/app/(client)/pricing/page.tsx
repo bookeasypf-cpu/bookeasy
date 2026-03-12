@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, Star, Zap, Crown, ArrowRight } from "lucide-react";
+import { Check, Star, Zap, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,17 +13,17 @@ const plans = [
     name: "Gratuit",
     price: "0",
     period: "pour toujours",
-    description: "Parfait pour d\u00e9marrer et tester la plateforme.",
+    description: "Parfait pour démarrer et tester la plateforme.",
     icon: Zap,
     color: "#0066FF",
     features: [
       "Profil professionnel complet",
-      "Jusqu'\u00e0 5 services",
-      "Gestion des r\u00e9servations",
-      "Calendrier int\u00e9gr\u00e9",
+      "Jusqu'à 5 services",
+      "Gestion des réservations",
+      "Calendrier intégré",
       "Notifications email",
       "Avis clients",
-      "Visibilit\u00e9 sur la carte",
+      "Visibilité sur la carte",
     ],
     cta: "Commencer gratuitement",
     href: "/register?role=MERCHANT",
@@ -31,43 +31,25 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "4 900",
+    price: "6 900",
     period: "F CFP / mois",
-    description: "Pour les professionnels qui veulent se d\u00e9marquer.",
+    description: "Pour les professionnels qui veulent se démarquer.",
     icon: Star,
     color: "#0066FF",
     features: [
       "Tout du plan Gratuit",
-      "Services illimit\u00e9s",
+      "Services illimités",
       "Mise en avant dans les recherches",
-      "Badge \u00ab Pro v\u00e9rifi\u00e9 \u00bb",
-      "Statistiques avanc\u00e9es",
+      "Badge « Pro vérifié »",
+      "Statistiques avancées",
       "Rappels SMS aux clients",
+      "Multi-employés & agenda par collaborateur",
+      "Programme fidélité XP personnalisable",
       "Support prioritaire",
     ],
     cta: "Choisir Pro",
     href: "/register?role=MERCHANT&plan=pro",
     popular: true,
-  },
-  {
-    name: "Premium",
-    price: "9 900",
-    period: "F CFP / mois",
-    description: "Pour les \u00e9tablissements ambitieux.",
-    icon: Crown,
-    color: "#8B5CF6",
-    features: [
-      "Tout du plan Pro",
-      "Multi-employ\u00e9s",
-      "Agenda par collaborateur",
-      "Page personnalis\u00e9e",
-      "Domaine personnalis\u00e9",
-      "API & int\u00e9grations",
-      "Account manager d\u00e9di\u00e9",
-    ],
-    cta: "Choisir Premium",
-    href: "/register?role=MERCHANT&plan=premium",
-    popular: false,
   },
 ];
 
@@ -108,7 +90,7 @@ export default function PricingPage() {
 
       {/* Plans */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
           {plans.map((plan) => {
             const Icon = plan.icon;
             return (

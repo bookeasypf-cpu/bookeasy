@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   LogOut,
   ChevronDown,
+  Star,
 } from "lucide-react";
 
 export function Header() {
@@ -84,11 +85,18 @@ export function Header() {
             )}
 
             {session?.user?.role === "CLIENT" && (
-              <Link href="/my-bookings" className={navLinkClass("/my-bookings")}>
-                <Calendar className="h-4 w-4" />
-                Mes RDV
-                {activeIndicator("/my-bookings")}
-              </Link>
+              <>
+                <Link href="/my-bookings" className={navLinkClass("/my-bookings")}>
+                  <Calendar className="h-4 w-4" />
+                  Mes RDV
+                  {activeIndicator("/my-bookings")}
+                </Link>
+                <Link href="/my-rewards" className={navLinkClass("/my-rewards")}>
+                  <Star className="h-4 w-4" />
+                  Mes XP
+                  {activeIndicator("/my-rewards")}
+                </Link>
+              </>
             )}
 
             {/* Separator + Auth section */}
@@ -234,18 +242,32 @@ export function Header() {
                 )}
 
                 {session.user.role === "CLIENT" && (
-                  <Link
-                    href="/my-bookings"
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                      isActive("/my-bookings")
-                        ? "text-[#0066FF] bg-[#0066FF]/5"
-                        : "text-[#0C1B2A]/70 hover:bg-gray-50"
-                    }`}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <Calendar className="h-4.5 w-4.5" />
-                    Mes RDV
-                  </Link>
+                  <>
+                    <Link
+                      href="/my-bookings"
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                        isActive("/my-bookings")
+                          ? "text-[#0066FF] bg-[#0066FF]/5"
+                          : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                      }`}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Calendar className="h-4.5 w-4.5" />
+                      Mes RDV
+                    </Link>
+                    <Link
+                      href="/my-rewards"
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                        isActive("/my-rewards")
+                          ? "text-[#0066FF] bg-[#0066FF]/5"
+                          : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                      }`}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Star className="h-4.5 w-4.5" />
+                      Mes XP
+                    </Link>
+                  </>
                 )}
 
                 <div className="border-t border-[#0C1B2A]/5 my-1.5" />
