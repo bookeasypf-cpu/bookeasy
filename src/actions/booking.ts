@@ -82,14 +82,15 @@ export async function createBooking(data: {
         },
       });
 
-      // Award XP to client
-      if (merchant.xpPerBooking > 0) {
+      // Award XP to client (service-level XP takes priority over merchant default)
+      const xpToAward = service.xpAmount ?? merchant.xpPerBooking;
+      if (xpToAward > 0) {
         await prisma.xpTransaction.create({
           data: {
             userId: user.id,
             merchantId: data.merchantId,
             bookingId: booking.id,
-            amount: merchant.xpPerBooking,
+            amount: xpToAward,
             type: "EARNED",
             reason: `Réservation : ${service.name}`,
           },

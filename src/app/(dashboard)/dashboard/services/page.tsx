@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { formatPrice, formatDuration } from "@/lib/utils";
-import { Plus, Pencil, Trash2, Clock } from "lucide-react";
+import { Plus, Pencil, Trash2, Clock, Star } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Service {
@@ -15,6 +15,7 @@ interface Service {
   description: string | null;
   duration: number;
   price: number;
+  xpAmount: number | null;
   isActive: boolean;
 }
 
@@ -29,6 +30,7 @@ export default function DashboardServicesPage() {
     description: "",
     duration: "30",
     price: "0",
+    xpAmount: "",
   });
 
   async function fetchServices() {
@@ -43,7 +45,7 @@ export default function DashboardServicesPage() {
   }, []);
 
   function resetForm() {
-    setForm({ name: "", description: "", duration: "30", price: "0" });
+    setForm({ name: "", description: "", duration: "30", price: "0", xpAmount: "" });
     setEditingId(null);
     setShowForm(false);
   }
@@ -54,6 +56,7 @@ export default function DashboardServicesPage() {
       description: service.description || "",
       duration: String(service.duration),
       price: String(service.price),
+      xpAmount: service.xpAmount ? String(service.xpAmount) : "",
     });
     setEditingId(service.id);
     setShowForm(true);
@@ -67,6 +70,7 @@ export default function DashboardServicesPage() {
       description: form.description || null,
       duration: Number(form.duration),
       price: Number(form.price),
+      xpAmount: form.xpAmount ? Number(form.xpAmount) : null,
     };
     const url = editingId
       ? `/api/dashboard/services?id=${editingId}`
@@ -142,10 +146,10 @@ export default function DashboardServicesPage() {
                   setForm({ ...form, description: e.target.value })
                 }
               />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Dur&eacute;e (min)
+                    Durée (min)
                   </label>
                   <select
                     value={form.duration}
@@ -165,7 +169,7 @@ export default function DashboardServicesPage() {
                 </div>
                 <Input
                   id="svc-price"
-                  label="Prix (\u20ac)"
+                  label="Prix (F CFP)"
                   type="number"
                   min="0"
                   step="0.01"
@@ -173,6 +177,25 @@ export default function DashboardServicesPage() {
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
                   required
                 />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    XP gagnés
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="500"
+                    placeholder="Défaut"
+                    value={form.xpAmount}
+                    onChange={(e) =>
+                      setForm({ ...form, xpAmount: e.target.value })
+                    }
+                    className="block w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors placeholder:text-gray-300"
+                  />
+                  <p className="text-[10px] text-gray-400 mt-0.5">
+                    Vide = défaut ({`paramètres XP`})
+                  </p>
+                </div>
               </div>
               <div className="flex gap-2">
                 <button
@@ -206,6 +229,12 @@ export default function DashboardServicesPage() {
                 </span>
               </div>
               <div className="flex items-center gap-3">
+                {service.xpAmount && (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-full">
+                    <Star className="h-3 w-3 text-yellow-500" />
+                    {service.xpAmount} XP
+                  </span>
+                )}
                 <span className="font-semibold text-[#0066FF]">
                   {formatPrice(service.price)}
                 </span>

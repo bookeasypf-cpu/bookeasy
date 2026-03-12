@@ -146,6 +146,7 @@ model Service {
   duration    Int
   price       Float
   currency    String   @default("EUR")
+  xpAmount    Int?     // XP personnalisé par service (null = utilise le défaut du commerçant)
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())

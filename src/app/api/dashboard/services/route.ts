@@ -34,6 +34,7 @@ export async function POST(request: Request) {
       description: body.description,
       duration: body.duration,
       price: body.price,
+      xpAmount: body.xpAmount || null,
     },
   });
   return NextResponse.json(service);
@@ -56,6 +57,7 @@ export async function PUT(request: NextRequest) {
       description: body.description,
       duration: body.duration,
       price: body.price,
+      xpAmount: body.xpAmount !== undefined ? (body.xpAmount || null) : undefined,
     },
   });
   return NextResponse.json(service);
