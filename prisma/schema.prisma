@@ -1,0 +1,262 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─────────────────────────────────────────────
+// USERS & AUTHENTICATION
+// ─────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  name          String?
+  phone         String?
+  image         String?
+  role          String    @default("CLIENT")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  merchant      Merchant?
+  bookings      Booking[]       @relation("ClientBookings")
+  reviews       Review[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─────────────────────────────────────────────
+// MERCHANT / BUSINESS
+// ─────────────────────────────────────────────
+
+model Sector {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  slug      String     @unique
+  icon      String?
+  merchants Merchant[]
+
+  @@map("sectors")
+}
+
+model Merchant {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  businessName String
+  description  String?
+  phone        String?
+  address      String?
+  city         String?
+  postalCode   String?
+  latitude     Float?
+  longitude    Float?
+  coverImage   String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sectorId     String
+  sector       Sector          @relation(fields: [sectorId], references: [id])
+  services     Service[]
+  availability WeeklySchedule[]
+  bookings     Booking[]       @relation("MerchantBookings")
+  reviews      Review[]
+  photos       MerchantPhoto[]
+  blockedSlots BlockedSlot[]
+
+  @@index([city])
+  @@index([sectorId])
+  @@map("merchants")
+}
+
+model MerchantPhoto {
+  id         String   @id @default(cuid())
+  merchantId String
+  url        String
+  caption    String?
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@map("merchant_photos")
+}
+
+// ─────────────────────────────────────────────
+// SERVICES
+// ─────────────────────────────────────────────
+
+model Service {
+  id          String   @id @default(cuid())
+  merchantId  String
+  name        String
+  description String?
+  duration    Int
+  price       Float
+  currency    String   @default("EUR")
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  merchant Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@index([merchantId])
+  @@map("services")
+}
+
+// ─────────────────────────────────────────────
+// AVAILABILITY & SCHEDULING
+// ─────────────────────────────────────────────
+
+model WeeklySchedule {
+  id         String  @id @default(cuid())
+  merchantId String
+  dayOfWeek  Int
+  startTime  String
+  endTime    String
+  isActive   Boolean @default(true)
+
+  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@unique([merchantId, dayOfWeek, startTime])
+  @@index([merchantId])
+  @@map("weekly_schedules")
+}
+
+model BlockedSlot {
+  id         String   @id @default(cuid())
+  merchantId String
+  date       String
+  startTime  String?
+  endTime    String?
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@index([merchantId, date])
+  @@map("blocked_slots")
+}
+
+// ─────────────────────────────────────────────
+// BOOKINGS
+// ─────────────────────────────────────────────
+
+model Booking {
+  id           String    @id @default(cuid())
+  clientId     String
+  merchantId   String
+  serviceId    String
+  date         String
+  startTime    String
+  endTime      String
+  status       String    @default("PENDING")
+  notes        String?
+  totalPrice   Float
+  cancelledAt  DateTime?
+  cancelReason String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  client   User     @relation("ClientBookings", fields: [clientId], references: [id])
+  merchant Merchant @relation("MerchantBookings", fields: [merchantId], references: [id])
+  service  Service  @relation(fields: [serviceId], references: [id])
+  review   Review?
+
+  @@index([clientId])
+  @@index([merchantId, date])
+  @@index([merchantId, date, startTime])
+  @@map("bookings")
+}
+
+// ─────────────────────────────────────────────
+// REVIEWS
+// ─────────────────────────────────────────────
+
+model Review {
+  id         String   @id @default(cuid())
+  bookingId  String   @unique
+  clientId   String
+  merchantId String
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  booking  Booking  @relation(fields: [bookingId], references: [id])
+  client   User     @relation(fields: [clientId], references: [id])
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+
+  @@index([merchantId])
+  @@map("reviews")
+}
+
+// ─────────────────────────────────────────────
+// NOTIFICATIONS
+// ─────────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}

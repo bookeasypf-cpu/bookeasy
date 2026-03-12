@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" fill="none">
+  <defs>
+    <!-- Primary gradient: blue to cyan -->
+    <linearGradient id="grad-easy" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0066FF"/>
+      <stop offset="100%" stop-color="#00B4D8"/>
+    </linearGradient>
+    <!-- Icon gradient -->
+    <linearGradient id="grad-icon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0066FF"/>
+      <stop offset="100%" stop-color="#00B4D8"/>
+    </linearGradient>
+    <!-- Wave gradient -->
+    <linearGradient id="grad-wave" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00B4D8"/>
+      <stop offset="100%" stop-color="#0066FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- === ICON: Calendar with wave + pin === -->
+  <g transform="translate(4, 8)">
+    <!-- Calendar body - rounded rectangle -->
+    <rect x="4" y="14" width="56" height="48" rx="10" ry="10" fill="url(#grad-icon)" opacity="0.1"/>
+    <rect x="4" y="14" width="56" height="48" rx="10" ry="10" stroke="url(#grad-icon)" stroke-width="3" fill="none"/>
+
+    <!-- Calendar top bar -->
+    <rect x="4" y="14" width="56" height="16" rx="10" ry="10" fill="url(#grad-icon)"/>
+    <rect x="4" y="24" width="56" height="6" fill="url(#grad-icon)"/>
+
+    <!-- Calendar hang tabs -->
+    <rect x="18" y="8" width="4" height="12" rx="2" fill="url(#grad-icon)"/>
+    <rect x="42" y="8" width="4" height="12" rx="2" fill="url(#grad-icon)"/>
+
+    <!-- Polynesian wave inside calendar -->
+    <path d="M14 46 Q20 38, 26 44 Q32 50, 38 42 Q44 34, 50 44" stroke="url(#grad-wave)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+    <!-- Location pin dot -->
+    <circle cx="46" cy="40" r="2.5" fill="#0066FF"/>
+
+    <!-- Small check mark / booking confirmation -->
+    <path d="M18 38 L23 43 L33 33" stroke="#0066FF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- === TEXT: BookEasy === -->
+  <!-- "Book" in dark -->
+  <text x="80" y="55" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="36" font-weight="700" letter-spacing="-0.5" fill="#0C1B2A">Book</text>
+
+  <!-- "Easy" with gradient -->
+  <text x="178" y="55" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="36" font-weight="700" letter-spacing="-0.5" fill="url(#grad-easy)">Easy</text>
+</svg>

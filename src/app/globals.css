@@ -1,26 +1,534 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --color-background: #F8FAFC;
+  --color-foreground: #0C1B2A;
+
+  /* BookEasy Polynesia Palette */
+  --color-primary-50: #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #0066FF;
+  --color-primary-600: #0052CC;
+  --color-primary-700: #003D99;
+  --color-primary-800: #002966;
+  --color-primary-900: #0C1B2A;
+
+  --color-accent-50: #ECFEFF;
+  --color-accent-100: #CFFAFE;
+  --color-accent-200: #A5F3FC;
+  --color-accent-300: #67E8F9;
+  --color-accent-400: #22D3EE;
+  --color-accent-500: #00B4D8;
+  --color-accent-600: #0891B2;
+
+  --color-coral-400: #FF8585;
+  --color-coral-500: #FF6B6B;
+  --color-coral-600: #E05555;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ===== BASE STYLES ===== */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 100px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* ===== EASING FUNCTIONS (PacifikAI-inspired) ===== */
+:root {
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes checkmark {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===== PacifikAI-INSPIRED ANIMATIONS ===== */
+
+/* Word-by-word reveal with blur */
+@keyframes heroWordReveal {
+  0% { opacity: 0; transform: translateY(30px); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.hero-word {
+  display: inline-block;
+  opacity: 0;
+  animation: heroWordReveal 0.6s var(--ease-out-expo) forwards;
+}
+
+/* Highlighted variant: gradient text with shimmer after reveal */
+@keyframes heroWordRevealHighlight {
+  0% { opacity: 0; transform: translateY(30px); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.hero-word--highlight {
+  display: inline-block;
+  opacity: 0;
+  background: linear-gradient(90deg, #67E8F9, #00B4D8, #ffffff, #00B4D8, #67E8F9);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: heroWordRevealHighlight 0.6s var(--ease-out-expo) forwards,
+             textShimmer 3s linear 1s infinite;
+}
+
+/* Gradient text shimmer sweep */
+@keyframes textShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #67E8F9 0%,
+    #00B4D8 20%,
+    #ffffff 40%,
+    #00B4D8 60%,
+    #67E8F9 80%,
+    #00B4D8 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 3s linear infinite;
+}
+
+/* Section title underline grow */
+@keyframes underlineGrow {
+  0% { width: 0; opacity: 0; }
+  100% { width: 100%; opacity: 1; }
+}
+
+.section-title-line {
+  position: relative;
+  display: inline-block;
+}
+
+.section-title-line::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  height: 3px;
+  width: 0;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #0066FF, #00B4D8);
+  transition: width 0.6s var(--ease-out-expo);
+}
+
+.section-title-line.is-visible::after {
+  width: 100%;
+}
+
+/* Dot scale for section subtitles */
+@keyframes dotScale {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 3D Tilt card (SectorGrid + MerchantCard) */
+.card-3d {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.card-3d-inner {
+  transition: transform 0.4s var(--ease-out-quart), box-shadow 0.4s var(--ease-out-quart);
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.card-3d-inner:hover {
+  box-shadow: 0 20px 60px -15px rgba(0, 102, 255, 0.2);
+}
+
+/* Mouse-tracking glow effect */
+.card-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  top: var(--mouse-y, 50%);
+  left: var(--mouse-x, 50%);
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0, 102, 255, 0.12) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.card-glow:hover::before {
+  opacity: 1;
+}
+
+/* Button text slide animation (PacifikAI-style) */
+.btn-slide {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-slide .btn-text {
+  display: block;
+  transition: transform 0.35s var(--ease-spring);
+}
+
+.btn-slide .btn-text-clone {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(110%);
+  transition: transform 0.35s var(--ease-spring);
+}
+
+.btn-slide:hover .btn-text {
+  transform: translateY(-110%);
+}
+
+.btn-slide:hover .btn-text-clone {
+  transform: translateY(0);
+}
+
+/* Bounce entrance for category icons */
+@keyframes iconBounceIn {
+  0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(5deg); opacity: 0.8; }
+  70% { transform: scale(0.9) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.icon-bounce-in {
+  animation: iconBounceIn 0.6s var(--ease-spring) forwards;
+}
+
+/* Count-up effect wrapper */
+@keyframes countReveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.8); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.count-reveal {
+  opacity: 0;
+  animation: countReveal 0.8s var(--ease-out-expo) forwards;
+}
+
+/* Typing dots animation (like PacifikAI chat) */
+@keyframes typingDot {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Glow pulse for active elements */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 102, 255, 0.15); }
+  50% { box-shadow: 0 0 40px rgba(0, 102, 255, 0.3); }
+}
+
+.glow-pulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* Utility classes */
+.animate-shimmer {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s var(--ease-out-expo) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s var(--ease-out-expo) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s var(--ease-spring) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s var(--ease-out-expo) forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s var(--ease-out-expo) forwards;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* Staggered children animation */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 420ms; }
+.stagger-children > *:nth-child(9) { animation-delay: 480ms; }
+.stagger-children > *:nth-child(10) { animation-delay: 540ms; }
+.stagger-children > *:nth-child(11) { animation-delay: 600ms; }
+.stagger-children > *:nth-child(12) { animation-delay: 660ms; }
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(12, 27, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Card hover effect (enhanced PacifikAI-style) */
+.card-hover {
+  transition: all 0.35s var(--ease-out-quart);
+  will-change: transform, box-shadow;
+}
+.card-hover:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 25px 50px -15px rgba(0, 102, 255, 0.18),
+              0 0 0 1px rgba(0, 102, 255, 0.08);
+}
+
+/* Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* Map styles */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  z-index: 0;
+}
+
+.custom-marker-pin {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+}
+
+.custom-marker-pin:hover {
+  transform: rotate(-45deg) scale(1.15);
+}
+
+.custom-marker-pin svg {
+  transform: rotate(45deg);
+}
+
+/* Bottom Sheet */
+.bottom-sheet {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Button press effect */
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* Smooth page transitions */
+.page-transition {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+/* ===== SCROLL REVEAL ANIMATIONS (PacifikAI-style) ===== */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(40px) scale(0.97);
+  filter: blur(4px);
+  transition: opacity 0.8s var(--ease-out-expo),
+              transform 0.8s var(--ease-spring),
+              filter 0.6s var(--ease-out-expo);
+}
+
+.scroll-reveal.scroll-reveal--visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* Directional variants */
+.scroll-reveal--left {
+  opacity: 0;
+  transform: translateX(-40px) scale(0.97);
+  filter: blur(4px);
+  transition: opacity 0.8s var(--ease-out-expo),
+              transform 0.8s var(--ease-spring),
+              filter 0.6s var(--ease-out-expo);
+}
+
+.scroll-reveal--left.scroll-reveal--visible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  filter: blur(0);
+}
+
+.scroll-reveal--right {
+  opacity: 0;
+  transform: translateX(40px) scale(0.97);
+  filter: blur(4px);
+  transition: opacity 0.8s var(--ease-out-expo),
+              transform 0.8s var(--ease-spring),
+              filter 0.6s var(--ease-out-expo);
+}
+
+.scroll-reveal--right.scroll-reveal--visible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  filter: blur(0);
+}
+
+.scroll-reveal--scale {
+  opacity: 0;
+  transform: scale(0.9);
+  filter: blur(6px);
+  transition: opacity 0.8s var(--ease-out-expo),
+              transform 0.8s var(--ease-spring),
+              filter 0.5s var(--ease-out-expo);
+}
+
+.scroll-reveal--scale.scroll-reveal--visible {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+
+/* Stagger delays for scroll reveal children */
+.scroll-reveal-stagger > .scroll-reveal:nth-child(1) { transition-delay: 0ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(2) { transition-delay: 100ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(3) { transition-delay: 200ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(4) { transition-delay: 300ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(5) { transition-delay: 400ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(6) { transition-delay: 500ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(7) { transition-delay: 600ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(8) { transition-delay: 700ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(9) { transition-delay: 800ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(10) { transition-delay: 900ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(11) { transition-delay: 1000ms; }
+.scroll-reveal-stagger > .scroll-reveal:nth-child(12) { transition-delay: 1100ms; }
+
+/* Leaflet popup override */
+.leaflet-popup-content-wrapper {
+  border-radius: 16px !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  min-width: 260px;
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
 }

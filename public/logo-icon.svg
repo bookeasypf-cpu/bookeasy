@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="gi" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0066FF"/>
+      <stop offset="100%" stop-color="#00B4D8"/>
+    </linearGradient>
+    <linearGradient id="gw" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00B4D8"/>
+      <stop offset="100%" stop-color="#0066FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Calendar body -->
+  <rect x="4" y="14" width="56" height="46" rx="10" ry="10" fill="url(#gi)" opacity="0.1"/>
+  <rect x="4" y="14" width="56" height="46" rx="10" ry="10" stroke="url(#gi)" stroke-width="3" fill="none"/>
+
+  <!-- Calendar top bar -->
+  <rect x="4" y="14" width="56" height="16" rx="10" ry="10" fill="url(#gi)"/>
+  <rect x="4" y="24" width="56" height="6" fill="url(#gi)"/>
+
+  <!-- Calendar hang tabs -->
+  <rect x="18" y="8" width="4" height="12" rx="2" fill="url(#gi)"/>
+  <rect x="42" y="8" width="4" height="12" rx="2" fill="url(#gi)"/>
+
+  <!-- Polynesian wave -->
+  <path d="M14 44 Q20 36, 26 42 Q32 48, 38 40 Q44 32, 50 42" stroke="url(#gw)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Check mark -->
+  <path d="M18 36 L23 41 L33 31" stroke="#0066FF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
