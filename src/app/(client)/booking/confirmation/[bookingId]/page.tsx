@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, formatDuration, formatDate, formatTime } from "@/lib/utils";
-import { Calendar, Clock, Briefcase, MapPin, Home, CalendarCheck } from "lucide-react";
+import { Calendar, Clock, Briefcase, MapPin, Home, CalendarCheck, Star } from "lucide-react";
 import Link from "next/link";
 
 interface ConfirmationPageProps {
@@ -16,12 +16,18 @@ export default async function BookingConfirmationPage({
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     include: {
-      merchant: { select: { businessName: true } },
+      merchant: { select: { businessName: true, xpPerBooking: true } },
       service: true,
     },
   });
 
   if (!booking) notFound();
+
+  // Get XP earned for this booking
+  const xpEarned = await prisma.xpTransaction.findFirst({
+    where: { bookingId, type: "EARNED" },
+    select: { amount: true },
+  });
 
   return (
     <div className="page-transition min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center px-4 sm:px-6 py-12">
@@ -140,6 +146,19 @@ export default async function BookingConfirmationPage({
                 {formatPrice(booking.totalPrice)}
               </span>
             </div>
+
+            {/* XP Earned */}
+            {xpEarned && (
+              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl px-4 py-3 flex items-center justify-between border border-yellow-100 animate-fade-in-up">
+                <span className="flex items-center gap-2 text-sm font-medium text-yellow-800">
+                  <Star className="h-4 w-4 text-yellow-500" />
+                  Points fidélité gagnés
+                </span>
+                <span className="font-bold text-yellow-700 text-lg">
+                  +{xpEarned.amount} XP
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

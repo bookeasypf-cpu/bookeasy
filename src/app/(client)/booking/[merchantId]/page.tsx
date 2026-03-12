@@ -23,6 +23,7 @@ import {
   User,
   MapPin,
   FileText,
+  Star,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -38,6 +39,7 @@ interface Merchant {
   id: string;
   businessName: string;
   services: Service[];
+  xpPerBooking: number;
 }
 
 interface TimeSlot {
@@ -496,6 +498,19 @@ export default function BookingPage() {
                     {formatPrice(selectedService.price)}
                   </span>
                 </div>
+
+                {/* XP Bonus */}
+                {merchant.xpPerBooking > 0 && (
+                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl px-4 py-3 flex items-center justify-between border border-yellow-100">
+                    <span className="flex items-center gap-2 text-sm font-medium text-yellow-800">
+                      <Star className="h-4 w-4 text-yellow-500" />
+                      Points fidélité
+                    </span>
+                    <span className="font-bold text-yellow-700">
+                      +{merchant.xpPerBooking} XP
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 

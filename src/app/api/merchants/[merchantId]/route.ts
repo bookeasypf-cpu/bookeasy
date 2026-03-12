@@ -9,7 +9,22 @@ export async function GET(
 
   const merchant = await prisma.merchant.findUnique({
     where: { id: merchantId, isActive: true },
-    include: {
+    select: {
+      id: true,
+      userId: true,
+      businessName: true,
+      description: true,
+      phone: true,
+      address: true,
+      city: true,
+      postalCode: true,
+      latitude: true,
+      longitude: true,
+      coverImage: true,
+      isActive: true,
+      xpPerBooking: true,
+      createdAt: true,
+      updatedAt: true,
       sector: true,
       services: {
         where: { isActive: true },
