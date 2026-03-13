@@ -37,6 +37,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Nom, durée et prix requis" }, { status: 400 });
     }
 
+    // Enforce 5-service limit for FREE plan
+    if (merchant.plan !== "PRO") {
+      const serviceCount = await prisma.service.count({ where: { merchantId: merchant.id } });
+      if (serviceCount >= 5) {
+        return NextResponse.json(
+          { error: "Limite de 5 services atteinte. Passez au plan Pro pour des services illimités !" },
+          { status: 403 }
+        );
+      }
+    }
+
     const xpAmount = body.xpAmount ? Math.max(1, Math.floor(Number(body.xpAmount))) : null;
 
     const service = await prisma.service.create({

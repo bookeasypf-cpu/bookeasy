@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
+import { ProBadge } from "@/components/ui/ProBadge";
+import { BadgeCheck, Zap, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 
 interface Sector {
@@ -18,6 +21,7 @@ export default function DashboardProfilePage() {
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [plan, setPlan] = useState<string>("FREE");
   const [form, setForm] = useState({
     businessName: "",
     description: "",
@@ -43,6 +47,7 @@ export default function DashboardProfilePage() {
           postalCode: profile.postalCode || "",
           sectorId: profile.sectorId || "",
         });
+        setPlan(profile.plan || "FREE");
       }
       setSectors(sectorsData || []);
       setInitialLoading(false);
@@ -78,6 +83,50 @@ export default function DashboardProfilePage() {
   return (
     <div className="page-transition">
       <h1 className="text-2xl font-bold text-[#0C1B2A] mb-6 animate-fade-in-up">Mon commerce</h1>
+
+      {/* Subscription Status Card */}
+      <Card className="rounded-2xl border-0 shadow-sm mb-6 animate-fade-in-up">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                plan === "PRO"
+                  ? "bg-gradient-to-br from-[#0066FF] to-[#00B4D8]"
+                  : "bg-gray-100"
+              }`}>
+                {plan === "PRO" ? (
+                  <BadgeCheck className="h-6 w-6 text-white" />
+                ) : (
+                  <Zap className="h-6 w-6 text-gray-400" />
+                )}
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-[#0C1B2A]">
+                    Plan {plan === "PRO" ? "Pro" : "Gratuit"}
+                  </h3>
+                  {plan === "PRO" && <ProBadge size="sm" />}
+                </div>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {plan === "PRO"
+                    ? "Services illimités, badge Pro vérifié, mise en avant dans les recherches"
+                    : "Jusqu'à 5 services, fonctionnalités de base"}
+                </p>
+              </div>
+            </div>
+            {plan !== "PRO" && (
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all shrink-0"
+              >
+                Passer au Pro
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="rounded-2xl border-0 shadow-sm">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useRef } from "react";
 import { MapPin, Star, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { ProBadge } from "@/components/ui/ProBadge";
 import { SectorIcon } from "@/components/ui/SectorIcon";
 
 interface MerchantCardProps {
@@ -12,6 +13,7 @@ interface MerchantCardProps {
     businessName: string;
     city: string | null;
     coverImage: string | null;
+    plan?: string;
     sector: { name: string };
     _count?: { reviews: number };
     avgRating?: number;
@@ -104,9 +106,10 @@ export function MerchantCard({ merchant }: MerchantCardProps) {
           {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
-          {/* Sector badge with glassmorphism */}
-          <div className="absolute top-3 left-3">
+          {/* Sector badge + Pro badge */}
+          <div className="absolute top-3 left-3 flex items-center gap-1.5">
             <Badge variant="gradient">{merchant.sector.name}</Badge>
+            {merchant.plan === "PRO" && <ProBadge size="sm" />}
           </div>
 
           {/* Hover "Réserver" button with slide-up effect */}

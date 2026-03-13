@@ -99,6 +99,7 @@ model Merchant {
   latitude     Float?
   longitude    Float?
   coverImage   String?
+  plan         String   @default("FREE") // FREE or PRO
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

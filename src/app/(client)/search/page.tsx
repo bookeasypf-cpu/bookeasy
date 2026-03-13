@@ -36,17 +36,25 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       reviews: { select: { rating: true } },
       _count: { select: { reviews: true } },
     },
+    // Pro merchants appear first ("FREE" > "PRO" alphabetically, so we use asc to put PRO first via custom sort below)
     orderBy: { createdAt: "desc" },
     take: 50,
   });
 
-  const merchantsWithRating = merchants.map((m) => ({
-    ...m,
-    avgRating:
-      m.reviews.length > 0
-        ? m.reviews.reduce((sum, r) => sum + r.rating, 0) / m.reviews.length
-        : 0,
-  }));
+  const merchantsWithRating = merchants
+    .map((m) => ({
+      ...m,
+      avgRating:
+        m.reviews.length > 0
+          ? m.reviews.reduce((sum, r) => sum + r.rating, 0) / m.reviews.length
+          : 0,
+    }))
+    // Pro merchants (plan=PRO) appear first in search results
+    .sort((a, b) => {
+      if (a.plan === "PRO" && b.plan !== "PRO") return -1;
+      if (a.plan !== "PRO" && b.plan === "PRO") return 1;
+      return 0;
+    });
 
   const sectorName = sector
     ? (await prisma.sector.findUnique({ where: { slug: sector } }))?.name

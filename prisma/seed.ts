@@ -1128,6 +1128,9 @@ async function main() {
       },
     });
 
+    // First 15 merchants get PRO plan, rest are FREE
+    const merchantPlan = i < 15 ? "PRO" : "FREE";
+
     // Create merchant profile
     const merchant = await prisma.merchant.upsert({
       where: { userId: user.id },
@@ -1141,6 +1144,7 @@ async function main() {
         latitude: m.latitude,
         longitude: m.longitude,
         sectorId,
+        plan: merchantPlan,
       },
       create: {
         userId: user.id,
@@ -1153,6 +1157,7 @@ async function main() {
         latitude: m.latitude,
         longitude: m.longitude,
         sectorId,
+        plan: merchantPlan,
       },
     });
 

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { MapPin, Phone, Star, Clock, ArrowLeft, ChevronRight, MessageSquare, Info, Briefcase, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { ProBadge } from "@/components/ui/ProBadge";
 import { StarRating } from "@/components/ui/StarRating";
 import { formatPrice, formatDuration } from "@/lib/utils";
 import Link from "next/link";
@@ -87,9 +88,12 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
         {/* Hero content */}
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 lg:p-8">
           <div className="max-w-4xl mx-auto">
-            <Badge variant="gradient" className="mb-3">
-              {merchant.sector.name}
-            </Badge>
+            <div className="flex items-center gap-2 mb-3">
+              <Badge variant="gradient">
+                {merchant.sector.name}
+              </Badge>
+              {merchant.plan === "PRO" && <ProBadge size="md" />}
+            </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-2 tracking-tight">
               {merchant.businessName}
             </h1>

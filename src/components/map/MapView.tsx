@@ -10,7 +10,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Search, MapPin, Star, List, Map as MapIcon, X } from "lucide-react";
+import { Search, MapPin, Star, List, Map as MapIcon, X, BadgeCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MerchantPopup } from "./MerchantPopup";
 import { formatPrice } from "@/lib/utils";
@@ -31,6 +31,7 @@ type MerchantWithDetails = {
   latitude: number | null;
   longitude: number | null;
   coverImage: string | null;
+  plan?: string;
   sector: { id: string; name: string; slug: string; icon: string };
   services: { id: string; name: string; price: number; duration: number }[];
   reviews: { rating: number }[];
@@ -401,6 +402,12 @@ export default function MapView({ merchants, sectors }: MapViewProps) {
               >
                 {merchant.sector.name}
               </span>
+              {merchant.plan === "PRO" && (
+                <span className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white">
+                  <BadgeCheck className="h-2.5 w-2.5" />
+                  Pro
+                </span>
+              )}
               {merchant.city && (
                 <span className="flex items-center gap-0.5 text-[11px] text-gray-400">
                   <MapPin className="h-2.5 w-2.5" />
