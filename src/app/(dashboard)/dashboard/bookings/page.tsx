@@ -67,12 +67,12 @@ export default async function DashboardBookingsPage() {
                         {b.service.name}
                       </p>
                       <p className="text-sm text-gray-400">
-                        {formatDate(b.date)} &middot;{" "}
+                        {formatDate(b.date)} ·{" "}
                         {formatTime(b.startTime)} - {formatTime(b.endTime)}
                       </p>
                       {b.notes && (
                         <p className="text-sm text-gray-500 mt-1 italic">
-                          &ldquo;{b.notes}&rdquo;
+                          « {b.notes} »
                         </p>
                       )}
                     </div>
@@ -101,8 +101,8 @@ export default async function DashboardBookingsPage() {
     <div className="page-transition">
       <h1 className="text-2xl font-bold text-[#0C1B2A] mb-6 animate-fade-in-up">Rendez-vous</h1>
       <BookingList items={pending} title="En attente" />
-      <BookingList items={confirmed} title="Confirm\u00e9s" />
-      <BookingList items={other} title="Pass\u00e9s / Annul\u00e9s" />
+      <BookingList items={confirmed} title="Confirmés" />
+      <BookingList items={other} title="Passés / Annulés" />
     </div>
   );
 }

@@ -1208,10 +1208,113 @@ async function main() {
     console.log(`   ${slug}: ${count}`);
   }
 
+  // ============================================================
+  // XP DEMO DATA - Bookings, XP Transactions, XP Rewards
+  // ============================================================
+  console.log("\n⭐ Création des données XP de démonstration...");
+
+  const clientUser = await prisma.user.findUnique({
+    where: { email: "client@demo.com" },
+  });
+
+  if (clientUser) {
+    // Get first 5 merchants for demo XP data
+    const demoMerchants = await prisma.merchant.findMany({
+      take: 5,
+      include: { services: true },
+      orderBy: { businessName: "asc" },
+    });
+
+    for (const merchant of demoMerchants) {
+      if (merchant.services.length === 0) continue;
+      const service = merchant.services[0];
+
+      // Create 3 completed bookings per merchant for demo client
+      for (let b = 0; b < 3; b++) {
+        const daysAgo = 30 - b * 10; // 30, 20, 10 days ago
+        const bookingDate = new Date();
+        bookingDate.setDate(bookingDate.getDate() - daysAgo);
+        const dateStr = bookingDate.toISOString().split("T")[0];
+        const bookingId = `demo-booking-${merchant.id}-${b}`;
+
+        await prisma.booking.upsert({
+          where: { id: bookingId },
+          update: {},
+          create: {
+            id: bookingId,
+            clientId: clientUser.id,
+            merchantId: merchant.id,
+            serviceId: service.id,
+            date: dateStr,
+            startTime: `${9 + b}:00`,
+            endTime: `${9 + b}:${service.duration < 60 ? service.duration : "00"}`,
+            status: "CONFIRMED",
+            totalPrice: service.price,
+          },
+        });
+
+        // Create XP transaction for each booking
+        const xpTxId = `demo-xp-${merchant.id}-${b}`;
+        await prisma.xpTransaction.upsert({
+          where: { id: xpTxId },
+          update: {},
+          create: {
+            id: xpTxId,
+            userId: clientUser.id,
+            merchantId: merchant.id,
+            bookingId: bookingId,
+            amount: merchant.xpPerBooking,
+            type: "EARNED",
+            reason: "Réservation confirmée",
+          },
+        });
+      }
+
+      // Create XP rewards for each merchant
+      const rewardId1 = `demo-reward-${merchant.id}-1`;
+      const rewardId2 = `demo-reward-${merchant.id}-2`;
+
+      await prisma.xpReward.upsert({
+        where: { id: rewardId1 },
+        update: {},
+        create: {
+          id: rewardId1,
+          merchantId: merchant.id,
+          name: "10% de réduction",
+          description: "Réduction de 10% sur votre prochaine prestation",
+          xpCost: 20,
+          type: "DISCOUNT",
+          value: 10,
+          isActive: true,
+        },
+      });
+
+      await prisma.xpReward.upsert({
+        where: { id: rewardId2 },
+        update: {},
+        create: {
+          id: rewardId2,
+          merchantId: merchant.id,
+          name: "Prestation gratuite",
+          description: "Une prestation de base offerte",
+          xpCost: 50,
+          type: "FREE_SERVICE",
+          value: null,
+          isActive: true,
+        },
+      });
+    }
+
+    console.log("✅ Bookings de démo créés pour client@demo.com");
+    console.log("✅ Transactions XP créées (30 XP par marchand × 5 marchands)");
+    console.log("✅ Récompenses XP créées (2 par marchand × 5 marchands)");
+  }
+
   console.log("\n🎉 Seed terminé ! Comptes de démo:");
   console.log("   Client: client@demo.com / password123");
   console.log("   Pro (premier): merchant1@bookeasy.pf / password123");
   console.log(`   Pro (tous): merchant1@bookeasy.pf → merchant${TAHITI_MERCHANTS.length}@bookeasy.pf`);
+  console.log("   Le client a 30 XP chez chacun des 5 premiers marchands");
 }
 
 main()

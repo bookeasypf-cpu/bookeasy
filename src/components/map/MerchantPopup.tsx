@@ -115,7 +115,7 @@ export function MerchantPopup({ merchant }: MerchantPopupProps) {
             href={`/booking/${merchant.id}`}
             className="flex-1 text-center text-xs font-semibold text-white bg-gradient-to-r from-[#0066FF] to-[#00B4D8] rounded-lg py-2 hover:shadow-md transition-all"
           >
-            R&eacute;server
+            Réserver
           </Link>
         </div>
       </div>

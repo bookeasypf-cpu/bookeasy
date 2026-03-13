@@ -81,7 +81,7 @@ export default function DashboardServicesPage() {
       body: JSON.stringify(payload),
     });
     if (res.ok) {
-      toast.success(editingId ? "Service modifi\u00e9" : "Service ajout\u00e9");
+      toast.success(editingId ? "Service modifié" : "Service ajouté");
       resetForm();
       fetchServices();
     } else {
@@ -96,7 +96,7 @@ export default function DashboardServicesPage() {
       method: "DELETE",
     });
     if (res.ok) {
-      toast.success("Service supprim\u00e9");
+      toast.success("Service supprimé");
       fetchServices();
     }
   }

@@ -61,7 +61,7 @@ export default function DashboardProfilePage() {
     if (data.error) {
       toast.error(data.error);
     } else {
-      toast.success("Profil mis \u00e0 jour !");
+      toast.success("Profil mis à jour !");
       router.refresh();
     }
     setLoading(false);
@@ -133,7 +133,7 @@ export default function DashboardProfilePage() {
             </div>
             <Input
               id="phone"
-              label="T\u00e9l\u00e9phone"
+              label="Téléphone"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />

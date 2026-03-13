@@ -435,7 +435,7 @@ export default function MapView({ merchants, sectors }: MapViewProps) {
             <MapPin className="h-6 w-6 text-gray-400" />
           </div>
           <p className="text-sm font-medium text-gray-600 mb-1">
-            Aucun professionnel trouv&eacute;
+            Aucun professionnel trouvé
           </p>
           <p className="text-xs text-gray-400">
             Essayez de modifier vos filtres

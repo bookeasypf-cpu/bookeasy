@@ -32,10 +32,10 @@ export function BookingActions({
     } else {
       toast.success(
         action === "confirm"
-          ? "Confirm\u00e9"
+          ? "Confirmé"
           : action === "complete"
-            ? "Termin\u00e9"
-            : "Annul\u00e9"
+            ? "Terminé"
+            : "Annulé"
       );
       router.refresh();
     }
@@ -69,7 +69,7 @@ export function BookingActions({
             disabled={loading}
             className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm hover:shadow-md hover:shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50"
           >
-            Termin&eacute;
+            Terminé
           </button>
           <button
             onClick={() => handleAction("cancel")}

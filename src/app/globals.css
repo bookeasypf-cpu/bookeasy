@@ -244,7 +244,10 @@ body {
 }
 
 .btn-slide .btn-text {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   transition: transform 0.35s var(--ease-spring);
 }
 
@@ -254,16 +257,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   transform: translateY(110%);
   transition: transform 0.35s var(--ease-spring);
 }
 
-.btn-slide:hover .btn-text {
-  transform: translateY(-110%);
-}
+/* Only apply slide effect on devices with hover capability (not touch) */
+@media (hover: hover) and (pointer: fine) {
+  .btn-slide:hover .btn-text {
+    transform: translateY(-110%);
+  }
 
-.btn-slide:hover .btn-text-clone {
-  transform: translateY(0);
+  .btn-slide:hover .btn-text-clone {
+    transform: translateY(0);
+  }
 }
 
 /* Bounce entrance for category icons */
@@ -303,6 +310,17 @@ body {
 
 .glow-pulse {
   animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* QR Scanner scan line animation */
+@keyframes scanLine {
+  0% { top: 10%; }
+  50% { top: 85%; }
+  100% { top: 10%; }
+}
+
+.animate-scan-line {
+  animation: scanLine 2s ease-in-out infinite;
 }
 
 /* Utility classes */

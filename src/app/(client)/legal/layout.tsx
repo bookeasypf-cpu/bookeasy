@@ -33,13 +33,13 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
       <footer className="border-t border-gray-200 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 flex flex-wrap gap-6 text-sm text-gray-500">
           <Link href="/legal/mentions-legales" className="hover:text-[#0066FF] transition-colors">
-            Mentions l&eacute;gales
+            Mentions légales
           </Link>
           <Link href="/legal/cgu" className="hover:text-[#0066FF] transition-colors">
-            Conditions g&eacute;n&eacute;rales
+            Conditions générales
           </Link>
           <Link href="/legal/confidentialite" className="hover:text-[#0066FF] transition-colors">
-            Politique de confidentialit&eacute;
+            Politique de confidentialité
           </Link>
         </div>
       </footer>

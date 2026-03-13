@@ -55,12 +55,12 @@ const plans = [
 
 const faqs = [
   {
-    q: "Puis-je changer de plan \u00e0 tout moment ?",
-    a: "Oui, vous pouvez upgrader ou downgrader votre plan \u00e0 tout moment. Le changement prend effet imm\u00e9diatement.",
+    q: "Puis-je changer de plan à tout moment ?",
+    a: "Oui, vous pouvez upgrader ou downgrader votre plan à tout moment. Le changement prend effet immédiatement.",
   },
   {
     q: "Y a-t-il un engagement ?",
-    a: "Non, aucun engagement. Vous pouvez annuler votre abonnement \u00e0 tout moment sans frais.",
+    a: "Non, aucun engagement. Vous pouvez annuler votre abonnement à tout moment sans frais.",
   },
   {
     q: "Le plan Gratuit est-il vraiment gratuit ?",
@@ -68,7 +68,7 @@ const faqs = [
   },
   {
     q: "Comment fonctionne le paiement ?",
-    a: "Les paiements sont pr\u00e9lev\u00e9s mensuellement. Nous acceptons les cartes bancaires et les virements.",
+    a: "Les paiements sont prélevés mensuellement. Nous acceptons les cartes bancaires et les virements.",
   },
 ];
 
@@ -82,8 +82,8 @@ export default function PricingPage() {
             Des tarifs simples et transparents
           </h1>
           <p className="text-white/60 max-w-xl mx-auto text-lg">
-            Commencez gratuitement, &eacute;voluez quand vous &ecirc;tes
-            pr&ecirc;t. Sans engagement.
+            Commencez gratuitement, évoluez quand vous êtes
+            prêt. Sans engagement.
           </p>
         </div>
       </div>
@@ -174,7 +174,7 @@ export default function PricingPage() {
       <div className="bg-gray-50 border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">
-            Questions fr&eacute;quentes
+            Questions fréquentes
           </h2>
           <div className="space-y-4">
             {faqs.map((faq) => (
@@ -192,7 +192,7 @@ export default function PricingPage() {
 
           <div className="mt-12 text-center">
             <p className="text-gray-500 mb-4">
-              Vous avez d&apos;autres questions ?
+              Vous avez d'autres questions ?
             </p>
             <Link
               href="mailto:contact@bookeasy.pf"

@@ -4,7 +4,7 @@ import MapViewLoader from "@/components/map/MapViewLoader";
 export const metadata = {
   title: "Explorer la carte | BookEasy",
   description:
-    "Trouvez les meilleurs professionnels autour de vous en Polyn\u00e9sie fran\u00e7aise.",
+    "Trouvez les meilleurs professionnels autour de vous en Polynésie française.",
 };
 
 export default async function MapPage() {

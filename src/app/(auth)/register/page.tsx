@@ -23,6 +23,7 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const defaultRole = searchParams.get("role") || "CLIENT";
+  const callbackUrl = searchParams.get("callbackUrl") || "";
   const [role, setRole] = useState<"CLIENT" | "MERCHANT">(
     defaultRole === "MERCHANT" ? "MERCHANT" : "CLIENT"
   );
@@ -55,7 +56,9 @@ function RegisterForm() {
     if (signInResult?.error) {
       router.push("/login");
     } else {
-      router.push(role === "MERCHANT" ? "/dashboard/profile" : "/");
+      // Redirect to callbackUrl if available (e.g., booking page), otherwise role-based default
+      const redirectUrl = callbackUrl || (role === "MERCHANT" ? "/dashboard/profile" : "/");
+      router.push(redirectUrl);
       router.refresh();
     }
   }
@@ -64,7 +67,7 @@ function RegisterForm() {
     <Card className="w-full max-w-md">
       <CardContent className="p-6 sm:p-8">
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
-          Cr&eacute;er un compte
+          Créer un compte
         </h1>
         <p className="text-sm text-gray-500 text-center mb-6">
           Rejoignez BookEasy gratuitement
@@ -97,7 +100,7 @@ function RegisterForm() {
               Client
             </span>
             <span className="text-xs text-gray-400">
-              Je veux r&eacute;server
+              Je veux réserver
             </span>
           </button>
           <button
@@ -169,7 +172,7 @@ function RegisterForm() {
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-500">
-          D&eacute;j&agrave; un compte ?{" "}
+          Déjà un compte ?{" "}
           <Link
             href="/login"
             className="text-indigo-600 font-medium hover:text-indigo-500"

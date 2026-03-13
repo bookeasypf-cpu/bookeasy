@@ -123,13 +123,13 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap gap-x-6 gap-y-2">
           <Link href="/legal/mentions-legales" className="text-xs text-white/30 hover:text-white/60 transition-colors">
-            Mentions l&eacute;gales
+            Mentions légales
           </Link>
           <Link href="/legal/cgu" className="text-xs text-white/30 hover:text-white/60 transition-colors">
-            Conditions g&eacute;n&eacute;rales
+            Conditions générales
           </Link>
           <Link href="/legal/confidentialite" className="text-xs text-white/30 hover:text-white/60 transition-colors">
-            Politique de confidentialit&eacute;
+            Politique de confidentialité
           </Link>
         </div>
       </div>
@@ -139,8 +139,8 @@ export function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-white/30">
-              &copy; {new Date().getFullYear()} BookEasy. Tous droits
-              r&eacute;serv&eacute;s.
+              © {new Date().getFullYear()} BookEasy. Tous droits
+              réservés.
             </p>
             <p className="text-xs text-white/30">
               Made with ❤️ in Tahiti

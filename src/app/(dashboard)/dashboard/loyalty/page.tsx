@@ -14,8 +14,15 @@ import {
   TrendingUp,
   Users,
   Settings,
+  QrCode,
+  CheckCircle2,
+  XCircle,
+  Camera,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import dynamic from "next/dynamic";
+
+const QRScanner = dynamic(() => import("@/components/qr/QRScanner"), { ssr: false });
 
 interface Reward {
   id: string;
@@ -174,6 +181,67 @@ export default function DashboardLoyaltyPage() {
     setSavingSettings(false);
   }
 
+  // Code validation
+  const [codeInput, setCodeInput] = useState("");
+  const [validating, setValidating] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [validationResult, setValidationResult] = useState<{
+    success?: boolean;
+    reward?: string;
+    error?: string;
+  } | null>(null);
+
+  async function handleValidateCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (!codeInput.trim()) return;
+    setValidating(true);
+    setValidationResult(null);
+
+    const res = await fetch("/api/dashboard/validate-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: codeInput.trim().toUpperCase() }),
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      setValidationResult({ success: true, reward: data.reward });
+      toast.success("Code validé avec succès !");
+      setCodeInput("");
+      fetchData();
+    } else {
+      setValidationResult({ success: false, error: data.error });
+      toast.error(data.error || "Code invalide");
+    }
+    setValidating(false);
+  }
+
+  async function handleQrScan(code: string) {
+    setShowScanner(false);
+    setCodeInput(code);
+    // Auto-validate the scanned code
+    setValidating(true);
+    setValidationResult(null);
+
+    const res = await fetch("/api/dashboard/validate-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: code.trim().toUpperCase() }),
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      setValidationResult({ success: true, reward: data.reward });
+      toast.success("Code QR validé avec succès !");
+      setCodeInput("");
+      fetchData();
+    } else {
+      setValidationResult({ success: false, error: data.error });
+      toast.error(data.error || "Code invalide");
+    }
+    setValidating(false);
+  }
+
   const typeLabels: Record<string, string> = {
     DISCOUNT: "Réduction (%)",
     FREE_SERVICE: "Prestation gratuite",
@@ -282,10 +350,91 @@ export default function DashboardLoyaltyPage() {
             </button>
           </div>
           <p className="text-xs text-gray-400 mt-2">
-            Chaque client gagnera ce nombre d&apos;XP à chaque réservation
-            confirmée. En cas d&apos;annulation, les XP sont automatiquement
+            Chaque client gagnera ce nombre d'XP à chaque réservation
+            confirmée. En cas d'annulation, les XP sont automatiquement
             révoqués.
           </p>
+        </CardContent>
+      </Card>
+
+      {/* QR Scanner Modal */}
+      {showScanner && (
+        <QRScanner
+          onScan={handleQrScan}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
+
+      {/* Code Validation */}
+      <Card className="rounded-2xl border-0 shadow-sm mb-6 animate-fade-in-up">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <QrCode className="h-5 w-5 text-gray-400" />
+              <h3 className="font-semibold text-[#0C1B2A]">Valider un code client</h3>
+            </div>
+          </div>
+
+          {/* Scanner button - prominent */}
+          <button
+            onClick={() => setShowScanner(true)}
+            className="w-full mb-4 flex items-center justify-center gap-3 py-4 px-6 rounded-xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white font-semibold hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all duration-300"
+          >
+            <Camera className="h-5 w-5" />
+            Scanner le QR code du client
+          </button>
+
+          <div className="relative mb-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-3 bg-white text-gray-400">ou entrez le code manuellement</span>
+            </div>
+          </div>
+
+          <form onSubmit={handleValidateCode} className="flex items-end gap-3">
+            <div className="flex-1 max-w-sm">
+              <input
+                type="text"
+                placeholder="ex: BE-A1B2C3D4"
+                value={codeInput}
+                onChange={(e) => {
+                  setCodeInput(e.target.value);
+                  setValidationResult(null);
+                }}
+                className="block w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-mono uppercase focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={validating || !codeInput.trim()}
+              className="px-5 py-2.5 text-sm font-medium rounded-xl bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {validating ? "..." : "Valider"}
+            </button>
+          </form>
+          {validationResult && (
+            <div
+              className={`mt-3 flex items-center gap-2 text-sm ${
+                validationResult.success
+                  ? "text-green-700 bg-green-50"
+                  : "text-red-700 bg-red-50"
+              } px-3 py-2 rounded-lg`}
+            >
+              {validationResult.success ? (
+                <>
+                  <CheckCircle2 className="h-4 w-4" />
+                  Code validé ! Récompense : {validationResult.reward}
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4" />
+                  {validationResult.error}
+                </>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 

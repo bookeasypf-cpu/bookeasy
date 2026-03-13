@@ -25,11 +25,11 @@ export default async function SectorsPage() {
       <div className="bg-gradient-to-b from-[#0C1B2A] to-[#132D46] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">
-            Secteurs d&apos;activit&eacute;
+            Secteurs d'activité
           </h1>
           <p className="text-white/60 max-w-xl">
             Explorez tous les types de professionnels disponibles sur BookEasy
-            en Polyn&eacute;sie fran&ccedil;aise.
+            en Polynésie française.
           </p>
           <div className="mt-8 max-w-2xl">
             <SearchBar />

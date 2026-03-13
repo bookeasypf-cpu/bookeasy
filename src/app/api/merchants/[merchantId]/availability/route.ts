@@ -5,19 +5,23 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ merchantId: string }> }
 ) {
-  const { merchantId } = await params;
-  const { searchParams } = new URL(request.url);
-  const date = searchParams.get("date");
-  const serviceId = searchParams.get("serviceId");
+  try {
+    const { merchantId } = await params;
+    const { searchParams } = new URL(request.url);
+    const date = searchParams.get("date");
+    const serviceId = searchParams.get("serviceId");
 
-  if (!date || !serviceId) {
-    return NextResponse.json(
-      { error: "date and serviceId are required" },
-      { status: 400 }
-    );
+    if (!date || !serviceId) {
+      return NextResponse.json(
+        { error: "date and serviceId are required" },
+        { status: 400 }
+      );
+    }
+
+    const slots = await getAvailableSlots(merchantId, date, serviceId);
+
+    return NextResponse.json({ slots });
+  } catch {
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
-
-  const slots = await getAvailableSlots(merchantId, date, serviceId);
-
-  return NextResponse.json({ slots });
 }

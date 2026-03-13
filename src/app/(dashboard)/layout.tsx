@@ -5,6 +5,7 @@ import {
   DashboardSidebar,
   DashboardMobileNav,
 } from "@/components/layout/DashboardSidebar";
+import MerchantOnboarding from "@/components/onboarding/MerchantOnboarding";
 
 export default async function DashboardLayout({
   children,
@@ -25,6 +26,7 @@ export default async function DashboardLayout({
     <div className="min-h-screen flex flex-col bg-gray-50/50">
       <Header />
       <DashboardMobileNav />
+      <MerchantOnboarding />
       <div className="flex flex-1">
         <DashboardSidebar />
         <main className="flex-1 p-4 lg:p-8 page-transition">{children}</main>

@@ -32,13 +32,13 @@ export default async function DashboardPage() {
           Configurez votre profil
         </h2>
         <p className="text-gray-500 mb-6">
-          Pour commencer &agrave; recevoir des rendez-vous, cr&eacute;ez votre profil professionnel.
+          Pour commencer à recevoir des rendez-vous, créez votre profil professionnel.
         </p>
         <Link
           href="/dashboard/profile"
           className="inline-flex items-center bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all duration-300"
         >
-          Cr&eacute;er mon profil
+          Créer mon profil
         </Link>
       </div>
     );
@@ -204,7 +204,7 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <p className="text-gray-500 text-sm py-4">
-              Aucun rendez-vous pr&eacute;vu aujourd&apos;hui
+              Aucun rendez-vous prévu aujourd'hui
             </p>
           )}
         </CardContent>

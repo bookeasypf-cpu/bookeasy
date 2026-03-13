@@ -75,10 +75,10 @@ export default async function BookingConfirmationPage({
       {/* Success text */}
       <div className="animate-fade-in-up text-center mb-8">
         <h1 className="text-2xl sm:text-3xl font-black text-[#0C1B2A] mb-2">
-          Rendez-vous confirme !
+          Rendez-vous confirmé !
         </h1>
         <p className="text-gray-500 text-sm max-w-xs mx-auto">
-          Votre rendez-vous a bien ete enregistre. Vous recevrez une confirmation.
+          Votre rendez-vous a bien été enregistré. Vous recevrez une confirmation.
         </p>
       </div>
 
@@ -95,7 +95,7 @@ export default async function BookingConfirmationPage({
                 <h2 className="font-bold text-white text-sm">
                   {booking.merchant.businessName}
                 </h2>
-                <p className="text-xs text-white/70">Reservation confirmee</p>
+                <p className="text-xs text-white/70">Réservation confirmée</p>
               </div>
             </div>
           </div>
@@ -177,7 +177,7 @@ export default async function BookingConfirmationPage({
         <Link href="/" className="flex-1">
           <button className="btn-press w-full inline-flex items-center justify-center gap-2 border-2 border-gray-200 bg-white text-[#0C1B2A] font-semibold px-6 py-3.5 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all text-sm">
             <Home className="h-4 w-4" />
-            Retour a l&apos;accueil
+            Retour à l'accueil
           </button>
         </Link>
       </div>

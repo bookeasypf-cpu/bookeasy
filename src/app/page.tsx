@@ -9,6 +9,7 @@ import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { HeroTitle } from "@/components/ui/HeroTitle";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { CountUp } from "@/components/ui/CountUp";
+import ClientOnboardingWrapper from "@/components/onboarding/ClientOnboardingWrapper";
 import {
   Calendar,
   ArrowRight,
@@ -46,6 +47,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
       <Header />
+      <ClientOnboardingWrapper />
 
       {/* ===== HERO SECTION ===== */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0C1B2A] via-[#0C1B2A]/95 to-[#0066FF]/20">
@@ -56,7 +58,7 @@ export default async function HomePage() {
             {/* Small tag with shimmer */}
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/80 text-sm font-medium px-4 py-1.5 rounded-full mb-6 animate-fade-in border border-white/5">
               <Sparkles className="h-4 w-4 text-[#00B4D8]" />
-              Polyn&eacute;sie fran&ccedil;aise
+              Polynésie française
             </div>
 
             {/* Word-by-word reveal title */}
@@ -76,8 +78,8 @@ export default async function HomePage() {
               className="text-base sm:text-lg text-white/60 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up"
               style={{ animationDelay: "0.9s" }}
             >
-              Coiffeurs, barbers, esth&eacute;ticiennes, tatoueurs, spas et bien
-              plus. Trouvez et r&eacute;servez le professionnel qu&apos;il vous faut.
+              Coiffeurs, barbers, esthéticiennes, tatoueurs, spas et bien
+              plus. Trouvez et réservez le professionnel qu'il vous faut.
             </p>
 
             {/* Search bar with delayed entrance */}
@@ -111,19 +113,19 @@ export default async function HomePage() {
                 Explorer la carte interactive
               </h3>
               <p className="text-sm text-gray-500">
-                D&eacute;couvrez les professionnels autour de vous sur notre carte interactive
+                Découvrez les professionnels autour de vous sur notre carte interactive
               </p>
             </div>
 
             <div className="flex-shrink-0">
               <span className="btn-slide inline-flex items-center gap-2 bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-blue-500/25 group-hover:shadow-blue-500/40 transition-all duration-300 text-sm">
-                <span className="btn-text flex items-center gap-2">
+                <span className="btn-text">
                   Explorer la carte
                   <ArrowRight className="h-4 w-4" />
                 </span>
                 <span className="btn-text-clone">
                   Explorer la carte
-                  <ArrowRight className="h-4 w-4 ml-2" />
+                  <ArrowRight className="h-4 w-4" />
                 </span>
               </span>
             </div>
@@ -211,7 +213,7 @@ export default async function HomePage() {
                   <CountUp end={10} />
                 </div>
                 <div className="text-sm text-gray-500 font-medium">
-                  Secteurs d&apos;activit&eacute;
+                  Secteurs d'activité
                 </div>
               </div>
             </ScrollReveal>
@@ -225,7 +227,7 @@ export default async function HomePage() {
                   <CountUp end={100} suffix="%" />
                 </div>
                 <div className="text-sm text-gray-500 font-medium">
-                  Polyn&eacute;sie
+                  Polynésie
                 </div>
               </div>
             </ScrollReveal>
@@ -245,13 +247,13 @@ export default async function HomePage() {
           </ScrollReveal>
           <ScrollReveal delay={100}>
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-              Vous &ecirc;tes professionnel ?
+              Vous êtes professionnel ?
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={200}>
             <p className="text-white/50 mb-8 max-w-md mx-auto text-base leading-relaxed">
-              Rejoignez BookEasy et d&eacute;veloppez votre client&egrave;le.
-              Laissez vos clients r&eacute;server en ligne 24h/24.
+              Rejoignez BookEasy et développez votre clientèle.
+              Laissez vos clients réserver en ligne 24h/24.
             </p>
           </ScrollReveal>
           <ScrollReveal delay={300}>
@@ -259,13 +261,13 @@ export default async function HomePage() {
               href="/register?role=MERCHANT"
               className="btn-slide btn-press inline-flex items-center gap-2 bg-gradient-to-r from-[#0066FF] to-[#00B4D8] hover:from-[#0052CC] hover:to-[#0891B2] text-white px-7 py-3.5 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 text-base"
             >
-              <span className="btn-text flex items-center gap-2">
-                Cr&eacute;er mon compte pro
+              <span className="btn-text">
+                Créer mon compte pro
                 <ArrowRight className="h-4 w-4" />
               </span>
               <span className="btn-text-clone">
-                Cr&eacute;er mon compte pro
-                <ArrowRight className="h-4 w-4 ml-2" />
+                Créer mon compte pro
+                <ArrowRight className="h-4 w-4" />
               </span>
             </Link>
           </ScrollReveal>

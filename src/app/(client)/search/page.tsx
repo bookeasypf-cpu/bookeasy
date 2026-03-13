@@ -89,16 +89,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[#0C1B2A]">
               {sectorName
-                ? `${sectorName}${city ? ` a ${city}` : ""}`
+                ? `${sectorName}${city ? ` à ${city}` : ""}`
                 : q
-                  ? `Resultats pour "${q}"${city ? ` a ${city}` : ""}`
+                  ? `Résultats pour "${q}"${city ? ` à ${city}` : ""}`
                   : "Tous les professionnels"}
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">
               <span className="inline-flex items-center gap-1.5">
                 <span className="inline-block w-2 h-2 rounded-full bg-[#00B4D8]" />
-                {merchantsWithRating.length} resultat
-                {merchantsWithRating.length !== 1 ? "s" : ""} trouves
+                {merchantsWithRating.length} résultat
+                {merchantsWithRating.length !== 1 ? "s" : ""} trouvés
               </span>
             </p>
           </div>
@@ -151,10 +151,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <SearchX className="h-10 w-10 text-[#0066FF]/40" />
             </div>
             <h2 className="text-xl font-bold text-[#0C1B2A] mb-2">
-              Aucun resultat trouve
+              Aucun résultat trouvé
             </h2>
             <p className="text-gray-500 text-sm text-center max-w-sm mb-6">
-              Nous n&apos;avons trouve aucun professionnel correspondant a vos criteres.
+              Nous n'avons trouvé aucun professionnel correspondant à vos critères.
               Essayez de modifier votre recherche.
             </p>
             <Link

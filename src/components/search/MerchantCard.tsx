@@ -112,7 +112,7 @@ export function MerchantCard({ merchant }: MerchantCardProps) {
           {/* Hover "Réserver" button with slide-up effect */}
           <div className="absolute bottom-3 right-3 opacity-100 sm:opacity-0 sm:translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-400 ease-out">
             <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-[#0066FF] text-sm font-semibold px-4 py-2 rounded-xl shadow-lg shadow-black/10 group-hover:bg-white transition-colors">
-              R&eacute;server
+              Réserver
               <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
             </span>
           </div>

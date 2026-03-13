@@ -48,7 +48,7 @@ export default async function MyBookingsPage() {
       {/* Upcoming */}
       <section className="mb-10">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          &Agrave; venir ({upcoming.length})
+          À venir ({upcoming.length})
         </h2>
         {upcoming.length > 0 ? (
           <div className="space-y-3">
@@ -98,7 +98,7 @@ export default async function MyBookingsPage() {
           </div>
         ) : (
           <p className="text-gray-500 text-sm">
-            Aucun rendez-vous &agrave; venir.{" "}
+            Aucun rendez-vous à venir.{" "}
             <Link href="/search" className="text-indigo-600">
               Trouver un professionnel
             </Link>
@@ -110,7 +110,7 @@ export default async function MyBookingsPage() {
       {past.length > 0 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Pass&eacute;s ({past.length})
+            Passés ({past.length})
           </h2>
           <div className="space-y-3">
             {past.map((booking) => (
@@ -132,7 +132,7 @@ export default async function MyBookingsPage() {
                         {booking.service.name}
                       </p>
                       <span className="text-sm text-gray-400">
-                        {formatDate(booking.date)} &agrave;{" "}
+                        {formatDate(booking.date)} à{" "}
                         {formatTime(booking.startTime)}
                       </span>
                     </div>

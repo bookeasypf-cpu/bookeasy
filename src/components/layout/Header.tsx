@@ -16,6 +16,7 @@ import {
   LogOut,
   ChevronDown,
   Star,
+  Bell,
 } from "lucide-react";
 
 export function Header() {
@@ -97,6 +98,17 @@ export function Header() {
                   {activeIndicator("/my-rewards")}
                 </Link>
               </>
+            )}
+
+            {/* Notifications bell */}
+            {session?.user && (
+              <Link
+                href={session.user.role === "MERCHANT" ? "/dashboard/bookings" : "/my-bookings"}
+                className="relative p-2 text-[#0C1B2A]/50 hover:text-[#0066FF] transition-colors rounded-lg hover:bg-[#0066FF]/5"
+                title="Notifications"
+              >
+                <Bell className="h-4.5 w-4.5" />
+              </Link>
             )}
 
             {/* Separator + Auth section */}

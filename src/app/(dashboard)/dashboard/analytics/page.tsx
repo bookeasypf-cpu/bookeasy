@@ -57,7 +57,7 @@ export default async function DashboardAnalyticsPage() {
             <p className="text-2xl font-bold text-[#0C1B2A]">
               {completedBookings}
             </p>
-            <p className="text-xs text-gray-500 mt-1">Termin&eacute;s</p>
+            <p className="text-xs text-gray-500 mt-1">Terminés</p>
           </CardContent>
         </Card>
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
@@ -107,14 +107,14 @@ export default async function DashboardAnalyticsPage() {
                     <span className="text-sm text-[#0C1B2A] font-medium">{name}</span>
                   </div>
                   <span className="text-sm font-medium text-gray-500">
-                    {count} r&eacute;servation{count > 1 ? "s" : ""}
+                    {count} réservation{count > 1 ? "s" : ""}
                   </span>
                 </div>
               ))}
             </div>
           ) : (
             <p className="text-gray-500 text-sm py-4">
-              Pas encore de donn&eacute;es
+              Pas encore de données
             </p>
           )}
         </CardContent>

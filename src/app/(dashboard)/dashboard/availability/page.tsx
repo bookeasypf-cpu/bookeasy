@@ -58,7 +58,7 @@ export default function DashboardAvailabilityPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ schedule }),
     });
-    if (res.ok) toast.success("Horaires enregistr\u00e9s !");
+    if (res.ok) toast.success("Horaires enregistrés !");
     else toast.error("Erreur");
     setSaving(false);
   }
@@ -134,7 +134,7 @@ export default function DashboardAvailabilityPage() {
                           }
                           className="rounded-xl border border-gray-300 px-2 py-1 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
                         />
-                        <span className="text-gray-400">&mdash;</span>
+                        <span className="text-gray-400">—</span>
                         <input
                           type="time"
                           value={slot.endTime}
@@ -157,7 +157,7 @@ export default function DashboardAvailabilityPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-400">Ferm&eacute;</p>
+                  <p className="text-sm text-gray-400">Fermé</p>
                 )}
               </CardContent>
             </Card>
