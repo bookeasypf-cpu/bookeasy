@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Star, Gift, ChevronRight, Trophy, Sparkles, Clock, CheckCircle, XCircle, History, QrCode } from "lucide-react";
 import toast from "react-hot-toast";
 import QRCodeDisplay from "@/components/qr/QRCodeDisplay";
+import LucideIcon from "@/components/ui/LucideIcon";
 
 interface MerchantReward {
   id: string;
@@ -222,8 +223,8 @@ export default function MyRewardsPage() {
                   {/* Merchant header */}
                   <div className="flex items-center justify-between p-5 border-b border-gray-100">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 flex items-center justify-center text-lg">
-                        {item.merchant?.sector.icon || "⭐"}
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 flex items-center justify-center">
+                        <LucideIcon name={item.merchant?.sector.icon} className="h-5 w-5 text-[#0066FF]" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-[#0C1B2A]">
