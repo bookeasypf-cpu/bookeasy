@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { bookingSchema } from "@/lib/validators";
 import { revalidatePath } from "next/cache";
+import { sendBookingConfirmation, sendBookingCancellation } from "@/lib/email";
 
 export async function createBooking(data: {
   merchantId: string;
@@ -65,10 +66,10 @@ export async function createBooking(data: {
       });
     });
 
-    // Create notification for merchant
+    // Create notification for merchant + send confirmation email
     const merchant = await prisma.merchant.findUnique({
       where: { id: data.merchantId },
-      select: { userId: true, xpPerBooking: true },
+      select: { userId: true, xpPerBooking: true, businessName: true, address: true, city: true },
     });
 
     if (merchant) {
@@ -96,6 +97,20 @@ export async function createBooking(data: {
           },
         });
       }
+
+      // Send confirmation email to client (async, non-blocking)
+      sendBookingConfirmation({
+        clientName: user.name || "Client",
+        clientEmail: user.email!,
+        serviceName: service.name,
+        merchantName: merchant.businessName,
+        date: data.date,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        price: service.price,
+        address: merchant.address,
+        city: merchant.city,
+      }).catch(() => {}); // Don't fail booking if email fails
     }
 
     revalidatePath("/my-bookings");
@@ -115,7 +130,11 @@ export async function cancelBooking(bookingId: string, reason?: string) {
 
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    include: { merchant: { select: { userId: true } }, service: true },
+    include: {
+      merchant: { select: { userId: true, businessName: true } },
+      service: true,
+      client: { select: { name: true, email: true } },
+    },
   });
 
   if (!booking) {
@@ -170,6 +189,37 @@ export async function cancelBooking(bookingId: string, reason?: string) {
       metadata: JSON.stringify({ bookingId }),
     },
   });
+
+  // Send cancellation email to the other party (async, non-blocking)
+  if (isMerchant && booking.client.email) {
+    // Merchant cancelled → notify client
+    const merchantUser = await prisma.user.findUnique({ where: { id: booking.merchant.userId }, select: { email: true } });
+    sendBookingCancellation({
+      recipientName: booking.client.name || "Client",
+      recipientEmail: booking.client.email,
+      serviceName: booking.service.name,
+      otherPartyName: booking.merchant.businessName,
+      date: booking.date,
+      startTime: booking.startTime,
+      cancelledBy: "merchant",
+      reason,
+    }).catch(() => {});
+  } else if (isClient) {
+    // Client cancelled → notify merchant
+    const merchantUser = await prisma.user.findUnique({ where: { id: booking.merchant.userId }, select: { email: true, name: true } });
+    if (merchantUser?.email) {
+      sendBookingCancellation({
+        recipientName: booking.merchant.businessName,
+        recipientEmail: merchantUser.email,
+        serviceName: booking.service.name,
+        otherPartyName: booking.client.name || "Un client",
+        date: booking.date,
+        startTime: booking.startTime,
+        cancelledBy: "client",
+        reason,
+      }).catch(() => {});
+    }
+  }
 
   revalidatePath("/my-bookings");
   revalidatePath("/dashboard/bookings");

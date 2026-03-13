@@ -12,6 +12,7 @@ import {
   Star,
   BarChart3,
   Gift,
+  Headphones,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/dashboard/reviews", icon: Star, label: "Avis" },
   { href: "/dashboard/loyalty", icon: Gift, label: "Fidélité XP" },
   { href: "/dashboard/analytics", icon: BarChart3, label: "Statistiques" },
+  { href: "/dashboard/support", icon: Headphones, label: "Support" },
 ];
 
 export function DashboardSidebar() {
