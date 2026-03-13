@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Camera, X, SwitchCamera } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { Camera, X, SwitchCamera, Loader2 } from "lucide-react";
+import jsQR from "jsqr";
 
 interface QRScannerProps {
   onScan: (code: string) => void;
@@ -13,43 +14,37 @@ export default function QRScanner({ onScan, onClose }: QRScannerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const animFrameRef = useRef<number>(0);
+  const activeRef = useRef(true);
   const [error, setError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
   const [scanning, setScanning] = useState(false);
-  const scannerRef = useRef<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  async function startCamera(facing: "environment" | "user") {
-    // Stop previous stream
+  const cleanup = useCallback(() => {
+    activeRef.current = false;
+    cancelAnimationFrame(animFrameRef.current);
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
     }
+    setScanning(false);
+  }, []);
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: facing, width: { ideal: 640 }, height: { ideal: 480 } },
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-        setScanning(true);
-        setError(null);
-        scanFrames();
-      }
-    } catch {
-      setError("Impossible d'accéder à la caméra. Vérifiez les permissions.");
-    }
-  }
+  const handleClose = useCallback(() => {
+    cleanup();
+    onClose();
+  }, [cleanup, onClose]);
 
-  function scanFrames() {
+  const scanFrames = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
 
     function tick() {
+      if (!activeRef.current) return;
       if (!video || video.readyState !== video.HAVE_ENOUGH_DATA) {
         animFrameRef.current = requestAnimationFrame(tick);
         return;
@@ -59,65 +54,60 @@ export default function QRScanner({ onScan, onClose }: QRScannerProps) {
       canvas.height = video.videoHeight;
       ctx!.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Use BarcodeDetector API if available (Chrome, Edge)
-      if ("BarcodeDetector" in window) {
-        if (!scannerRef.current) {
-          // @ts-expect-error BarcodeDetector is not in all TS defs
-          scannerRef.current = new BarcodeDetector({ formats: ["qr_code"] });
-        }
-        const imageData = ctx!.getImageData(0, 0, canvas.width, canvas.height);
-        scannerRef.current
-          .detect(createImageBitmapCompat(canvas, imageData))
-          .then((barcodes: { rawValue: string }[]) => {
-            if (barcodes.length > 0) {
-              const val = barcodes[0].rawValue.trim().toUpperCase();
-              if (val.startsWith("BE-") && val.length >= 10) {
-                onScan(val);
-                cleanup();
-                return;
-              }
-            }
-            animFrameRef.current = requestAnimationFrame(tick);
-          })
-          .catch(() => {
-            animFrameRef.current = requestAnimationFrame(tick);
-          });
-        return;
-      }
-
-      // Fallback: try jsQR if BarcodeDetector not available
       try {
         const imageData = ctx!.getImageData(0, 0, canvas.width, canvas.height);
-        // Dynamic import would be ideal but for simplicity we scan with BarcodeDetector
-        // If BarcodeDetector not available, show manual entry message
-        if (!("BarcodeDetector" in window)) {
-          setError("Scan QR non supporté sur ce navigateur. Entrez le code manuellement.");
-          cleanup();
-          return;
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+
+        if (code && code.data) {
+          const val = code.data.trim().toUpperCase();
+          if (val.startsWith("BE-") && val.length >= 10) {
+            onScan(val);
+            cleanup();
+            return;
+          }
         }
       } catch {
-        // continue
+        // Continue scanning on error
       }
 
       animFrameRef.current = requestAnimationFrame(tick);
     }
 
     animFrameRef.current = requestAnimationFrame(tick);
-  }
+  }, [onScan, cleanup]);
 
-  function createImageBitmapCompat(canvas: HTMLCanvasElement, _imageData: ImageData) {
-    // BarcodeDetector can work directly with canvas
-    return canvas;
-  }
-
-  function cleanup() {
-    cancelAnimationFrame(animFrameRef.current);
+  const startCamera = useCallback(async (facing: "environment" | "user") => {
+    // Stop previous stream
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop());
-      streamRef.current = null;
     }
-    setScanning(false);
-  }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: facing,
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+        },
+      });
+      streamRef.current = stream;
+      if (videoRef.current && activeRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+        setScanning(true);
+        setLoading(false);
+        scanFrames();
+      }
+    } catch {
+      setLoading(false);
+      setError("Impossible d'accéder à la caméra. Vérifiez les permissions dans les réglages de votre navigateur.");
+    }
+  }, [scanFrames]);
 
   function switchCamera() {
     const newFacing = facingMode === "environment" ? "user" : "environment";
@@ -126,6 +116,7 @@ export default function QRScanner({ onScan, onClose }: QRScannerProps) {
   }
 
   useEffect(() => {
+    activeRef.current = true;
     startCamera(facingMode);
     return cleanup;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,7 +142,7 @@ export default function QRScanner({ onScan, onClose }: QRScannerProps) {
               </button>
             )}
             <button
-              onClick={() => { cleanup(); onClose(); }}
+              onClick={handleClose}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <X className="h-4 w-4" />
@@ -166,11 +157,20 @@ export default function QRScanner({ onScan, onClose }: QRScannerProps) {
             className="w-full h-full object-cover"
             playsInline
             muted
+            autoPlay
           />
           <canvas ref={canvasRef} className="hidden" />
 
+          {/* Loading state */}
+          {loading && !error && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 gap-3">
+              <Loader2 className="h-8 w-8 text-[#0066FF] animate-spin" />
+              <p className="text-white/70 text-sm">Activation de la caméra...</p>
+            </div>
+          )}
+
           {/* Scanner overlay */}
-          {scanning && (
+          {scanning && !error && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-48 h-48 relative">
                 {/* Corner indicators */}
@@ -185,8 +185,15 @@ export default function QRScanner({ onScan, onClose }: QRScannerProps) {
           )}
 
           {error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/60 p-6">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 p-6 gap-4">
+              <Camera className="h-10 w-10 text-white/40" />
               <p className="text-white text-center text-sm">{error}</p>
+              <button
+                onClick={() => startCamera(facingMode)}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-[#0066FF] text-white hover:bg-[#0052CC] transition-colors"
+              >
+                Réessayer
+              </button>
             </div>
           )}
         </div>
