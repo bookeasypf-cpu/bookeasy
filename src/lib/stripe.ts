@@ -8,10 +8,10 @@ export const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2026-02-25.clover" })
   : null;
 
-// Prix de l'abonnement Pro en F CFP (6 900 F CFP ≈ 57.84 EUR)
-// Stripe utilise les centimes → 5784 centimes
-export const PRO_PRICE_EUR_CENTS = 5784;
-export const PRO_PRICE_DISPLAY = "6 900 F CFP";
+// Prix de l'abonnement Pro en F CFP (7 800 F CFP ≈ 65.38 EUR)
+// Stripe utilise les centimes → 6538 centimes
+export const PRO_PRICE_EUR_CENTS = 6538;
+export const PRO_PRICE_DISPLAY = "7 800 F CFP";
 
 export async function createCheckoutSession({
   merchantId,
