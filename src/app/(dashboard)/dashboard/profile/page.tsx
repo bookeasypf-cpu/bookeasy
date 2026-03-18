@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { ProBadge } from "@/components/ui/ProBadge";
-import { BadgeCheck, Zap, ArrowUpRight } from "lucide-react";
+import { BadgeCheck, Zap, ArrowUpRight, Settings, Loader2 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { UpgradeButton } from "@/components/ui/UpgradeButton";
 
 interface Sector {
   id: string;
@@ -22,6 +23,8 @@ export default function DashboardProfilePage() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [plan, setPlan] = useState<string>("FREE");
+  const [hasStripe, setHasStripe] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
   const [form, setForm] = useState({
     businessName: "",
     description: "",
@@ -48,6 +51,7 @@ export default function DashboardProfilePage() {
           sectorId: profile.sectorId || "",
         });
         setPlan(profile.plan || "FREE");
+        setHasStripe(!!profile.stripeCustomerId);
       }
       setSectors(sectorsData || []);
       setInitialLoading(false);
@@ -114,15 +118,27 @@ export default function DashboardProfilePage() {
                 </p>
               </div>
             </div>
-            {plan !== "PRO" && (
-              <Link
-                href="/pricing"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all shrink-0"
+            {plan === "PRO" && hasStripe ? (
+              <button
+                onClick={async () => {
+                  setPortalLoading(true);
+                  try {
+                    const res = await fetch("/api/stripe/portal", { method: "POST" });
+                    const data = await res.json();
+                    if (data.url) window.location.href = data.url;
+                    else toast.error(data.error || "Erreur");
+                  } catch { toast.error("Erreur de connexion"); }
+                  setPortalLoading(false);
+                }}
+                disabled={portalLoading}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all shrink-0 disabled:opacity-50"
               >
-                Passer au Pro
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            )}
+                {portalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Settings className="h-4 w-4" />}
+                Gérer l&apos;abonnement
+              </button>
+            ) : plan !== "PRO" ? (
+              <UpgradeButton className="!w-auto" />
+            ) : null}
           </div>
         </CardContent>
       </Card>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Check, Star, Zap, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import { UpgradeButton } from "@/components/ui/UpgradeButton";
 
 export const metadata: Metadata = {
   title: "Tarifs - BookEasy",
@@ -154,16 +155,16 @@ export default function PricingPage() {
                   ))}
                 </ul>
 
-                <Link
-                  href={plan.href}
-                  className={`w-full py-3 px-4 rounded-xl text-center font-semibold text-sm transition-all duration-200 ${
-                    plan.popular
-                      ? "bg-[#0066FF] text-white hover:bg-[#0052CC] shadow-lg shadow-[#0066FF]/25"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
+                {plan.popular ? (
+                  <UpgradeButton />
+                ) : (
+                  <Link
+                    href={plan.href}
+                    className="w-full py-3 px-4 rounded-xl text-center font-semibold text-sm transition-all duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  >
+                    {plan.cta}
+                  </Link>
+                )}
               </div>
             );
           })}
