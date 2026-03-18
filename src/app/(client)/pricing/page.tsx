@@ -43,8 +43,8 @@ const plans = [
       "Mise en avant dans les recherches",
       "Badge « Pro vérifié »",
       "Statistiques avancées",
-      "Rappels SMS aux clients",
-      "Multi-employés & agenda par collaborateur",
+      "Rappels email automatiques",
+      "Multi-employés & agenda par collaborateur (bientôt)",
       "Programme fidélité XP personnalisable",
       "Support prioritaire",
     ],
@@ -69,7 +69,7 @@ const faqs = [
   },
   {
     q: "Comment fonctionne le paiement ?",
-    a: "Les paiements sont prélevés mensuellement. Nous acceptons les cartes bancaires et les virements.",
+    a: "Les paiements sont prélevés mensuellement par carte bancaire via Stripe, notre partenaire de paiement sécurisé.",
   },
 ];
 
