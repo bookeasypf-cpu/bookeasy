@@ -107,7 +107,7 @@ export default function PricingPage() {
                 {plan.popular && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                     <span className="bg-[#0066FF] text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
-                      Populaire
+                      Recommandé
                     </span>
                   </div>
                 )}
