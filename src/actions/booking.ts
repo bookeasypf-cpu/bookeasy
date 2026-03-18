@@ -14,6 +14,7 @@ export async function createBooking(data: {
   startTime: string;
   endTime: string;
   notes?: string;
+  giftCardCode?: string;
 }) {
   const user = await requireAuth();
 
@@ -52,6 +53,28 @@ export async function createBooking(data: {
         throw new Error("TIME_SLOT_UNAVAILABLE");
       }
 
+      // Handle gift card deduction if provided
+      let giftCardId: string | null = null;
+      if (data.giftCardCode) {
+        const card = await tx.giftCard.findUnique({
+          where: { code: data.giftCardCode },
+        });
+        if (card && card.status === "ACTIVE" && card.balance > 0 && card.expiresAt > new Date()) {
+          // Deduct service price from gift card (convert XPF price to EUR)
+          const priceEUR = service.price / 119.33;
+          const newBalance = Math.max(0, card.balance - priceEUR);
+          await tx.giftCard.update({
+            where: { id: card.id },
+            data: {
+              balance: newBalance,
+              status: newBalance <= 0 ? "USED" : "ACTIVE",
+              usedAt: newBalance <= 0 ? new Date() : null,
+            },
+          });
+          giftCardId = card.id;
+        }
+      }
+
       return tx.booking.create({
         data: {
           clientId: user.id,
@@ -61,7 +84,9 @@ export async function createBooking(data: {
           startTime: data.startTime,
           endTime: data.endTime,
           totalPrice: service.price,
-          notes: data.notes || null,
+          notes: data.giftCardCode
+            ? `${data.notes || ""}\n[Carte cadeau: ${data.giftCardCode}]`.trim()
+            : data.notes || null,
           status: "CONFIRMED",
         },
       });

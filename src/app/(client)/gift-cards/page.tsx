@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Gift, Send, CheckCircle, Search } from "lucide-react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { Gift, Send, CheckCircle, Search, Download } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import toast from "react-hot-toast";
+import QRCode from "qrcode";
 
 const amounts = [
   { value: 2000, label: "2 000 F" },
@@ -14,12 +16,15 @@ const amounts = [
   { value: 50000, label: "50 000 F" },
 ];
 
-export default function GiftCardsPage() {
-  const [tab, setTab] = useState<"buy" | "check">("buy");
+function GiftCardsContent() {
+  const searchParams = useSearchParams();
+  const codeFromUrl = searchParams.get("code");
+
+  const [tab, setTab] = useState<"buy" | "check">(codeFromUrl ? "check" : "buy");
   const [selectedAmount, setSelectedAmount] = useState<number>(5000);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState<{ code: string; amountXPF: number } | null>(null);
-  const [checkCode, setCheckCode] = useState("");
+  const [checkCode, setCheckCode] = useState(codeFromUrl || "");
   const [checkResult, setCheckResult] = useState<{
     code: string;
     balanceXPF: number;
@@ -34,6 +39,34 @@ export default function GiftCardsPage() {
     recipientEmail: "",
     message: "",
   });
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Auto-check if code is in URL
+  useEffect(() => {
+    if (codeFromUrl) {
+      handleCheckCode(codeFromUrl);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [codeFromUrl]);
+
+  // Generate QR code when gift card is created
+  useEffect(() => {
+    if (sent?.code && qrCanvasRef.current) {
+      const baseUrl = window.location.origin;
+      const url = `${baseUrl}/gift-cards?code=${sent.code}`;
+      QRCode.toCanvas(qrCanvasRef.current, url, {
+        width: 200,
+        margin: 2,
+        color: { dark: "#0C1B2A", light: "#FFFFFF" },
+      });
+      QRCode.toDataURL(url, {
+        width: 400,
+        margin: 2,
+        color: { dark: "#0C1B2A", light: "#FFFFFF" },
+      }).then(setQrDataUrl);
+    }
+  }, [sent]);
 
   async function handleBuy(e: React.FormEvent) {
     e.preventDefault();
@@ -57,10 +90,10 @@ export default function GiftCardsPage() {
     setSending(false);
   }
 
-  async function handleCheck() {
-    if (!checkCode.trim()) return;
+  async function handleCheckCode(code: string) {
+    if (!code.trim()) return;
     try {
-      const res = await fetch(`/api/gift-cards?code=${encodeURIComponent(checkCode)}`);
+      const res = await fetch(`/api/gift-cards?code=${encodeURIComponent(code)}`);
       const data = await res.json();
       if (res.ok) {
         setCheckResult(data);
@@ -71,6 +104,18 @@ export default function GiftCardsPage() {
     } catch {
       toast.error("Erreur de connexion");
     }
+  }
+
+  function handleCheck() {
+    handleCheckCode(checkCode);
+  }
+
+  function downloadQR() {
+    if (!qrDataUrl || !sent) return;
+    const link = document.createElement("a");
+    link.download = `carte-cadeau-${sent.code}.png`;
+    link.href = qrDataUrl;
+    link.click();
   }
 
   return (
@@ -238,12 +283,31 @@ export default function GiftCardsPage() {
               <p className="text-gray-500 mb-2">
                 Montant : <strong>{sent.amountXPF.toLocaleString()} F CFP</strong>
               </p>
+
+              {/* QR Code */}
+              <div className="my-6">
+                <p className="text-sm text-gray-500 mb-3">Scannez pour vérifier le solde :</p>
+                <div className="inline-block bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                  <canvas ref={qrCanvasRef} />
+                </div>
+                <div className="mt-3">
+                  <button
+                    onClick={downloadQR}
+                    className="inline-flex items-center gap-2 text-sm text-[#0066FF] hover:underline font-medium"
+                  >
+                    <Download className="h-4 w-4" />
+                    Télécharger le QR code
+                  </button>
+                </div>
+              </div>
+
               <p className="text-sm text-gray-400 mb-6">
-                Le code a été envoyé par email au destinataire. Valable 1 an.
+                Le code et le QR code ont été envoyés par email au destinataire. Valable 1 an.
               </p>
               <button
                 onClick={() => {
                   setSent(null);
+                  setQrDataUrl(null);
                   setForm({ senderName: "", senderEmail: "", recipientName: "", recipientEmail: "", message: "" });
                 }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-[#0066FF]/10 text-[#0066FF] hover:bg-[#0066FF]/20 transition-colors"
@@ -299,5 +363,13 @@ export default function GiftCardsPage() {
         )}
       </div>
     </>
+  );
+}
+
+export default function GiftCardsPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center py-24 text-gray-400">Chargement...</div>}>
+      <GiftCardsContent />
+    </Suspense>
   );
 }

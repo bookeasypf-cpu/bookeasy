@@ -24,6 +24,8 @@ import {
   MapPin,
   FileText,
   Star,
+  Gift,
+  X,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -69,6 +71,12 @@ export default function BookingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
+  const [giftCardCode, setGiftCardCode] = useState("");
+  const [giftCardApplied, setGiftCardApplied] = useState<{
+    code: string;
+    balanceXPF: number;
+  } | null>(null);
+  const [checkingGiftCard, setCheckingGiftCard] = useState(false);
 
   // Fetch merchant info
   useEffect(() => {
@@ -104,6 +112,24 @@ export default function BookingPage() {
     return d.toISOString().split("T")[0];
   });
 
+  async function handleApplyGiftCard() {
+    if (!giftCardCode.trim()) return;
+    setCheckingGiftCard(true);
+    try {
+      const res = await fetch(`/api/gift-cards?code=${encodeURIComponent(giftCardCode)}`);
+      const data = await res.json();
+      if (res.ok && data.balanceXPF > 0) {
+        setGiftCardApplied({ code: data.code, balanceXPF: data.balanceXPF });
+        toast.success(`Carte cadeau appliquée : ${data.balanceXPF.toLocaleString()} F CFP`);
+      } else {
+        toast.error(data.error || "Carte cadeau invalide");
+      }
+    } catch {
+      toast.error("Erreur de vérification");
+    }
+    setCheckingGiftCard(false);
+  }
+
   async function handleConfirm() {
     if (!selectedService || !selectedSlot || !selectedDate) return;
     setSubmitting(true);
@@ -115,13 +141,14 @@ export default function BookingPage() {
       startTime: selectedSlot.startTime,
       endTime: selectedSlot.endTime,
       notes: notes || undefined,
+      giftCardCode: giftCardApplied?.code || undefined,
     });
 
     if (result.error) {
       toast.error(result.error);
       setSubmitting(false);
     } else if (result.bookingId) {
-      toast.success("Rendez-vous confirme !");
+      toast.success("Rendez-vous confirmé !");
       router.push(`/booking/confirmation/${result.bookingId}`);
     }
   }
@@ -523,6 +550,53 @@ export default function BookingPage() {
               </div>
             </div>
 
+            {/* Gift Card */}
+            <div className="mb-6">
+              <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] mb-2">
+                <Gift className="h-4 w-4 text-[#0066FF]" />
+                Carte cadeau (optionnel)
+              </label>
+              {giftCardApplied ? (
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl px-4 py-3 flex items-center justify-between border border-green-200">
+                  <div>
+                    <p className="text-sm font-semibold text-green-800">
+                      Carte {giftCardApplied.code}
+                    </p>
+                    <p className="text-xs text-green-600">
+                      Solde : {giftCardApplied.balanceXPF.toLocaleString()} F CFP
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setGiftCardApplied(null);
+                      setGiftCardCode("");
+                    }}
+                    className="p-1.5 rounded-lg hover:bg-green-100 text-green-600 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Ex: BE-ABCD-1234-EFGH"
+                    value={giftCardCode}
+                    onChange={(e) => setGiftCardCode(e.target.value.toUpperCase())}
+                    className="flex-1 rounded-xl border-2 border-gray-100 bg-white px-4 py-2.5 text-sm font-mono tracking-wider text-[#0C1B2A] placeholder:text-gray-300 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyGiftCard}
+                    disabled={!giftCardCode.trim() || checkingGiftCard}
+                    className="px-4 py-2.5 rounded-xl bg-[#0066FF]/10 text-[#0066FF] font-semibold text-sm hover:bg-[#0066FF]/20 transition-colors disabled:opacity-50"
+                  >
+                    {checkingGiftCard ? "..." : "Appliquer"}
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Notes */}
             <div className="mb-6">
               <label
@@ -536,7 +610,7 @@ export default function BookingPage() {
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Des precisions pour votre rendez-vous..."
+                placeholder="Des précisions pour votre rendez-vous..."
                 className="w-full rounded-2xl border-2 border-gray-100 bg-white px-4 py-3 text-sm text-[#0C1B2A] placeholder:text-gray-300 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 resize-none transition-all"
                 rows={3}
               />
