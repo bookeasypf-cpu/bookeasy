@@ -29,6 +29,7 @@ model User {
   reviews       Review[]
   notifications Notification[]
   xpTransactions XpTransaction[]
+  pushSubscriptions PushSubscription[]
 
   @@map("users")
 }
@@ -119,6 +120,7 @@ model Merchant {
   xpRewards      XpReward[]
   xpTransactions XpTransaction[]
   xpPerBooking   Int             @default(10)
+  giftCards      GiftCard[]
 
   @@index([city])
   @@index([sectorId])
@@ -330,4 +332,50 @@ model XpRedemption {
   @@index([userId])
   @@index([code])
   @@map("xp_redemptions")
+}
+
+// ─────────────────────────────────────────────
+// GIFT CARDS / CARTES CADEAUX
+// ─────────────────────────────────────────────
+
+model GiftCard {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  amount        Float     // Montant en EUR
+  balance       Float     // Solde restant
+  currency      String    @default("XPF")
+  senderName    String    // Nom de l'acheteur
+  senderEmail   String    // Email de l'acheteur
+  recipientName String    // Nom du destinataire
+  recipientEmail String   // Email du destinataire
+  message       String?   // Message personnalisé
+  merchantId    String?   // null = valable partout, sinon chez un marchand spécifique
+  status        String    @default("ACTIVE") // ACTIVE, USED, EXPIRED
+  expiresAt     DateTime  // Date d'expiration (1 an)
+  usedAt        DateTime?
+  createdAt     DateTime  @default(now())
+
+  merchant Merchant? @relation(fields: [merchantId], references: [id], onDelete: SetNull)
+
+  @@index([code])
+  @@index([recipientEmail])
+  @@map("gift_cards")
+}
+
+// ─────────────────────────────────────────────
+// PUSH NOTIFICATIONS
+// ─────────────────────────────────────────────
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_subscriptions")
 }

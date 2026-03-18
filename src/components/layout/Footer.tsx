@@ -54,6 +54,14 @@ export function Footer() {
                   Secteurs
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/gift-cards"
+                  className="text-sm text-white/60 hover:text-white transition-colors"
+                >
+                  Cartes cadeaux
+                </Link>
+              </li>
             </ul>
           </div>
 

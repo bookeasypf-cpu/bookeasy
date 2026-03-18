@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check, Star, Zap, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import { UpgradeButton } from "@/components/ui/UpgradeButton";
+import { QuickRegisterForm } from "@/components/ui/QuickRegisterForm";
 
 export const metadata: Metadata = {
   title: "Tarifs - BookEasy",
@@ -168,6 +169,19 @@ export default function PricingPage() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Quick Registration */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+        <div className="max-w-md mx-auto bg-gradient-to-br from-[#0C1B2A] to-[#132D46] rounded-2xl p-8 text-center">
+          <h2 className="text-xl font-bold text-white mb-2">
+            Inscrivez-vous en 30 secondes
+          </h2>
+          <p className="text-white/60 text-sm mb-6">
+            Cr&eacute;ez votre compte professionnel et commencez &agrave; recevoir des r&eacute;servations.
+          </p>
+          <QuickRegisterForm />
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import { requireAuth } from "@/lib/auth";
 import { bookingSchema } from "@/lib/validators";
 import { revalidatePath } from "next/cache";
 import { sendBookingConfirmation, sendBookingCancellation } from "@/lib/email";
+import { sendPushNotification } from "@/lib/push";
 
 export async function createBooking(data: {
   merchantId: string;
@@ -98,6 +99,13 @@ export async function createBooking(data: {
         });
       }
 
+      // Push notification to merchant (async, non-blocking)
+      sendPushNotification(merchant.userId, {
+        title: "Nouveau rendez-vous",
+        body: `${user.name || "Un client"} a réservé ${service.name} le ${data.date} à ${data.startTime}`,
+        url: "/dashboard/bookings",
+      }).catch(() => {});
+
       // Send confirmation email to client (async, non-blocking)
       sendBookingConfirmation({
         clientName: user.name || "Client",
@@ -178,8 +186,14 @@ export async function cancelBooking(bookingId: string, reason?: string) {
     });
   }
 
-  // Notify the other party
+  // Push notification to the other party
   const notifyUserId = isMerchant ? booking.clientId : booking.merchant.userId;
+  sendPushNotification(notifyUserId, {
+    title: "Rendez-vous annulé",
+    body: `Le RDV pour ${booking.service.name} le ${booking.date} à ${booking.startTime} a été annulé`,
+    url: isMerchant ? "/my-bookings" : "/dashboard/bookings",
+  }).catch(() => {});
+
   await prisma.notification.create({
     data: {
       userId: notifyUserId,

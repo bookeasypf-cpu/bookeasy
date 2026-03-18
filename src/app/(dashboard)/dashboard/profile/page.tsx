@@ -10,6 +10,7 @@ import { ProBadge } from "@/components/ui/ProBadge";
 import { BadgeCheck, Zap, ArrowUpRight, Settings, Loader2 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { PushNotificationToggle } from "@/components/ui/PushNotificationToggle";
 import { UpgradeButton } from "@/components/ui/UpgradeButton";
 
 interface Sector {
@@ -139,6 +140,19 @@ export default function DashboardProfilePage() {
             ) : plan !== "PRO" ? (
               <UpgradeButton className="!w-auto" />
             ) : null}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Push Notifications */}
+      <Card className="rounded-2xl border-0 shadow-sm mb-6 animate-fade-in-up">
+        <CardContent className="p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-[#0C1B2A]">Notifications push</h3>
+              <p className="text-sm text-gray-500 mt-0.5">Recevez des alertes instantanées pour les nouvelles réservations</p>
+            </div>
+            <PushNotificationToggle />
           </div>
         </CardContent>
       </Card>

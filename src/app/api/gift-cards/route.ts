@@ -1,0 +1,106 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+// Générer un code carte cadeau lisible
+function generateGiftCardCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "BE-";
+  for (let i = 0; i < 3; i++) {
+    if (i > 0) code += "-";
+    for (let j = 0; j < 4; j++) {
+      code += chars[Math.floor(Math.random() * chars.length)];
+    }
+  }
+  return code;
+}
+
+// GET - Vérifier le solde d'une carte cadeau
+export async function GET(req: NextRequest) {
+  const code = req.nextUrl.searchParams.get("code");
+  if (!code) {
+    return NextResponse.json({ error: "Code requis" }, { status: 400 });
+  }
+
+  const card = await prisma.giftCard.findUnique({
+    where: { code: code.toUpperCase() },
+    include: { merchant: { select: { businessName: true } } },
+  });
+
+  if (!card) {
+    return NextResponse.json({ error: "Carte cadeau introuvable" }, { status: 404 });
+  }
+
+  if (card.status === "USED" || card.balance <= 0) {
+    return NextResponse.json({ error: "Cette carte cadeau a déjà été utilisée", card: { code: card.code, status: "USED" } }, { status: 400 });
+  }
+
+  if (card.expiresAt < new Date()) {
+    return NextResponse.json({ error: "Cette carte cadeau a expiré", card: { code: card.code, status: "EXPIRED" } }, { status: 400 });
+  }
+
+  // Convertir EUR en XPF pour l'affichage
+  const amountXPF = Math.round(card.amount * 119.33);
+  const balanceXPF = Math.round(card.balance * 119.33);
+
+  return NextResponse.json({
+    code: card.code,
+    amountXPF,
+    balanceXPF,
+    status: card.status,
+    merchantName: card.merchant?.businessName || "Tous les partenaires",
+    expiresAt: card.expiresAt,
+  });
+}
+
+// POST - Créer une carte cadeau
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+
+    const { amountXPF, senderName, senderEmail, recipientName, recipientEmail, message, merchantId } = body;
+
+    if (!amountXPF || !senderName || !senderEmail || !recipientName || !recipientEmail) {
+      return NextResponse.json({ error: "Champs requis manquants" }, { status: 400 });
+    }
+
+    // Montants autorisés en XPF
+    const allowedAmounts = [2000, 5000, 10000, 20000, 50000];
+    if (!allowedAmounts.includes(amountXPF)) {
+      return NextResponse.json({ error: "Montant non autorisé" }, { status: 400 });
+    }
+
+    // Convertir XPF en EUR (1 EUR = 119.33 XPF)
+    const amountEUR = amountXPF / 119.33;
+
+    const code = generateGiftCardCode();
+
+    const card = await prisma.giftCard.create({
+      data: {
+        code,
+        amount: amountEUR,
+        balance: amountEUR,
+        currency: "XPF",
+        senderName,
+        senderEmail,
+        recipientName,
+        recipientEmail,
+        message: message || null,
+        merchantId: merchantId || null,
+        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 an
+      },
+    });
+
+    const balanceXPF = Math.round(card.balance * 119.33);
+
+    return NextResponse.json({
+      code: card.code,
+      amountXPF,
+      balanceXPF,
+      expiresAt: card.expiresAt,
+      message: `Carte cadeau créée ! Code : ${card.code}`,
+    });
+  } catch (error) {
+    console.error("Gift card creation error:", error);
+    return NextResponse.json({ error: "Erreur lors de la création" }, { status: 500 });
+  }
+}
