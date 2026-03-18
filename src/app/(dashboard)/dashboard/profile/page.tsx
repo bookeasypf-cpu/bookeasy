@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { ProBadge } from "@/components/ui/ProBadge";
-import { BadgeCheck, Zap, ArrowUpRight, Settings, Loader2 } from "lucide-react";
+import { BadgeCheck, Zap } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { PushNotificationToggle } from "@/components/ui/PushNotificationToggle";
@@ -24,8 +24,7 @@ export default function DashboardProfilePage() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [plan, setPlan] = useState<string>("FREE");
-  const [hasStripe, setHasStripe] = useState(false);
-  const [portalLoading, setPortalLoading] = useState(false);
+  const [planExpiresAt, setPlanExpiresAt] = useState<string | null>(null);
   const [form, setForm] = useState({
     businessName: "",
     description: "",
@@ -52,7 +51,7 @@ export default function DashboardProfilePage() {
           sectorId: profile.sectorId || "",
         });
         setPlan(profile.plan || "FREE");
-        setHasStripe(!!profile.stripeCustomerId);
+        setPlanExpiresAt(profile.planExpiresAt || null);
       }
       setSectors(sectorsData || []);
       setInitialLoading(false);
@@ -119,27 +118,18 @@ export default function DashboardProfilePage() {
                 </p>
               </div>
             </div>
-            {plan === "PRO" && hasStripe ? (
-              <button
-                onClick={async () => {
-                  setPortalLoading(true);
-                  try {
-                    const res = await fetch("/api/stripe/portal", { method: "POST" });
-                    const data = await res.json();
-                    if (data.url) window.location.href = data.url;
-                    else toast.error(data.error || "Erreur");
-                  } catch { toast.error("Erreur de connexion"); }
-                  setPortalLoading(false);
-                }}
-                disabled={portalLoading}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all shrink-0 disabled:opacity-50"
-              >
-                {portalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Settings className="h-4 w-4" />}
-                Gérer l&apos;abonnement
-              </button>
-            ) : plan !== "PRO" ? (
+            {plan === "PRO" ? (
+              <div className="text-right shrink-0">
+                {planExpiresAt && (
+                  <p className="text-xs text-gray-400">
+                    Valide jusqu&apos;au {new Date(planExpiresAt).toLocaleDateString("fr-FR")}
+                  </p>
+                )}
+                <UpgradeButton className="!w-auto mt-1" />
+              </div>
+            ) : (
               <UpgradeButton className="!w-auto" />
-            ) : null}
+            )}
           </div>
         </CardContent>
       </Card>

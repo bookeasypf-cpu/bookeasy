@@ -33,7 +33,7 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "6 900",
+    price: "7 800",
     period: "F CFP / mois",
     description: "Pour les professionnels qui veulent se démarquer.",
     icon: Star,
@@ -70,7 +70,7 @@ const faqs = [
   },
   {
     q: "Comment fonctionne le paiement ?",
-    a: "Les paiements sont prélevés mensuellement par carte bancaire via Stripe, notre partenaire de paiement sécurisé.",
+    a: "Les paiements sont prélevés mensuellement par carte bancaire via PayZen by OSB, notre partenaire de paiement sécurisé basé en Polynésie française.",
   },
 ];
 
