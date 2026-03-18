@@ -81,7 +81,7 @@ export default function PricingPage() {
       <div className="bg-gradient-to-b from-[#0C1B2A] to-[#132D46] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            Des tarifs simples et transparents
+            Développez votre activité
           </h1>
           <p className="text-white/60 max-w-xl mx-auto text-lg">
             Commencez gratuitement, évoluez quand vous êtes
