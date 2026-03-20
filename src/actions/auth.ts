@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validators";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function registerUser(formData: FormData) {
   const raw = {
@@ -34,6 +35,9 @@ export async function registerUser(formData: FormData) {
       role,
     },
   });
+
+  // Send welcome email (async, non-blocking)
+  sendWelcomeEmail(email, name).catch(() => {});
 
   return { success: true };
 }

@@ -6,6 +6,7 @@ import { MapPin, Star, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { ProBadge } from "@/components/ui/ProBadge";
 import { SectorIcon } from "@/components/ui/SectorIcon";
+import { FavoriteButton } from "@/components/ui/FavoriteButton";
 
 interface MerchantCardProps {
   merchant: {
@@ -110,6 +111,11 @@ export function MerchantCard({ merchant }: MerchantCardProps) {
           <div className="absolute top-3 left-3 flex items-center gap-1.5">
             <Badge variant="gradient">{merchant.sector.name}</Badge>
             {merchant.plan === "PRO" && <ProBadge size="sm" />}
+          </div>
+
+          {/* Favorite button */}
+          <div className="absolute top-3 right-3">
+            <FavoriteButton merchantId={merchant.id} size="sm" />
           </div>
 
           {/* Hover "Réserver" button with slide-up effect */}

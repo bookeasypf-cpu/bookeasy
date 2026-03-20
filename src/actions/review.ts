@@ -27,6 +27,14 @@ export async function submitReview(data: {
   if (booking.review)
     return { error: "Vous avez déjà laissé un avis" };
 
+  // Les avis sont réservés aux commerçants Pro
+  const merchant = await prisma.merchant.findUnique({
+    where: { id: booking.merchantId },
+    select: { plan: true },
+  });
+  if (merchant?.plan !== "PRO")
+    return { error: "Les avis clients sont disponibles uniquement pour les commerçants Pro" };
+
   await prisma.review.create({
     data: {
       bookingId: data.bookingId,

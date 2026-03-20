@@ -30,6 +30,7 @@ model User {
   notifications Notification[]
   xpTransactions XpTransaction[]
   pushSubscriptions PushSubscription[]
+  favorites         Favorite[]
 
   @@map("users")
 }
@@ -121,6 +122,7 @@ model Merchant {
   xpTransactions XpTransaction[]
   xpPerBooking   Int             @default(10)
   giftCards      GiftCard[]
+  favorites      Favorite[]
 
   @@index([city])
   @@index([sectorId])
@@ -360,6 +362,24 @@ model GiftCard {
   @@index([code])
   @@index([recipientEmail])
   @@map("gift_cards")
+}
+
+// ─────────────────────────────────────────────
+// FAVORITES
+// ─────────────────────────────────────────────
+
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  merchantId String
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, merchantId])
+  @@index([userId])
+  @@map("favorites")
 }
 
 // ─────────────────────────────────────────────

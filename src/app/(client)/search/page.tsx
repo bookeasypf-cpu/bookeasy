@@ -3,6 +3,13 @@ import { SearchBar } from "@/components/search/SearchBar";
 import { MerchantCard } from "@/components/search/MerchantCard";
 import { SearchX, MapIcon, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Recherche - BookEasy",
+  description:
+    "Trouvez et réservez les meilleurs professionnels beauté, bien-être et services en Polynésie française.",
+};
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string; sector?: string; city?: string }>;
@@ -14,19 +21,36 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const where: Record<string, unknown> = { isActive: true };
 
+  const andConditions: Record<string, unknown>[] = [];
+
   if (q) {
-    where.OR = [
-      { businessName: { contains: q } },
-      { description: { contains: q } },
-    ];
+    andConditions.push({
+      OR: [
+        { businessName: { contains: q, mode: "insensitive" } },
+        { description: { contains: q, mode: "insensitive" } },
+        { services: { some: { name: { contains: q, mode: "insensitive" } } } },
+      ],
+    });
   }
 
   if (sector) {
-    where.sector = { slug: sector };
+    // Match merchants in this sector OR merchants with services matching the sector name
+    const sectorRecord = await prisma.sector.findUnique({ where: { slug: sector } });
+    const sectorLabel = sectorRecord?.name || sector;
+    andConditions.push({
+      OR: [
+        { sector: { slug: sector } },
+        { services: { some: { name: { contains: sectorLabel, mode: "insensitive" } } } },
+      ],
+    });
   }
 
   if (city) {
-    where.city = { contains: city };
+    where.city = { contains: city, mode: "insensitive" };
+  }
+
+  if (andConditions.length > 0) {
+    where.AND = andConditions;
   }
 
   const merchants = await prisma.merchant.findMany({
@@ -57,7 +81,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     });
 
   const sectorName = sector
-    ? (await prisma.sector.findUnique({ where: { slug: sector } }))?.name
+    ? (await prisma.sector.findUnique({ where: { slug: sector } }))?.name ?? null
     : null;
 
   // Build active filters for display

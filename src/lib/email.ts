@@ -4,7 +4,8 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
-const FROM = process.env.EMAIL_FROM || "BookEasy <noreply@bookeasy.pf>";
+const FROM = process.env.EMAIL_FROM || "BookEasy <noreply@bookeasy.me>";
+const BASE_URL = process.env.NEXTAUTH_URL || "https://bookeasy.me";
 
 // ─────────────────────────────────────────────
 // SHARED LAYOUT
@@ -27,7 +28,7 @@ function layout(content: string) {
     </div>
     <!-- Footer -->
     <div style="text-align:center;margin-top:24px;color:#9ca3af;font-size:12px;">
-      <p style="margin:0;">BookEasy &mdash; La plateforme de réservation de Tahiti</p>
+      <p style="margin:0;">BookEasy &mdash; Réservation en ligne en Polynésie française</p>
       <p style="margin:4px 0 0;">Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
     </div>
   </div>
@@ -105,7 +106,10 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
           </tr>
         </table>
       </div>
-      <p style="margin:0;color:#9ca3af;font-size:12px;">Vous pouvez gérer vos rendez-vous depuis votre espace <strong>Mes rendez-vous</strong> sur BookEasy.</p>
+      <div style="text-align:center;margin-top:8px;">
+        <a href="${BASE_URL}/my-bookings" style="display:inline-block;background:linear-gradient(135deg,#0066FF,#00B4D8);color:#fff;text-decoration:none;padding:12px 32px;border-radius:8px;font-weight:600;font-size:14px;">Voir mes rendez-vous</a>
+      </div>
+      <p style="margin:16px 0 0;color:#9ca3af;font-size:12px;text-align:center;">Vous pouvez gérer vos rendez-vous depuis votre espace BookEasy.</p>
     </div>
   `);
 
@@ -189,7 +193,10 @@ export async function sendBookingReminder(data: ReminderData) {
           </tr>` : ""}
         </table>
       </div>
-      <p style="margin:0;color:#9ca3af;font-size:12px;">Si vous devez annuler, rendez-vous dans <strong>Mes rendez-vous</strong> sur BookEasy.</p>
+      <div style="text-align:center;margin-top:8px;">
+        <a href="${BASE_URL}/my-bookings" style="display:inline-block;background:linear-gradient(135deg,#0C1B2A,#132D46);color:#fff;text-decoration:none;padding:12px 32px;border-radius:8px;font-weight:600;font-size:14px;">Voir mes rendez-vous</a>
+      </div>
+      <p style="margin:16px 0 0;color:#9ca3af;font-size:12px;text-align:center;">Si vous devez annuler, rendez-vous dans votre espace BookEasy.</p>
     </div>
   `);
 
@@ -261,6 +268,9 @@ export async function sendBookingCancellation(data: CancellationData) {
           </tr>` : ""}
         </table>
       </div>
+      <div style="text-align:center;margin-top:8px;">
+        <a href="${BASE_URL}/my-bookings" style="display:inline-block;background:#0066FF;color:#fff;text-decoration:none;padding:12px 32px;border-radius:8px;font-weight:600;font-size:14px;">Prendre un nouveau rendez-vous</a>
+      </div>
     </div>
   `);
 
@@ -274,6 +284,68 @@ export async function sendBookingCancellation(data: CancellationData) {
     console.log("[EMAIL] Cancellation sent to", data.recipientEmail);
   } catch (err) {
     console.error("[EMAIL] Failed to send cancellation:", err);
+  }
+}
+
+// ─────────────────────────────────────────────
+// WELCOME EMAIL (after registration)
+// ─────────────────────────────────────────────
+
+export async function sendWelcomeEmail(to: string, name: string) {
+  if (!resend) {
+    console.log("[EMAIL] Resend not configured – skipping welcome email to", to);
+    return;
+  }
+
+  const html = layout(`
+    <div style="background:linear-gradient(135deg,#0066FF,#00B4D8);padding:40px 24px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+      <h1 style="color:#fff;font-size:24px;margin:0;font-weight:700;">Bienvenue sur BookEasy !</h1>
+      <p style="color:rgba(255,255,255,0.85);font-size:15px;margin:10px 0 0;">Votre compte a été créé avec succès</p>
+    </div>
+    <div style="padding:24px;">
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Ia ora na <strong>${name}</strong> 👋</p>
+      <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
+        Merci de nous rejoindre ! Avec BookEasy, réservez vos rendez-vous en quelques clics auprès des meilleurs professionnels de Polynésie française.
+      </p>
+      <div style="background:#f0f7ff;border-radius:12px;padding:20px;margin-bottom:20px;">
+        <p style="margin:0 0 12px;color:#0C1B2A;font-weight:600;font-size:14px;">Ce que vous pouvez faire :</p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr>
+            <td style="padding:6px 0;color:#0066FF;width:28px;vertical-align:top;font-size:16px;">📅</td>
+            <td style="padding:6px 0;color:#374151;">Réserver un rendez-vous en ligne, 24h/24</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;color:#0066FF;width:28px;vertical-align:top;font-size:16px;">🔔</td>
+            <td style="padding:6px 0;color:#374151;">Recevoir des rappels avant vos rendez-vous</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;color:#0066FF;width:28px;vertical-align:top;font-size:16px;">⭐</td>
+            <td style="padding:6px 0;color:#374151;">Gagner des points XP à chaque réservation</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;color:#0066FF;width:28px;vertical-align:top;font-size:16px;">🎁</td>
+            <td style="padding:6px 0;color:#374151;">Offrir des cartes cadeaux à vos proches</td>
+          </tr>
+        </table>
+      </div>
+      <div style="text-align:center;margin-top:8px;">
+        <a href="${BASE_URL}/search" style="display:inline-block;background:linear-gradient(135deg,#0066FF,#00B4D8);color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:600;font-size:15px;">Découvrir les professionnels</a>
+      </div>
+      <p style="margin:20px 0 0;color:#9ca3af;font-size:12px;text-align:center;">À très bientôt sur BookEasy !</p>
+    </div>
+  `);
+
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to,
+      subject: "🎉 Bienvenue sur BookEasy !",
+      html,
+    });
+    console.log("[EMAIL] Welcome email sent to", to);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send welcome email:", err);
   }
 }
 
@@ -331,7 +403,7 @@ export async function sendSupportMessage(data: SupportData) {
   try {
     await resend.emails.send({
       from: FROM,
-      to: process.env.SUPPORT_EMAIL || "contact@bookeasy.pf",
+      to: process.env.SUPPORT_EMAIL || "contact@bookeasy.me",
       replyTo: data.merchantEmail,
       subject: `${priority} ${data.subject} — ${data.merchantName}`,
       html,

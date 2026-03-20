@@ -7,7 +7,13 @@ export const metadata = {
     "Trouvez les meilleurs professionnels autour de vous en Polynésie française.",
 };
 
-export default async function MapPage() {
+interface MapPageProps {
+  searchParams: Promise<{ sector?: string; q?: string; city?: string }>;
+}
+
+export default async function MapPage({ searchParams }: MapPageProps) {
+  const params = await searchParams;
+  const initialSector = params.sector || null;
   const [merchants, sectors] = await Promise.all([
     prisma.merchant.findMany({
       where: {
@@ -70,6 +76,7 @@ export default async function MapPage() {
       <MapViewLoader
         merchants={serializedMerchants}
         sectors={serializedSectors}
+        initialSector={initialSector}
       />
     </div>
   );

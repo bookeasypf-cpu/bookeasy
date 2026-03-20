@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
 // Générer un code carte cadeau lisible
 function generateGiftCardCode(): string {
@@ -92,10 +94,26 @@ export async function POST(req: NextRequest) {
 
     const balanceXPF = Math.round(card.balance * 119.33);
 
+    // Award XP to buyer: 1 XP per 1000 XPF
+    const xpEarned = Math.floor(amountXPF / 1000);
+    const session = await getServerSession(authOptions);
+    if (session?.user?.id && xpEarned > 0 && merchantId) {
+      await prisma.xpTransaction.create({
+        data: {
+          userId: session.user.id,
+          merchantId,
+          amount: xpEarned,
+          type: "EARNED",
+          reason: `Carte cadeau offerte (${amountXPF.toLocaleString()} F)`,
+        },
+      });
+    }
+
     return NextResponse.json({
       code: card.code,
       amountXPF,
       balanceXPF,
+      xpEarned: session?.user?.id ? xpEarned : 0,
       expiresAt: card.expiresAt,
       message: `Carte cadeau créée ! Code : ${card.code}`,
     });

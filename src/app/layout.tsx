@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { Toaster } from "react-hot-toast";
+import { InstallBanner } from "@/components/ui/InstallBanner";
+import { ServiceWorkerProvider } from "@/components/providers/ServiceWorkerProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -12,7 +14,40 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "BookEasy - Réservez vos rendez-vous en ligne",
   description:
-    "Plateforme de réservation en ligne pour coiffeurs, barbers, esthéticiennes et tous les commerçants.",
+    "Réservez vos rendez-vous beauté, bien-être et services en Polynésie française.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "BookEasy",
+  },
+  icons: {
+    icon: [
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  openGraph: {
+    title: "BookEasy - Réservez vos rendez-vous en ligne",
+    description:
+      "Réservez vos rendez-vous beauté, bien-être et services en Polynésie française.",
+    siteName: "BookEasy",
+    locale: "fr_FR",
+    type: "website",
+    url: "https://bookeasy.pf",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0066FF",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -25,6 +60,8 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased bg-gray-50`}>
         <SessionProvider>
           {children}
+          <ServiceWorkerProvider />
+          <InstallBanner />
           <Toaster
             position="top-right"
             toastOptions={{

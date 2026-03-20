@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { MapPin, Phone, Star, Clock, ArrowLeft, ChevronRight, MessageSquare, Info, Briefcase, Calendar } from "lucide-react";
+import { MapPin, Phone, Star, Clock, ChevronRight, MessageSquare, Info, Briefcase, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { ProBadge } from "@/components/ui/ProBadge";
+import { BackButton } from "@/components/ui/BackButton";
+import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import { StarRating } from "@/components/ui/StarRating";
 import { formatPrice, formatDuration } from "@/lib/utils";
 import Link from "next/link";
@@ -74,15 +76,12 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0C1B2A] via-[#0C1B2A]/40 to-transparent" />
 
-        {/* Back button */}
+        {/* Back button + Favorite */}
         <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
-          <Link
-            href="/search"
-            className="btn-press inline-flex items-center gap-1.5 glass-dark text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-white/20 transition-all"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Retour
-          </Link>
+          <BackButton />
+        </div>
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+          <FavoriteButton merchantId={merchantId} />
         </div>
 
         {/* Hero content */}
@@ -98,7 +97,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
               {merchant.businessName}
             </h1>
             <div className="flex flex-wrap items-center gap-3 text-sm text-white/80">
-              {avgRating > 0 && (
+              {merchant.plan === "PRO" && avgRating > 0 && (
                 <span className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-3 py-1.5 rounded-full">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                   <span className="font-semibold text-white">
@@ -175,13 +174,15 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             <Briefcase className="h-4 w-4" />
             Services
           </a>
-          <a
-            href="#avis"
-            className="flex items-center gap-1.5 flex-1 justify-center text-sm font-medium text-gray-500 px-4 py-2.5 rounded-lg transition-colors hover:bg-gray-50 hover:text-[#0C1B2A]"
-          >
-            <MessageSquare className="h-4 w-4" />
-            Avis ({merchant._count.reviews})
-          </a>
+          {merchant.plan === "PRO" && (
+            <a
+              href="#avis"
+              className="flex items-center gap-1.5 flex-1 justify-center text-sm font-medium text-gray-500 px-4 py-2.5 rounded-lg transition-colors hover:bg-gray-50 hover:text-[#0C1B2A]"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Avis ({merchant._count.reviews})
+            </a>
+          )}
           <a
             href="#infos"
             className="flex items-center gap-1.5 flex-1 justify-center text-sm font-medium text-gray-500 px-4 py-2.5 rounded-lg transition-colors hover:bg-gray-50 hover:text-[#0C1B2A]"
@@ -238,89 +239,91 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
           </div>
         </section>
 
-        {/* Reviews Section */}
-        <section id="avis" className="scroll-mt-24">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#0066FF] to-[#00B4D8]" />
-            <h2 className="text-lg font-bold text-[#0C1B2A]">
-              Avis ({merchant._count.reviews})
-            </h2>
-          </div>
+        {/* Reviews Section — Pro only */}
+        {merchant.plan === "PRO" && (
+          <section id="avis" className="scroll-mt-24">
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#0066FF] to-[#00B4D8]" />
+              <h2 className="text-lg font-bold text-[#0C1B2A]">
+                Avis ({merchant._count.reviews})
+              </h2>
+            </div>
 
-          {merchant.reviews.length > 0 ? (
-            <div className="space-y-5">
-              {/* Rating Summary Card */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
-                <div className="flex flex-col sm:flex-row items-center gap-6">
-                  {/* Big rating number */}
-                  <div className="text-center shrink-0">
-                    <div className="text-5xl font-black text-[#0C1B2A]">
-                      {avgRating.toFixed(1)}
-                    </div>
-                    <StarRating rating={avgRating} size={18} className="mt-1.5 justify-center" />
-                    <p className="text-xs text-gray-400 mt-1.5">
-                      {merchant._count.reviews} avis
-                    </p>
-                  </div>
-                  {/* Rating bars */}
-                  <div className="flex-1 w-full space-y-2">
-                    {ratingDistribution.map((dist) => (
-                      <div key={dist.stars} className="flex items-center gap-2.5">
-                        <span className="text-xs font-medium text-gray-500 w-3 text-right">
-                          {dist.stars}
-                        </span>
-                        <Star className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" />
-                        <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-amber-400 to-amber-300 rounded-full transition-all duration-500"
-                            style={{ width: `${dist.percentage}%` }}
-                          />
-                        </div>
-                        <span className="text-xs text-gray-400 w-6 text-right">{dist.count}</span>
+            {merchant.reviews.length > 0 ? (
+              <div className="space-y-5">
+                {/* Rating Summary Card */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    {/* Big rating number */}
+                    <div className="text-center shrink-0">
+                      <div className="text-5xl font-black text-[#0C1B2A]">
+                        {avgRating.toFixed(1)}
                       </div>
-                    ))}
+                      <StarRating rating={avgRating} size={18} className="mt-1.5 justify-center" />
+                      <p className="text-xs text-gray-400 mt-1.5">
+                        {merchant._count.reviews} avis
+                      </p>
+                    </div>
+                    {/* Rating bars */}
+                    <div className="flex-1 w-full space-y-2">
+                      {ratingDistribution.map((dist) => (
+                        <div key={dist.stars} className="flex items-center gap-2.5">
+                          <span className="text-xs font-medium text-gray-500 w-3 text-right">
+                            {dist.stars}
+                          </span>
+                          <Star className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" />
+                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-amber-400 to-amber-300 rounded-full transition-all duration-500"
+                              style={{ width: `${dist.percentage}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-400 w-6 text-right">{dist.count}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Review cards */}
-              <div className="stagger-children space-y-3">
-                {merchant.reviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-sm font-bold text-white shrink-0">
-                        {review.client.name?.[0]?.toUpperCase() || "?"}
+                {/* Review cards */}
+                <div className="stagger-children space-y-3">
+                  {merchant.reviews.map((review) => (
+                    <div
+                      key={review.id}
+                      className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-sm font-bold text-white shrink-0">
+                          {review.client.name?.[0]?.toUpperCase() || "?"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm font-semibold text-[#0C1B2A] block">
+                            {review.client.name || "Anonyme"}
+                          </span>
+                          <StarRating
+                            rating={review.rating}
+                            size={13}
+                            className="mt-0.5"
+                          />
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm font-semibold text-[#0C1B2A] block">
-                          {review.client.name || "Anonyme"}
-                        </span>
-                        <StarRating
-                          rating={review.rating}
-                          size={13}
-                          className="mt-0.5"
-                        />
-                      </div>
+                      {review.comment && (
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          {review.comment}
+                        </p>
+                      )}
                     </div>
-                    {review.comment && (
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        {review.comment}
-                      </p>
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
-              <MessageSquare className="h-10 w-10 text-gray-200 mx-auto mb-3" />
-              <p className="text-sm text-gray-400">Aucun avis pour le moment</p>
-            </div>
-          )}
-        </section>
+            ) : (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+                <MessageSquare className="h-10 w-10 text-gray-200 mx-auto mb-3" />
+                <p className="text-sm text-gray-400">Aucun avis pour le moment</p>
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Info Section */}
         <section id="infos" className="scroll-mt-24">

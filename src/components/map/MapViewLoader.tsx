@@ -41,11 +41,13 @@ type SectorInfo = {
 interface MapViewLoaderProps {
   merchants: MerchantWithDetails[];
   sectors: SectorInfo[];
+  initialSector?: string | null;
 }
 
 export default function MapViewLoader({
   merchants,
   sectors,
+  initialSector,
 }: MapViewLoaderProps) {
-  return <MapView merchants={merchants} sectors={sectors} />;
+  return <MapView merchants={merchants} sectors={sectors} initialSector={initialSector} />;
 }

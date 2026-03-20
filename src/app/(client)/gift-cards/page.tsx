@@ -23,7 +23,7 @@ function GiftCardsContent() {
   const [tab, setTab] = useState<"buy" | "check">(codeFromUrl ? "check" : "buy");
   const [selectedAmount, setSelectedAmount] = useState<number>(5000);
   const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState<{ code: string; amountXPF: number } | null>(null);
+  const [sent, setSent] = useState<{ code: string; amountXPF: number; xpEarned: number } | null>(null);
   const [checkCode, setCheckCode] = useState(codeFromUrl || "");
   const [checkResult, setCheckResult] = useState<{
     code: string;
@@ -79,7 +79,7 @@ function GiftCardsContent() {
       });
       const data = await res.json();
       if (res.ok) {
-        setSent({ code: data.code, amountXPF: data.amountXPF });
+        setSent({ code: data.code, amountXPF: data.amountXPF, xpEarned: data.xpEarned || 0 });
         toast.success("Carte cadeau créée !");
       } else {
         toast.error(data.error);
@@ -283,6 +283,11 @@ function GiftCardsContent() {
               <p className="text-gray-500 mb-2">
                 Montant : <strong>{sent.amountXPF.toLocaleString()} F CFP</strong>
               </p>
+              {sent.xpEarned > 0 && (
+                <p className="text-sm font-semibold text-[#0066FF] mb-1">
+                  +{sent.xpEarned} XP gagnés !
+                </p>
+              )}
 
               {/* QR Code */}
               <div className="my-6">

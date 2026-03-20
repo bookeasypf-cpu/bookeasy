@@ -9,65 +9,75 @@ export default function MentionsLegales() {
     <>
       <h1>Mentions légales</h1>
       <p className="text-sm text-gray-400 mb-8">
-        Dernière mise à jour : 11 mars 2026
+        Dernière mise à jour : 18 mars 2026
       </p>
 
-      <h2>1. &Eacute;diteur du site</h2>
+      <h2>1. Éditeur du site</h2>
       <p>
-        Le site <strong>BookEasy</strong> (ci-après &laquo; le Site &raquo;) est
-        édité par :
+        Le site <strong>BookEasy</strong> (ci-après « le Site ») est édité par :
       </p>
       <ul>
         <li><strong>Raison sociale :</strong> [Votre entreprise]</li>
-        <li><strong>Forme juridique :</strong> [SARL / SAS / Auto-entrepreneur]</li>
-        <li><strong>Numéro TAHITI :</strong> [Votre numéro d'immatriculation]</li>
+        <li><strong>Forme juridique :</strong> [SARL / SAS / Entreprise individuelle]</li>
+        <li><strong>Numéro TAHITI :</strong> [Votre numéro d&apos;immatriculation]</li>
         <li><strong>Siège social :</strong> [Adresse complète], Papeete, Polynésie française</li>
         <li><strong>Téléphone :</strong> +689 40 00 00 00</li>
-        <li><strong>Email :</strong> contact@bookeasy.pf</li>
+        <li><strong>Email :</strong> <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a></li>
         <li><strong>Directeur de la publication :</strong> [Nom du responsable]</li>
       </ul>
 
       <h2>2. Hébergeur</h2>
       <ul>
         <li><strong>Raison sociale :</strong> Vercel Inc.</li>
-        <li><strong>Adresse :</strong> 440 N Barranca Ave #4133, Covina, CA 91723, &Eacute;tats-Unis</li>
+        <li><strong>Adresse :</strong> 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis</li>
         <li><strong>Site web :</strong> https://vercel.com</li>
       </ul>
 
-      <h2>3. Propriété intellectuelle</h2>
+      <h2>3. Activité</h2>
       <p>
-        L'ensemble des contenus présents sur le Site (textes, images, logos, icônes,
-        graphismes, logiciels, base de données) est protégé par les lois
-        relatives à la propriété intellectuelle et au droit d'auteur.
+        BookEasy est une plateforme de mise en relation entre des particuliers et des professionnels
+        de services en Polynésie française. BookEasy permet la recherche de professionnels,
+        la prise de rendez-vous en ligne, l&apos;achat de cartes cadeaux et la consultation d&apos;avis clients.
       </p>
       <p>
-        Toute reproduction, représentation, modification, publication ou adaptation de tout ou
-        partie des éléments du Site, quel que soit le moyen ou le procédé
-        utilisé, est interdite sans autorisation écrite préalable de l'éditeur.
+        BookEasy agit en qualité d&apos;intermédiaire technique et n&apos;est pas partie prenante
+        aux contrats de prestation conclus entre les professionnels et leurs clients.
       </p>
 
-      <h2>4. Responsabilité</h2>
+      <h2>4. Propriété intellectuelle</h2>
       <p>
-        L'éditeur s'efforce de fournir des informations aussi précises que
-        possible. Toutefois, il ne pourra être tenu responsable des omissions, inexactitudes
+        L&apos;ensemble des contenus présents sur le Site (textes, images, logos, icônes,
+        graphismes, logiciels, bases de données, code source) est protégé par les lois
+        relatives à la propriété intellectuelle et au droit d&apos;auteur.
+      </p>
+      <p>
+        La dénomination « BookEasy », le logo et les marques associées sont la propriété
+        exclusive de l&apos;éditeur. Toute reproduction, représentation, modification ou
+        adaptation de tout ou partie des éléments du Site est interdite sans autorisation
+        écrite préalable.
+      </p>
+
+      <h2>5. Responsabilité</h2>
+      <p>
+        L&apos;éditeur s&apos;efforce de fournir des informations aussi précises que possible.
+        Toutefois, il ne pourra être tenu responsable des omissions, inexactitudes
         ou carences dans la mise à jour des informations.
       </p>
       <p>
-        BookEasy agit en tant que plateforme de mise en relation entre les professionnels et les
-        clients. BookEasy n'est pas partie prenante aux contrats de prestation conclus entre
-        les professionnels et leurs clients.
+        BookEasy n&apos;est pas responsable de la qualité des prestations réalisées par les
+        professionnels référencés, ni des litiges pouvant survenir entre un professionnel
+        et un client.
       </p>
 
-      <h2>5. Données personnelles</h2>
+      <h2>6. Données personnelles</h2>
       <p>
-        Conformément à la loi n° 78-17 du 6 janvier 1978 relative à
-        l'informatique, aux fichiers et aux libertés, et au Règlement
-        Général sur la Protection des Données (RGPD), vous disposez d'un
-        droit d'accès, de rectification, de suppression et d'opposition aux
-        données vous concernant.
+        Conformément à la loi n° 78-17 du 6 janvier 1978 relative à l&apos;informatique,
+        aux fichiers et aux libertés, et au Règlement Général sur la Protection des
+        Données (RGPD), vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression
+        et d&apos;opposition aux données vous concernant.
       </p>
       <p>
-        Pour exercer ces droits, vous pouvez nous contacter à l'adresse suivante :{" "}
+        Pour exercer ces droits :{" "}
         <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a>.
       </p>
       <p>
@@ -75,18 +85,28 @@ export default function MentionsLegales() {
         <a href="/legal/confidentialite">Politique de confidentialité</a>.
       </p>
 
-      <h2>6. Cookies</h2>
+      <h2>7. Cookies</h2>
       <p>
-        Le Site utilise des cookies nécessaires à son bon fonctionnement (cookies de
-        session, d'authentification). Aucun cookie publicitaire ou de tracking n'est
-        utilisé sans votre consentement préalable.
+        Le Site utilise des cookies nécessaires à son bon fonctionnement (cookies de session,
+        d&apos;authentification). Aucun cookie publicitaire ou de tracking n&apos;est utilisé
+        sans votre consentement préalable.
       </p>
 
-      <h2>7. Droit applicable</h2>
+      <h2>8. Médiation</h2>
       <p>
-        Les présentes mentions légales sont régies par le droit
-        français applicable en Polynésie française. Tout litige sera soumis
-        aux tribunaux compétents de Papeete.
+        Conformément aux articles L. 152-1 et suivants du Code de la consommation,
+        en cas de litige non résolu, le consommateur peut recourir gratuitement au médiateur
+        désigné par BookEasy :
+      </p>
+      <p>
+        <strong>AMDPF TAHITI</strong> (Association des Médiateurs Diplômés de Polynésie Française)<br />
+        Email : <a href="mailto:contact.amdpf@gmail.com">contact.amdpf@gmail.com</a>
+      </p>
+
+      <h2>9. Droit applicable</h2>
+      <p>
+        Les présentes mentions légales sont régies par le droit français applicable
+        en Polynésie française. Tout litige sera soumis aux tribunaux compétents de Papeete.
       </p>
     </>
   );

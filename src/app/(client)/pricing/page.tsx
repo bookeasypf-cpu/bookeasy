@@ -20,11 +20,10 @@ const plans = [
     color: "#0066FF",
     features: [
       "Profil professionnel complet",
-      "Jusqu'à 5 services",
+      "1 service",
       "Gestion des réservations",
       "Calendrier intégré",
       "Notifications email",
-      "Avis clients",
       "Visibilité sur la carte",
     ],
     cta: "Commencer gratuitement",
@@ -41,6 +40,7 @@ const plans = [
     features: [
       "Tout du plan Gratuit",
       "Services illimités",
+      "Avis clients & notes étoiles",
       "Mise en avant dans les recherches",
       "Badge « Pro vérifié »",
       "Statistiques avancées",

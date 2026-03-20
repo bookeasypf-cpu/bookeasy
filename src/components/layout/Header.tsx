@@ -18,6 +18,7 @@ import {
   Star,
   Bell,
   Gift,
+  Heart,
 } from "lucide-react";
 
 export function Header() {
@@ -103,6 +104,11 @@ export function Header() {
                   <Star className="h-4 w-4" />
                   Mes XP
                   {activeIndicator("/my-rewards")}
+                </Link>
+                <Link href="/favorites" className={navLinkClass("/favorites")}>
+                  <Heart className="h-4 w-4" />
+                  Favoris
+                  {activeIndicator("/favorites")}
                 </Link>
               </>
             )}
@@ -298,6 +304,18 @@ export function Header() {
                     >
                       <Star className="h-4.5 w-4.5" />
                       Mes XP
+                    </Link>
+                    <Link
+                      href="/favorites"
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                        isActive("/favorites")
+                          ? "text-[#0066FF] bg-[#0066FF]/5"
+                          : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                      }`}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Heart className="h-4.5 w-4.5" />
+                      Mes favoris
                     </Link>
                   </>
                 )}

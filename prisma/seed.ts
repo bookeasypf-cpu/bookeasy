@@ -7,16 +7,35 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
 const SECTORS = [
+  // Beauté & Bien-être
   { name: "Coiffeur", slug: "coiffeur", icon: "Scissors" },
   { name: "Barber", slug: "barber", icon: "Scissors" },
   { name: "Esthéticienne", slug: "estheticienne", icon: "Sparkles" },
   { name: "Spa & Bien-être", slug: "spa", icon: "Droplets" },
   { name: "Manucure & Onglerie", slug: "manucure", icon: "Hand" },
   { name: "Massage", slug: "massage", icon: "Heart" },
+  { name: "Maquillage", slug: "maquillage", icon: "Palette" },
+  { name: "Tatoueur", slug: "tatoueur", icon: "Pen" },
+  // Santé
   { name: "Dentiste", slug: "dentiste", icon: "Stethoscope" },
   { name: "Médecin", slug: "medecin", icon: "Stethoscope" },
-  { name: "Tatoueur", slug: "tatoueur", icon: "Pen" },
+  { name: "Kinésithérapeute", slug: "kinesitherapeute", icon: "Activity" },
+  { name: "Ostéopathe", slug: "osteopathe", icon: "Activity" },
+  { name: "Nutritionniste", slug: "nutritionniste", icon: "Apple" },
+  { name: "Psychologue", slug: "psychologue", icon: "Brain" },
+  { name: "Vétérinaire", slug: "veterinaire", icon: "PawPrint" },
+  // Sport & Loisirs
   { name: "Coach sportif", slug: "coach-sportif", icon: "Dumbbell" },
+  { name: "Plongée", slug: "plongee", icon: "Waves" },
+  { name: "Yoga & Pilates", slug: "yoga-pilates", icon: "Flame" },
+  { name: "Excursion & Tour", slug: "excursion", icon: "Compass" },
+  // Services pro
+  { name: "Photographe", slug: "photographe", icon: "Camera" },
+  { name: "Auto-école", slug: "auto-ecole", icon: "Car" },
+  { name: "Mécanicien", slug: "mecanicien", icon: "Wrench" },
+  { name: "Pressing & Couture", slug: "pressing", icon: "Shirt" },
+  { name: "Cours particulier", slug: "cours-particulier", icon: "GraduationCap" },
+  // Autre
   { name: "Autre", slug: "autre", icon: "Store" },
 ];
 

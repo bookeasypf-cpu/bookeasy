@@ -15,7 +15,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MerchantPopup } from "./MerchantPopup";
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -47,6 +46,7 @@ type SectorInfo = {
 interface MapViewProps {
   merchants: MerchantWithDetails[];
   sectors: SectorInfo[];
+  initialSector?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -54,20 +54,35 @@ interface MapViewProps {
 // ---------------------------------------------------------------------------
 
 const SECTOR_COLORS: Record<string, string> = {
+  // Beauté & Bien-être
   coiffeur: "#0066FF",
   barber: "#6366F1",
   estheticienne: "#EC4899",
   spa: "#14B8A6",
   manucure: "#F472B6",
   massage: "#EF4444",
+  maquillage: "#DB2777",
   tatoueur: "#8B5CF6",
+  // Santé
   dentiste: "#10B981",
   medecin: "#06B6D4",
   kinesitherapeute: "#0891B2",
-  "coach-sportif": "#F59E0B",
-  photographe: "#A855F7",
-  mecanicien: "#64748B",
+  osteopathe: "#0D9488",
+  nutritionniste: "#65A30D",
+  psychologue: "#7C3AED",
   veterinaire: "#22C55E",
+  // Sport & Loisirs
+  "coach-sportif": "#F59E0B",
+  plongee: "#0284C7",
+  "yoga-pilates": "#A78BFA",
+  excursion: "#0EA5E9",
+  // Services pro
+  photographe: "#A855F7",
+  "auto-ecole": "#EA580C",
+  mecanicien: "#64748B",
+  pressing: "#78716C",
+  "cours-particulier": "#2563EB",
+  // Autre
   autre: "#6B7280",
 };
 
@@ -203,29 +218,42 @@ function getAvgRating(reviews: { rating: number }[]): number {
 // MapView component
 // ---------------------------------------------------------------------------
 
-export default function MapView({ merchants, sectors }: MapViewProps) {
+export default function MapView({ merchants, sectors, initialSector }: MapViewProps) {
   const [selectedMerchant, setSelectedMerchant] = useState<string | null>(null);
-  const [activeSector, setActiveSector] = useState<string | null>(null);
+  const [activeSector, setActiveSector] = useState<string | null>(initialSector ?? null);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileView, setMobileView] = useState<"map" | "list">("map");
   const [flyTarget, setFlyTarget] = useState<[number, number] | null>(null);
 
   const listRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const markerRefs = useRef<Map<string, L.Marker>>(new Map());
+
+  // Build a lookup of sector slug -> sector name for service matching
+  const sectorNameBySlug = useMemo(() => {
+    const map: Record<string, string> = {};
+    sectors.forEach((s) => { map[s.slug] = s.name.toLowerCase(); });
+    return map;
+  }, [sectors]);
 
   // ---- Filtering ----
   const filteredMerchants = useMemo(() => {
     return merchants.filter((m) => {
       const matchesSector = activeSector
-        ? m.sector.slug === activeSector
+        ? m.sector.slug === activeSector ||
+          // Also match if merchant has a service whose name contains the sector name
+          m.services.some((s) =>
+            s.name.toLowerCase().includes(sectorNameBySlug[activeSector] || "")
+          )
         : true;
       const matchesSearch = searchQuery
         ? m.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (m.city?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
+          (m.city?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+          m.services.some((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
         : true;
       return matchesSector && matchesSearch;
     });
-  }, [merchants, activeSector, searchQuery]);
+  }, [merchants, activeSector, searchQuery, sectorNameBySlug]);
 
   // ---- Handlers ----
   const handleSelectMerchant = useCallback(
@@ -244,6 +272,18 @@ export default function MapView({ merchants, sectors }: MapViewProps) {
       if (mobileView === "list") {
         setMobileView("map");
       }
+      // Open the marker popup after fly animation completes
+      // On mobile list view, need extra delay for view switch + map mount
+      const openPopup = () => {
+        const marker = markerRefs.current.get(merchantId);
+        if (marker && typeof marker.openPopup === "function") {
+          marker.openPopup();
+        }
+      };
+      // Try multiple times to ensure popup opens even with slow animations
+      setTimeout(openPopup, 1000);
+      setTimeout(openPopup, 1500);
+      setTimeout(openPopup, 2000);
       // Scroll card into view in desktop sidebar
       const cardEl = cardRefs.current.get(merchantId);
       if (cardEl) {
@@ -472,6 +512,13 @@ export default function MapView({ merchants, sectors }: MapViewProps) {
         return (
           <Marker
             key={merchant.id}
+            ref={(ref: any) => {
+              if (ref) {
+                // react-leaflet v4: ref is the Leaflet marker instance directly
+                const leafletMarker = ref._leaflet_id ? ref : ref.leafletElement;
+                markerRefs.current.set(merchant.id, leafletMarker || ref);
+              }
+            }}
             position={[merchant.latitude, merchant.longitude]}
             icon={createMarkerIcon(
               merchant.sector.slug,
