@@ -9,7 +9,7 @@ export default function MentionsLegales() {
     <>
       <h1>Mentions légales</h1>
       <p className="text-sm text-gray-400 mb-8">
-        Dernière mise à jour : 18 mars 2026
+        Dernière mise à jour : 22 mars 2026
       </p>
 
       <h2>1. Éditeur du site</h2>
@@ -17,13 +17,17 @@ export default function MentionsLegales() {
         Le site <strong>BookEasy</strong> (ci-après « le Site ») est édité par :
       </p>
       <ul>
-        <li><strong>Raison sociale :</strong> [Votre entreprise]</li>
-        <li><strong>Forme juridique :</strong> [SARL / SAS / Entreprise individuelle]</li>
-        <li><strong>Numéro TAHITI :</strong> [Votre numéro d&apos;immatriculation]</li>
-        <li><strong>Siège social :</strong> [Adresse complète], Papeete, Polynésie française</li>
-        <li><strong>Téléphone :</strong> +689 40 00 00 00</li>
-        <li><strong>Email :</strong> <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a></li>
-        <li><strong>Directeur de la publication :</strong> [Nom du responsable]</li>
+        <li><strong>Responsable légal :</strong> Maravai PARAU</li>
+        <li><strong>Forme juridique :</strong> Entreprise individuelle (EI) — Exploitation directe</li>
+        <li><strong>N° TAHITI :</strong> D11783</li>
+        <li><strong>RCS :</strong> 26 270 A R.C.S. Papeete</li>
+        <li><strong>Date d&apos;immatriculation :</strong> 03/02/2026</li>
+        <li><strong>Activité :</strong> Apporteur d&apos;affaires dans les services digitaux et d&apos;automatisation</li>
+        <li><strong>Siège social :</strong> Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française</li>
+        <li><strong>Téléphone :</strong> +689 89 70 01 05</li>
+        <li><strong>Email :</strong> <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a></li>
+        <li><strong>Site web :</strong> <a href="https://bookeasy.me" target="_blank" rel="noopener noreferrer">https://bookeasy.me</a></li>
+        <li><strong>Directeur de la publication :</strong> Maravai PARAU</li>
       </ul>
 
       <h2>2. Hébergeur</h2>
@@ -78,7 +82,7 @@ export default function MentionsLegales() {
       </p>
       <p>
         Pour exercer ces droits :{" "}
-        <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a>.
+        <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a>.
       </p>
       <p>
         Pour plus de détails, consultez notre{" "}

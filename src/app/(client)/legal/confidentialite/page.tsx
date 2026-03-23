@@ -9,7 +9,7 @@ export default function Confidentialite() {
     <>
       <h1>Politique de confidentialité</h1>
       <p className="text-sm text-gray-400 mb-8">
-        Dernière mise à jour : 18 mars 2026
+        Dernière mise à jour : 22 mars 2026
       </p>
 
       <h2>1. Introduction</h2>
@@ -27,10 +27,11 @@ export default function Confidentialite() {
       <h2>2. Responsable du traitement</h2>
       <p>
         Le responsable du traitement des données est :<br />
-        <strong>[Votre entreprise]</strong><br />
-        [Adresse complète], Papeete, Polynésie française<br />
-        Email : <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a><br />
-        Téléphone : +689 40 00 00 00
+        <strong>Maravai PARAU — Entreprise individuelle (EI)</strong><br />
+        N° TAHITI : D11783 — RCS : 26 270 A R.C.S. Papeete<br />
+        Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française<br />
+        Email : <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a><br />
+        Téléphone : +689 89 70 01 05
       </p>
 
       <h2>3. Données collectées</h2>
@@ -110,7 +111,7 @@ export default function Confidentialite() {
       </ul>
       <p>
         Pour exercer ces droits, contactez-nous à :{" "}
-        <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a>.
+        <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a>.
         Nous répondrons dans un délai de 30 jours. En cas de demande complexe, ce délai
         peut être prolongé de 60 jours, avec notification préalable.
       </p>
@@ -172,9 +173,9 @@ export default function Confidentialite() {
       <h2>14. Contact et réclamation</h2>
       <p>
         Pour toute question relative à la présente politique ou pour exercer vos droits :<br />
-        Email : <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a><br />
-        Téléphone : +689 40 00 00 00<br />
-        Adresse : [Adresse complète], Papeete, Polynésie française
+        Email : <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a><br />
+        Téléphone : +689 89 70 01 05<br />
+        Adresse : Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française
       </p>
       <p>
         Vous pouvez également adresser une réclamation à la CNIL

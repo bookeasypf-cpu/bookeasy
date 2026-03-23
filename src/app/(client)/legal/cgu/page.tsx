@@ -9,18 +9,18 @@ export default function CGU() {
     <>
       <h1>Conditions Générales d&apos;Utilisation</h1>
       <p className="text-sm text-gray-400 mb-8">
-        Dernière mise à jour : 18 mars 2026
+        Dernière mise à jour : 22 mars 2026
       </p>
 
       <h2>Article 1 — Identification</h2>
       <p>
         La plateforme <strong>BookEasy</strong> (ci-après « la Plateforme ») est éditée par
-        la société <strong>[Votre entreprise]</strong>, [forme juridique],
-        dont le siège social est situé à [adresse complète], Papeete, Polynésie française,
-        immatriculée sous le numéro TAHITI [numéro].
+        <strong>Maravai PARAU</strong>, Entreprise individuelle (EI) — Exploitation directe,
+        dont le siège social est situé au Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française,
+        immatriculée sous le N° TAHITI D11783 — RCS 26 270 A R.C.S. Papeete.
       </p>
       <p>
-        Contact : <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a> — Tél. : +689 40 00 00 00
+        Contact : <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a> — Tél. : +689 89 70 01 05
       </p>
 
       <h2>Article 2 — Définitions</h2>
@@ -67,7 +67,7 @@ export default function CGU() {
       </p>
       <p>
         L&apos;Utilisateur peut supprimer son compte à tout moment depuis la rubrique « Mon profil »
-        ou en envoyant un email à <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a>.
+        ou en envoyant un email à <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a>.
         Si un rendez-vous est réservé et n&apos;a pas encore eu lieu au moment de la suppression,
         celui-ci sera automatiquement annulé.
       </p>
@@ -256,7 +256,7 @@ export default function CGU() {
       <h3>10.3 Contestation</h3>
       <p>
         L&apos;Utilisateur peut contester la décision dans un délai de 30 jours à compter de
-        la notification en écrivant à <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a>.
+        la notification en écrivant à <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a>.
         BookEasy disposera d&apos;un délai de 90 jours pour reconsidérer sa décision et fournir
         une réponse motivée.
       </p>
@@ -320,7 +320,7 @@ export default function CGU() {
       <h3>15.2 Réclamation</h3>
       <p>
         En cas de réclamation, l&apos;Utilisateur peut contacter BookEasy par email
-        à <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a>.
+        à <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a>.
       </p>
 
       <h3>15.3 Médiation</h3>
@@ -356,9 +356,9 @@ export default function CGU() {
       <h2>Article 17 — Contact</h2>
       <p>
         Pour toute question relative aux présentes CGU :<br />
-        Email : <a href="mailto:contact@bookeasy.pf">contact@bookeasy.pf</a><br />
-        Téléphone : +689 40 00 00 00<br />
-        Adresse : [Adresse complète], Papeete, Polynésie française
+        Email : <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a><br />
+        Téléphone : +689 89 70 01 05<br />
+        Adresse : Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française
       </p>
     </>
   );
