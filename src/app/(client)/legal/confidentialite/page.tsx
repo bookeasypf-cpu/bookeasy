@@ -31,7 +31,7 @@ export default function Confidentialite() {
         N° TAHITI : D11783 — RCS : 26 270 A R.C.S. Papeete<br />
         Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française<br />
         Email : <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a><br />
-        Téléphone : +689 89 70 01 05
+        Téléphone : +689 89 70 03 05
       </p>
 
       <h2>3. Données collectées</h2>
@@ -174,7 +174,7 @@ export default function Confidentialite() {
       <p>
         Pour toute question relative à la présente politique ou pour exercer vos droits :<br />
         Email : <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a><br />
-        Téléphone : +689 89 70 01 05<br />
+        Téléphone : +689 89 70 03 05<br />
         Adresse : Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française
       </p>
       <p>

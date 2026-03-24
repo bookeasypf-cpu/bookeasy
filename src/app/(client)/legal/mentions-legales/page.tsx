@@ -24,7 +24,7 @@ export default function MentionsLegales() {
         <li><strong>Date d&apos;immatriculation :</strong> 03/02/2026</li>
         <li><strong>Activité :</strong> Apporteur d&apos;affaires dans les services digitaux et d&apos;automatisation</li>
         <li><strong>Siège social :</strong> Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française</li>
-        <li><strong>Téléphone :</strong> +689 89 70 01 05</li>
+        <li><strong>Téléphone :</strong> +689 89 70 03 05</li>
         <li><strong>Email :</strong> <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a></li>
         <li><strong>Site web :</strong> <a href="https://bookeasy.me" target="_blank" rel="noopener noreferrer">https://bookeasy.me</a></li>
         <li><strong>Directeur de la publication :</strong> Maravai PARAU</li>
