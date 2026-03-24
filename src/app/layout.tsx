@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     siteName: "BookEasy",
     locale: "fr_FR",
     type: "website",
-    url: "https://bookeasy.pf",
+    url: "https://bookeasy.me",
   },
   twitter: {
     card: "summary_large_image",

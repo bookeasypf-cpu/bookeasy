@@ -210,7 +210,7 @@ export default function PricingPage() {
               Vous avez d'autres questions ?
             </p>
             <Link
-              href="mailto:contact@bookeasy.pf"
+              href="mailto:contact@bookeasy.me"
               className="inline-flex items-center gap-2 text-[#0066FF] font-semibold hover:underline"
             >
               Contactez-nous <ArrowRight className="h-4 w-4" />

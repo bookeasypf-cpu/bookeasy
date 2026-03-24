@@ -23,7 +23,7 @@ export async function geocodeAddress(
 
     const res = await fetch(url.toString(), {
       headers: {
-        "User-Agent": "BookEasy/1.0 (contact@bookeasy.pf)",
+        "User-Agent": "BookEasy/1.0 (contact@bookeasy.me)",
       },
     });
 
@@ -48,7 +48,7 @@ export async function geocodeAddress(
 
       const fallbackRes = await fetch(fallbackUrl.toString(), {
         headers: {
-          "User-Agent": "BookEasy/1.0 (contact@bookeasy.pf)",
+          "User-Agent": "BookEasy/1.0 (contact@bookeasy.me)",
         },
       });
 

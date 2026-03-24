@@ -4,7 +4,7 @@ import { prisma } from "./prisma";
 // Configurer VAPID keys
 if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webPush.setVapidDetails(
-    "mailto:contact@bookeasy.pf",
+    "mailto:contact@bookeasy.me",
     process.env.VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
   );
