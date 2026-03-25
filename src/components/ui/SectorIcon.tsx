@@ -177,8 +177,8 @@ function getIconPath(sector: string) {
     );
   }
 
-  // ── Médecin ──
-  if (sector.includes("medecin") || sector.includes("médecin") || sector.includes("doctor")) {
+  // ── Médecin / Médecin généraliste ──
+  if (sector.includes("medecin") || sector.includes("médecin") || sector.includes("doctor") || sector.includes("generaliste")) {
     return (
       <>
         {/* Stethoscope */}
@@ -190,6 +190,108 @@ function getIconPath(sector: string) {
         {/* Cross */}
         <line x1="8" y1="50" x2="8" y2="58" strokeWidth="2" />
         <line x1="4" y1="54" x2="12" y2="54" strokeWidth="2" />
+      </>
+    );
+  }
+
+  // ── Infirmier(ère) ──
+  if (sector.includes("infirmier") || sector.includes("nurse")) {
+    return (
+      <>
+        {/* Medical cross */}
+        <rect x="24" y="12" width="16" height="40" rx="3" />
+        <rect x="12" y="24" width="40" height="16" rx="3" />
+        {/* Heart accent */}
+        <path d="M 50,48 C 50,46 52,44 54,44 C 56,44 58,46 58,48 C 58,52 54,56 54,56 C 54,56 50,52 50,48" strokeWidth="1.3" />
+      </>
+    );
+  }
+
+  // ── Psychologue ──
+  if (sector.includes("psychologue") || sector.includes("psy")) {
+    return (
+      <>
+        {/* Brain shape */}
+        <path d="M 32,12 C 24,12 18,16 18,24 C 14,24 10,28 10,34 C 10,40 14,44 18,44 C 18,50 24,54 32,54 C 40,54 46,50 46,44 C 50,44 54,40 54,34 C 54,28 50,24 46,24 C 46,16 40,12 32,12" />
+        {/* Brain folds */}
+        <path d="M 32,12 L 32,54" strokeWidth="1.3" />
+        <path d="M 18,30 C 24,28 28,32 32,30" strokeWidth="1.3" />
+        <path d="M 46,30 C 40,28 36,32 32,30" strokeWidth="1.3" />
+        <path d="M 20,40 C 24,38 28,42 32,40" strokeWidth="1.3" />
+        <path d="M 44,40 C 40,38 36,42 32,40" strokeWidth="1.3" />
+      </>
+    );
+  }
+
+  // ── Opticien ──
+  if (sector.includes("opticien") || sector.includes("optique") || sector.includes("eye")) {
+    return (
+      <>
+        {/* Eye shape */}
+        <path d="M 6,32 C 14,20 24,16 32,16 C 40,16 50,20 58,32 C 50,44 40,48 32,48 C 24,48 14,44 6,32 Z" />
+        {/* Iris */}
+        <circle cx="32" cy="32" r="10" />
+        {/* Pupil */}
+        <circle cx="32" cy="32" r="5" fill="currentColor" stroke="none" />
+        {/* Light reflection */}
+        <circle cx="35" cy="29" r="2" fill="none" strokeWidth="1.5" />
+      </>
+    );
+  }
+
+  // ── Ostéopathe ──
+  if (sector.includes("osteopathe") || sector.includes("ostéo")) {
+    return (
+      <>
+        {/* Spine */}
+        <ellipse cx="32" cy="12" rx="6" ry="4" />
+        <ellipse cx="32" cy="22" rx="7" ry="4" />
+        <ellipse cx="32" cy="32" rx="7" ry="4" />
+        <ellipse cx="32" cy="42" rx="6" ry="4" />
+        <ellipse cx="32" cy="52" rx="5" ry="4" />
+        {/* Hands */}
+        <path d="M 10,28 C 14,26 18,28 20,32" strokeWidth="1.5" />
+        <path d="M 54,28 C 50,26 46,28 44,32" strokeWidth="1.5" />
+      </>
+    );
+  }
+
+  // ── Diététicien(ne) / Nutritionniste ──
+  if (sector.includes("dieteticien") || sector.includes("diététicien") || sector.includes("nutritionniste") || sector.includes("nutrition")) {
+    return (
+      <>
+        {/* Apple */}
+        <path d="M 32,16 C 22,16 14,24 14,34 C 14,46 22,54 32,54 C 42,54 50,46 50,34 C 50,24 42,16 32,16" />
+        {/* Stem */}
+        <path d="M 32,16 C 32,12 34,8 38,6" strokeWidth="1.5" />
+        {/* Leaf */}
+        <path d="M 36,10 C 40,8 44,10 42,14 C 40,12 38,12 36,10" fill="currentColor" stroke="none" />
+        {/* Measuring tape */}
+        <line x1="6" y1="34" x2="14" y2="34" strokeWidth="1.3" />
+        <line x1="8" y1="30" x2="8" y2="38" strokeWidth="1" />
+        <line x1="10" y1="32" x2="10" y2="36" strokeWidth="1" />
+        <line x1="12" y1="30" x2="12" y2="38" strokeWidth="1" />
+      </>
+    );
+  }
+
+  // ── Kinésithérapeute ──
+  if (sector.includes("kinesitherapeute") || sector.includes("kiné") || sector.includes("kine")) {
+    return (
+      <>
+        {/* Person stretching */}
+        <circle cx="32" cy="12" r="6" />
+        {/* Body */}
+        <line x1="32" y1="18" x2="32" y2="38" strokeWidth="2" />
+        {/* Arms raised */}
+        <path d="M 32,24 L 18,16" strokeWidth="2" />
+        <path d="M 32,24 L 46,16" strokeWidth="2" />
+        {/* Legs */}
+        <path d="M 32,38 L 22,54" strokeWidth="2" />
+        <path d="M 32,38 L 42,54" strokeWidth="2" />
+        {/* Movement lines */}
+        <path d="M 12,20 C 10,22 10,26 12,28" strokeWidth="1.2" />
+        <path d="M 52,20 C 54,22 54,26 52,28" strokeWidth="1.2" />
       </>
     );
   }

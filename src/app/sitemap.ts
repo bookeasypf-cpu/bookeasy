@@ -1,6 +1,19 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
+const COMMUNES_TAHITI = [
+  "Papeete",
+  "Faa'a",
+  "Punaauia",
+  "Pirae",
+  "Arue",
+  "Mahina",
+  "Paea",
+  "Papara",
+  "Taravao",
+  "Moorea",
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const merchants = await prisma.merchant.findMany({
     where: { isActive: true },
@@ -37,5 +50,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...merchantPages, ...sectorPages];
+  // City-specific pages for each commune
+  const cityPages = COMMUNES_TAHITI.map((city) => ({
+    url: `https://bookeasy.me/search?city=${encodeURIComponent(city)}`,
+    lastModified: new Date(),
+    changeFrequency: "daily" as const,
+    priority: 0.6,
+  }));
+
+  // Sector + city combination pages for SEO
+  const sectorCityPages = sectors.flatMap((s) =>
+    COMMUNES_TAHITI.map((city) => ({
+      url: `https://bookeasy.me/search?sector=${s.slug}&city=${encodeURIComponent(city)}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.5,
+    }))
+  );
+
+  return [...staticPages, ...merchantPages, ...sectorPages, ...cityPages, ...sectorCityPages];
 }

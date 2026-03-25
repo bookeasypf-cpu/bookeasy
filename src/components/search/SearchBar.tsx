@@ -1,8 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, ChevronDown } from "lucide-react";
+
+const COMMUNES_TAHITI = [
+  "Papeete",
+  "Faa'a",
+  "Punaauia",
+  "Pirae",
+  "Arue",
+  "Mahina",
+  "Paea",
+  "Papara",
+  "Taravao",
+  "Moorea",
+];
 
 export function SearchBar({
   defaultQuery = "",
@@ -14,6 +27,26 @@ export function SearchBar({
   const router = useRouter();
   const [query, setQuery] = useState(defaultQuery);
   const [city, setCity] = useState(defaultCity);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Filter communes based on current input
+  const filteredCommunes = city
+    ? COMMUNES_TAHITI.filter((c) =>
+        c.toLowerCase().includes(city.toLowerCase())
+      )
+    : COMMUNES_TAHITI;
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -21,6 +54,11 @@ export function SearchBar({
     if (query) params.set("q", query);
     if (city) params.set("city", city);
     router.push(`/search?${params.toString()}`);
+  }
+
+  function selectCity(c: string) {
+    setCity(c);
+    setShowDropdown(false);
   }
 
   return (
@@ -35,7 +73,7 @@ export function SearchBar({
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0066FF] transition-colors" />
             <input
               type="text"
-              placeholder="Coiffeur, barber, massage, tatoueur..."
+              placeholder="Coiffeur, barber, massage, médecin..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-3.5 sm:py-4 rounded-xl bg-white/60 sm:bg-transparent text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white/80 transition-colors"
@@ -45,16 +83,46 @@ export function SearchBar({
           {/* Divider (desktop only) */}
           <div className="hidden sm:block w-px h-8 bg-gray-200/80 mx-1 flex-shrink-0" />
 
-          {/* City input */}
-          <div className="relative sm:max-w-[220px] flex-1 group">
-            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0066FF] transition-colors" />
+          {/* City input with dropdown */}
+          <div ref={dropdownRef} className="relative sm:max-w-[220px] flex-1 group">
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0066FF] transition-colors z-10" />
             <input
               type="text"
-              placeholder="Papeete, Moorea..."
+              placeholder="Commune..."
               value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 sm:py-4 rounded-xl bg-white/60 sm:bg-transparent text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white/80 transition-colors"
+              onChange={(e) => {
+                setCity(e.target.value);
+                setShowDropdown(true);
+              }}
+              onFocus={() => setShowDropdown(true)}
+              className="w-full pl-12 pr-10 py-3.5 sm:py-4 rounded-xl bg-white/60 sm:bg-transparent text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white/80 transition-colors"
             />
+            <button
+              type="button"
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <ChevronDown className={`h-4 w-4 transition-transform ${showDropdown ? "rotate-180" : ""}`} />
+            </button>
+
+            {/* Dropdown */}
+            {showDropdown && filteredCommunes.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-50 max-h-60 overflow-y-auto">
+                {filteredCommunes.map((commune) => (
+                  <button
+                    key={commune}
+                    type="button"
+                    onClick={() => selectCity(commune)}
+                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#0066FF]/5 transition-colors flex items-center gap-2.5 ${
+                      city === commune ? "text-[#0066FF] font-semibold bg-[#0066FF]/5" : "text-gray-700"
+                    }`}
+                  >
+                    <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                    {commune}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Submit button */}

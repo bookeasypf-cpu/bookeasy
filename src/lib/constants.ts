@@ -1,18 +1,37 @@
 export const SECTORS = [
+  // Beauté & Bien-être
   { name: "Coiffeur", slug: "coiffeur", icon: "Scissors" },
   { name: "Barber", slug: "barber", icon: "Scissors" },
   { name: "Esthéticienne", slug: "estheticienne", icon: "Sparkles" },
   { name: "Spa & Bien-être", slug: "spa", icon: "Droplets" },
   { name: "Manucure & Onglerie", slug: "manucure", icon: "Hand" },
   { name: "Massage", slug: "massage", icon: "Heart" },
-  { name: "Dentiste", slug: "dentiste", icon: "Stethoscope" },
-  { name: "Médecin", slug: "medecin", icon: "Stethoscope" },
-  { name: "Kinésithérapeute", slug: "kinesitherapeute", icon: "Activity" },
+  { name: "Maquillage", slug: "maquillage", icon: "Palette" },
   { name: "Tatoueur", slug: "tatoueur", icon: "Pen" },
-  { name: "Coach sportif", slug: "coach-sportif", icon: "Dumbbell" },
-  { name: "Photographe", slug: "photographe", icon: "Camera" },
-  { name: "Mécanicien auto", slug: "mecanicien", icon: "Wrench" },
+  // Santé
+  { name: "Médecin généraliste", slug: "medecin-generaliste", icon: "Stethoscope" },
+  { name: "Dentiste", slug: "dentiste", icon: "SmilePlus" },
+  { name: "Kinésithérapeute", slug: "kinesitherapeute", icon: "Activity" },
+  { name: "Infirmier(ère)", slug: "infirmier", icon: "Cross" },
+  { name: "Psychologue", slug: "psychologue", icon: "Brain" },
+  { name: "Opticien", slug: "opticien", icon: "Eye" },
+  { name: "Ostéopathe", slug: "osteopathe", icon: "Bone" },
+  { name: "Diététicien(ne)", slug: "dieteticien", icon: "Apple" },
+  { name: "Nutritionniste", slug: "nutritionniste", icon: "Apple" },
+  { name: "Médecin", slug: "medecin", icon: "Stethoscope" },
   { name: "Vétérinaire", slug: "veterinaire", icon: "PawPrint" },
+  // Sport & Loisirs
+  { name: "Coach sportif", slug: "coach-sportif", icon: "Dumbbell" },
+  { name: "Plongée", slug: "plongee", icon: "Waves" },
+  { name: "Yoga & Pilates", slug: "yoga-pilates", icon: "Flame" },
+  { name: "Excursion & Tour", slug: "excursion", icon: "Compass" },
+  // Services pro
+  { name: "Photographe", slug: "photographe", icon: "Camera" },
+  { name: "Auto-école", slug: "auto-ecole", icon: "Car" },
+  { name: "Mécanicien", slug: "mecanicien", icon: "Wrench" },
+  { name: "Pressing & Couture", slug: "pressing", icon: "Shirt" },
+  { name: "Cours particulier", slug: "cours-particulier", icon: "GraduationCap" },
+  // Autre
   { name: "Autre", slug: "autre", icon: "Store" },
 ] as const;
 
