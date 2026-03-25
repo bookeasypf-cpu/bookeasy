@@ -28,9 +28,12 @@ model User {
   bookings      Booking[]       @relation("ClientBookings")
   reviews       Review[]
   notifications Notification[]
+  referralCode      String?        @unique
   xpTransactions XpTransaction[]
   pushSubscriptions PushSubscription[]
   favorites         Favorite[]
+  referralsSent     Referral[]     @relation("ReferralsSent")
+  referralsReceived Referral[]     @relation("ReferralsReceived")
 
   @@map("users")
 }
@@ -282,16 +285,16 @@ model Notification {
 model XpTransaction {
   id         String   @id @default(cuid())
   userId     String
-  merchantId String
+  merchantId String?
   bookingId  String?
   amount     Int      // positif = gagné, négatif = dépensé ou révoqué
   type       String   // EARNED, REVOKED, REDEEMED
   reason     String?  // ex: "Réservation confirmée", "Annulation", "Échange récompense"
   createdAt  DateTime @default(now())
 
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
-  booking  Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  merchant Merchant? @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  booking  Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
 
   @@index([userId, merchantId])
   @@index([bookingId])
@@ -398,4 +401,24 @@ model PushSubscription {
 
   @@index([userId])
   @@map("push_subscriptions")
+}
+
+// ─────────────────────────────────────────────
+// REFERRALS / PARRAINAGE
+// ─────────────────────────────────────────────
+
+model Referral {
+  id          String   @id @default(cuid())
+  referrerId  String
+  refereeId   String
+  status      String   @default("REGISTERED") // REGISTERED, FIRST_BOOKING, COMPLETED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  referrer    User     @relation("ReferralsSent", fields: [referrerId], references: [id], onDelete: Cascade)
+  referee     User     @relation("ReferralsReceived", fields: [refereeId], references: [id], onDelete: Cascade)
+
+  @@unique([refereeId])
+  @@index([referrerId])
+  @@map("referrals")
 }

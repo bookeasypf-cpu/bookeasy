@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import { registerUser } from "@/actions/auth";
-import { User, Store } from "lucide-react";
+import { User, Store, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function RegisterPage() {
@@ -24,11 +24,27 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const defaultRole = searchParams.get("role") || "CLIENT";
   const callbackUrl = searchParams.get("callbackUrl") || "";
+  const refCode = searchParams.get("ref") || "";
   const [role, setRole] = useState<"CLIENT" | "MERCHANT">(
     defaultRole === "MERCHANT" ? "MERCHANT" : "CLIENT"
   );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [referrerName, setReferrerName] = useState<string | null>(null);
+
+  // Validate referral code and get referrer name
+  useEffect(() => {
+    if (refCode) {
+      fetch(`/api/referrals/validate?code=${encodeURIComponent(refCode)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.valid && data.referrerName) {
+            setReferrerName(data.referrerName);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [refCode]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,6 +53,9 @@ function RegisterForm() {
 
     const formData = new FormData(e.currentTarget);
     formData.set("role", role);
+    if (refCode) {
+      formData.set("referralCode", refCode);
+    }
 
     const result = await registerUser(formData);
 
@@ -72,6 +91,19 @@ function RegisterForm() {
         <p className="text-sm text-gray-500 text-center mb-6">
           Rejoignez BookEasy gratuitement
         </p>
+
+        {/* Referral banner */}
+        {refCode && referrerName && (
+          <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl text-center">
+            <Gift className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-blue-800">
+              Vous avez été invité(e) par {referrerName} !
+            </p>
+            <p className="text-xs text-blue-600 mt-1">
+              Inscrivez-vous pour recevoir 5 XP de bienvenue
+            </p>
+          </div>
+        )}
 
         {/* Role selector */}
         <div className="grid grid-cols-2 gap-3 mb-6">

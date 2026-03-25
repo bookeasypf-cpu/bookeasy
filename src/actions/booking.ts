@@ -4,8 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { bookingSchema } from "@/lib/validators";
 import { revalidatePath } from "next/cache";
-import { sendBookingConfirmation, sendBookingCancellation } from "@/lib/email";
+import { sendBookingConfirmation, sendBookingCancellation, sendReferralRewardEmail } from "@/lib/email";
 import { sendPushNotification } from "@/lib/push";
+import { REFERRAL_XP_FIRST_BOOKING, checkAndAwardMilestoneBonus } from "@/lib/referral";
 
 export async function createBooking(data: {
   merchantId: string;
@@ -122,6 +123,46 @@ export async function createBooking(data: {
             reason: `Réservation : ${service.name}`,
           },
         });
+      }
+
+      // Check referral: if user was referred and this is their first booking
+      try {
+        const referral = await prisma.referral.findUnique({
+          where: { refereeId: user.id },
+          include: { referrer: { select: { id: true, name: true, email: true } } },
+        });
+
+        if (referral && referral.status === "REGISTERED") {
+          await prisma.referral.update({
+            where: { id: referral.id },
+            data: { status: "FIRST_BOOKING" },
+          });
+
+          // Award XP to referrer for first booking
+          await prisma.xpTransaction.create({
+            data: {
+              userId: referral.referrerId,
+              amount: REFERRAL_XP_FIRST_BOOKING,
+              type: "EARNED",
+              reason: `Parrainage : ${user.name || "Filleul"} a fait sa 1ère réservation`,
+            },
+          });
+
+          // Check milestones
+          await checkAndAwardMilestoneBonus(referral.referrerId);
+
+          // Notify referrer by email
+          if (referral.referrer.email) {
+            sendReferralRewardEmail(
+              referral.referrer.email,
+              referral.referrer.name || "Parrain",
+              REFERRAL_XP_FIRST_BOOKING,
+              `${user.name || "Votre filleul"} a fait sa première réservation`
+            ).catch(() => {});
+          }
+        }
+      } catch {
+        // Don't fail booking if referral processing fails
       }
 
       // Push notification to merchant (async, non-blocking)

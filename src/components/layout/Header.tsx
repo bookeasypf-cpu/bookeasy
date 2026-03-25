@@ -19,6 +19,7 @@ import {
   Bell,
   Gift,
   Heart,
+  Users,
 } from "lucide-react";
 
 export function Header() {
@@ -109,6 +110,11 @@ export function Header() {
                   <Heart className="h-4 w-4" />
                   Favoris
                   {activeIndicator("/favorites")}
+                </Link>
+                <Link href="/referrals" className={navLinkClass("/referrals")}>
+                  <Users className="h-4 w-4" />
+                  Parrainage
+                  {activeIndicator("/referrals")}
                 </Link>
               </>
             )}
@@ -316,6 +322,18 @@ export function Header() {
                     >
                       <Heart className="h-4.5 w-4.5" />
                       Mes favoris
+                    </Link>
+                    <Link
+                      href="/referrals"
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                        isActive("/referrals")
+                          ? "text-[#0066FF] bg-[#0066FF]/5"
+                          : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                      }`}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Users className="h-4.5 w-4.5" />
+                      Parrainage
                     </Link>
                   </>
                 )}

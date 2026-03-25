@@ -350,6 +350,58 @@ export async function sendWelcomeEmail(to: string, name: string) {
 }
 
 // ─────────────────────────────────────────────
+// REFERRAL REWARD (sent to referrer)
+// ─────────────────────────────────────────────
+
+export async function sendReferralRewardEmail(
+  to: string,
+  name: string,
+  xpEarned: number,
+  reason: string
+) {
+  if (!resend) {
+    console.log("[EMAIL] Resend not configured – skipping referral reward to", to);
+    return;
+  }
+
+  const html = layout(`
+    <div style="background:linear-gradient(135deg,#0066FF,#00B4D8);padding:32px 24px;text-align:center;">
+      <div style="font-size:40px;margin-bottom:8px;">🎁</div>
+      <h1 style="color:#fff;font-size:22px;margin:0;font-weight:700;">Vous avez gagné ${xpEarned} XP !</h1>
+      <p style="color:rgba(255,255,255,0.85);font-size:14px;margin:8px 0 0;">Grâce à votre parrainage</p>
+    </div>
+    <div style="padding:24px;">
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${name}</strong>,</p>
+      <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
+        ${reason}. Vous avez reçu <strong style="color:#0066FF;">${xpEarned} XP</strong> en récompense !
+      </p>
+      <div style="background:#f0f7ff;border-radius:12px;padding:20px;margin-bottom:20px;text-align:center;">
+        <div style="font-size:36px;font-weight:800;color:#0066FF;">+${xpEarned} XP</div>
+        <p style="margin:8px 0 0;color:#6b7280;font-size:13px;">ajoutés à votre solde</p>
+      </div>
+      <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
+        Continuez à inviter vos amis pour gagner encore plus de XP et débloquer des récompenses exclusives !
+      </p>
+      <div style="text-align:center;margin-top:8px;">
+        <a href="${BASE_URL}/referrals" style="display:inline-block;background:linear-gradient(135deg,#0066FF,#00B4D8);color:#fff;text-decoration:none;padding:12px 32px;border-radius:8px;font-weight:600;font-size:14px;">Voir mon parrainage</a>
+      </div>
+    </div>
+  `);
+
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to,
+      subject: `🎁 +${xpEarned} XP – Parrainage BookEasy`,
+      html,
+    });
+    console.log("[EMAIL] Referral reward email sent to", to);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send referral reward:", err);
+  }
+}
+
+// ─────────────────────────────────────────────
 // SUPPORT MESSAGE (from Pro merchant)
 // ─────────────────────────────────────────────
 

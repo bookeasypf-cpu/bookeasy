@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       _sum: { amount: true },
     });
 
-    const merchantIds = transactions.map((t) => t.merchantId);
+    const merchantIds = transactions.map((t) => t.merchantId).filter((id): id is string => id !== null);
     const merchants = await prisma.merchant.findMany({
       where: { id: { in: merchantIds } },
       select: {
