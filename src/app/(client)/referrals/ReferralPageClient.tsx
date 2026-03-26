@@ -60,7 +60,7 @@ export function ReferralPageClient() {
 
   const shareWhatsApp = () => {
     if (!data) return;
-    const text = `Rejoins BookEasy et réserve tes RDV en ligne ! Utilise mon code ${data.referralCode} pour gagner 5 XP 🎁 ${data.referralLink}`;
+    const text = `Rejoins BookEasy et réserve tes RDV en ligne ! Utilise mon code ${data.referralCode} pour gagner 2 XP 🎁 ${data.referralLink}`;
     window.open(
       `https://wa.me/?text=${encodeURIComponent(text)}`,
       "_blank"
@@ -69,7 +69,7 @@ export function ReferralPageClient() {
 
   const shareSMS = () => {
     if (!data) return;
-    const text = `Rejoins BookEasy ! Utilise mon code ${data.referralCode} pour gagner 5 XP : ${data.referralLink}`;
+    const text = `Rejoins BookEasy ! Utilise mon code ${data.referralCode} pour gagner 2 XP : ${data.referralLink}`;
     window.open(`sms:?body=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -150,12 +150,12 @@ export function ReferralPageClient() {
             <div className="bg-white/5 rounded-xl p-3">
               <UserPlus className="h-5 w-5 text-blue-400 mx-auto mb-1.5" />
               <p className="text-white/80 text-xs font-medium">Invitez</p>
-              <p className="text-white/40 text-[10px]">+5 XP chacun</p>
+              <p className="text-white/40 text-[10px]">+2 XP chacun</p>
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <CalendarCheck className="h-5 w-5 text-cyan-400 mx-auto mb-1.5" />
               <p className="text-white/80 text-xs font-medium">1ère résa</p>
-              <p className="text-white/40 text-[10px]">+10 XP pour vous</p>
+              <p className="text-white/40 text-[10px]">+5 XP pour vous</p>
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <Trophy className="h-5 w-5 text-yellow-400 mx-auto mb-1.5" />

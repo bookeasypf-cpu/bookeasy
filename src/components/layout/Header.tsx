@@ -67,10 +67,10 @@ export function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-3">
             <Link href="/map" className={navLinkClass("/map")}>
               <MapPin className="h-4 w-4" />
-              Explorer la carte
+              <span className="hidden xl:inline">Explorer la</span> carte
               {activeIndicator("/map")}
             </Link>
 
@@ -82,7 +82,7 @@ export function Header() {
 
             <Link href="/gift-cards" className={navLinkClass("/gift-cards")}>
               <Gift className="h-4 w-4" />
-              Cartes cadeaux
+              <span className="hidden xl:inline">Cartes</span> Cadeaux
               {activeIndicator("/gift-cards")}
             </Link>
 
@@ -98,12 +98,12 @@ export function Header() {
               <>
                 <Link href="/my-bookings" className={navLinkClass("/my-bookings")}>
                   <Calendar className="h-4 w-4" />
-                  Mes RDV
+                  RDV
                   {activeIndicator("/my-bookings")}
                 </Link>
                 <Link href="/my-rewards" className={navLinkClass("/my-rewards")}>
                   <Star className="h-4 w-4" />
-                  Mes XP
+                  XP
                   {activeIndicator("/my-rewards")}
                 </Link>
                 <Link href="/favorites" className={navLinkClass("/favorites")}>
@@ -212,7 +212,7 @@ export function Header() {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 text-[#0C1B2A]/70 hover:text-[#0066FF] transition-colors rounded-lg"
+            className="lg:hidden p-2 text-[#0C1B2A]/70 hover:text-[#0066FF] transition-colors rounded-lg"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
           >
@@ -227,7 +227,7 @@ export function Header() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[#0C1B2A]/5 animate-slide-down">
+        <div className="lg:hidden border-t border-[#0C1B2A]/5 animate-slide-down">
           <div className="px-4 py-3 space-y-1">
             <Link
               href="/map"

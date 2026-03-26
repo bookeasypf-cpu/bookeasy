@@ -34,9 +34,9 @@ export function getReferralLink(code: string): string {
 }
 
 // XP Constants
-export const REFERRAL_XP_SIGNUP = 5;
-export const REFERRAL_XP_FIRST_BOOKING = 10;
-export const REFEREE_XP_SIGNUP = 5;
+export const REFERRAL_XP_SIGNUP = 2;
+export const REFERRAL_XP_FIRST_BOOKING = 5;
+export const REFEREE_XP_SIGNUP = 2;
 export const MILESTONE_5_BONUS = 20;
 export const MILESTONE_10_BONUS = 30;
 

@@ -24,27 +24,43 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const defaultRole = searchParams.get("role") || "CLIENT";
   const callbackUrl = searchParams.get("callbackUrl") || "";
-  const refCode = searchParams.get("ref") || "";
+  const refCodeFromUrl = searchParams.get("ref") || "";
   const [role, setRole] = useState<"CLIENT" | "MERCHANT">(
     defaultRole === "MERCHANT" ? "MERCHANT" : "CLIENT"
   );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [referrerName, setReferrerName] = useState<string | null>(null);
+  const [refCode, setRefCode] = useState(refCodeFromUrl);
+  const [showRefInput, setShowRefInput] = useState(!refCodeFromUrl);
+  const [validatingRef, setValidatingRef] = useState(false);
 
-  // Validate referral code and get referrer name
-  useEffect(() => {
-    if (refCode) {
-      fetch(`/api/referrals/validate?code=${encodeURIComponent(refCode)}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.valid && data.referrerName) {
-            setReferrerName(data.referrerName);
-          }
-        })
-        .catch(() => {});
+  // Validate referral code
+  const validateRefCode = (code: string) => {
+    if (!code || code.length < 4) {
+      setReferrerName(null);
+      return;
     }
-  }, [refCode]);
+    setValidatingRef(true);
+    fetch(`/api/referrals/validate?code=${encodeURIComponent(code)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.valid && data.referrerName) {
+          setReferrerName(data.referrerName);
+        } else {
+          setReferrerName(null);
+        }
+      })
+      .catch(() => setReferrerName(null))
+      .finally(() => setValidatingRef(false));
+  };
+
+  // Validate on mount if code from URL
+  useEffect(() => {
+    if (refCodeFromUrl) {
+      validateRefCode(refCodeFromUrl);
+    }
+  }, [refCodeFromUrl]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -92,16 +108,55 @@ function RegisterForm() {
           Rejoignez BookEasy gratuitement
         </p>
 
-        {/* Referral banner */}
-        {refCode && referrerName && (
+        {/* Referral banner or input */}
+        {refCode && referrerName ? (
           <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl text-center">
             <Gift className="h-6 w-6 text-blue-600 mx-auto mb-2" />
             <p className="text-sm font-semibold text-blue-800">
               Vous avez été invité(e) par {referrerName} !
             </p>
             <p className="text-xs text-blue-600 mt-1">
-              Inscrivez-vous pour recevoir 5 XP de bienvenue
+              Inscrivez-vous pour recevoir 2 XP de bienvenue
             </p>
+          </div>
+        ) : (
+          <div className="mb-6">
+            {showRefInput ? (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Code de parrainage <span className="text-gray-400">(optionnel)</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={refCode}
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase();
+                      setRefCode(val);
+                    }}
+                    onBlur={() => validateRefCode(refCode)}
+                    placeholder="Ex: BK-A7X3"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono tracking-wider"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => validateRefCode(refCode)}
+                    disabled={validatingRef || !refCode}
+                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  >
+                    {validatingRef ? "..." : "Valider"}
+                  </button>
+                </div>
+                {refCode && !referrerName && !validatingRef && refCode.length >= 4 && (
+                  <p className="text-xs text-red-500">Code invalide</p>
+                )}
+                {referrerName && (
+                  <p className="text-xs text-green-600">
+                    ✓ Invité(e) par {referrerName} — vous recevrez 2 XP !
+                  </p>
+                )}
+              </div>
+            ) : null}
           </div>
         )}
 
