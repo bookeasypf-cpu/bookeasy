@@ -1,5 +1,4 @@
 import { type NextAuthOptions } from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
@@ -7,7 +6,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as NextAuthOptions["adapter"],
+  // No PrismaAdapter — we handle OAuth user creation manually in signIn callback
+  // This avoids the known conflict between PrismaAdapter + jwt strategy
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -67,33 +67,52 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async signIn({ user, account }) {
-      // For OAuth providers, ensure the user has a role
+    async signIn({ user, account, profile }) {
       if (account?.provider === "google" || account?.provider === "facebook") {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        });
-        if (dbUser && !dbUser.role) {
-          await prisma.user.update({
-            where: { id: dbUser.id },
-            data: { role: "CLIENT" },
+        try {
+          const email = user.email || profile?.email;
+          if (!email) return false;
+
+          // Find or create user in our database
+          let dbUser = await prisma.user.findUnique({
+            where: { email },
           });
+
+          if (!dbUser) {
+            // Create new user from OAuth
+            dbUser = await prisma.user.create({
+              data: {
+                email,
+                name: user.name || profile?.name || "Utilisateur",
+                image: user.image || null,
+                role: "CLIENT",
+                emailVerified: new Date(),
+              },
+            });
+          } else if (!dbUser.image && user.image) {
+            // Update image if missing
+            await prisma.user.update({
+              where: { id: dbUser.id },
+              data: { image: user.image },
+            });
+          }
+
+          // Store the DB user id on the user object so jwt callback can use it
+          user.id = dbUser.id;
+          (user as { role: string }).role = dbUser.role;
+
+          return true;
+        } catch (error) {
+          console.error("OAuth signIn error:", error);
+          return false;
         }
       }
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // For OAuth, fetch role from DB since user object doesn't have it
-        if (account?.provider === "google" || account?.provider === "facebook") {
-          const dbUser = await prisma.user.findUnique({
-            where: { id: user.id },
-          });
-          token.role = dbUser?.role || "CLIENT";
-        } else {
-          token.role = (user as { role: string }).role;
-        }
+        token.role = (user as { role: string }).role || "CLIENT";
       }
       return token;
     },
@@ -105,7 +124,6 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // After sign in, redirect to home page
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
