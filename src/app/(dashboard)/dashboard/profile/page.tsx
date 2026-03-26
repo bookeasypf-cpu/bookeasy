@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { ProBadge } from "@/components/ui/ProBadge";
 import { BadgeCheck, Zap } from "lucide-react";
-import Link from "next/link";
 import toast from "react-hot-toast";
 import { PushNotificationToggle } from "@/components/ui/PushNotificationToggle";
 import { UpgradeButton } from "@/components/ui/UpgradeButton";
@@ -25,6 +24,7 @@ export default function DashboardProfilePage() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [plan, setPlan] = useState<string>("FREE");
   const [planExpiresAt, setPlanExpiresAt] = useState<string | null>(null);
+  const [isMedical, setIsMedical] = useState(false);
   const [form, setForm] = useState({
     businessName: "",
     description: "",
@@ -36,26 +36,33 @@ export default function DashboardProfilePage() {
   });
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/dashboard/profile").then((r) => r.json()),
-      fetch("/api/sectors").then((r) => r.json()),
-    ]).then(([profile, sectorsData]) => {
-      if (profile && !profile.error) {
-        setForm({
-          businessName: profile.businessName || "",
-          description: profile.description || "",
-          phone: profile.phone || "",
-          address: profile.address || "",
-          city: profile.city || "",
-          postalCode: profile.postalCode || "",
-          sectorId: profile.sectorId || "",
-        });
-        setPlan(profile.plan || "FREE");
-        setPlanExpiresAt(profile.planExpiresAt || null);
-      }
-      setSectors(sectorsData || []);
-      setInitialLoading(false);
-    });
+    fetch("/api/dashboard/profile")
+      .then((r) => r.json())
+      .then((profile) => {
+        if (profile && !profile.error) {
+          setForm({
+            businessName: profile.businessName || "",
+            description: profile.description || "",
+            phone: profile.phone || "",
+            address: profile.address || "",
+            city: profile.city || "",
+            postalCode: profile.postalCode || "",
+            sectorId: profile.sectorId || "",
+          });
+          setPlan(profile.plan || "FREE");
+          setPlanExpiresAt(profile.planExpiresAt || null);
+          setIsMedical(profile.isMedical || false);
+
+          // Fetch sectors filtered by type (medical only sees medical sectors)
+          const medicalParam = profile.isMedical ? "?medical=true" : "";
+          return fetch(`/api/sectors${medicalParam}`).then((r) => r.json());
+        }
+        return fetch("/api/sectors").then((r) => r.json());
+      })
+      .then((sectorsData) => {
+        setSectors(sectorsData || []);
+        setInitialLoading(false);
+      });
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -86,7 +93,9 @@ export default function DashboardProfilePage() {
 
   return (
     <div className="page-transition">
-      <h1 className="text-2xl font-bold text-[#0C1B2A] mb-6 animate-fade-in-up">Mon commerce</h1>
+      <h1 className="text-2xl font-bold text-[#0C1B2A] mb-6 animate-fade-in-up">
+        {isMedical ? "Mon cabinet" : "Mon commerce"}
+      </h1>
 
       {/* Subscription Status Card */}
       <Card className="rounded-2xl border-0 shadow-sm mb-6 animate-fade-in-up">
@@ -95,7 +104,9 @@ export default function DashboardProfilePage() {
             <div className="flex items-center gap-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                 plan === "PRO"
-                  ? "bg-gradient-to-br from-[#0066FF] to-[#00B4D8]"
+                  ? isMedical
+                    ? "bg-gradient-to-br from-emerald-500 to-teal-500"
+                    : "bg-gradient-to-br from-[#0066FF] to-[#00B4D8]"
                   : "bg-gray-100"
               }`}>
                 {plan === "PRO" ? (
@@ -113,8 +124,12 @@ export default function DashboardProfilePage() {
                 </div>
                 <p className="text-sm text-gray-500 mt-0.5">
                   {plan === "PRO"
-                    ? "Services illimités, badge Pro vérifié, mise en avant dans les recherches"
-                    : "Jusqu'à 5 services, fonctionnalités de base"}
+                    ? isMedical
+                      ? "Consultations illimitées, badge Pro vérifié, mise en avant dans les recherches"
+                      : "Services illimités, badge Pro vérifié, mise en avant dans les recherches"
+                    : isMedical
+                      ? "1 type de consultation, fonctionnalités de base"
+                      : "1 service, fonctionnalités de base"}
                 </p>
               </div>
             </div>
@@ -140,7 +155,11 @@ export default function DashboardProfilePage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-[#0C1B2A]">Notifications push</h3>
-              <p className="text-sm text-gray-500 mt-0.5">Recevez des alertes instantanées pour les nouvelles réservations</p>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {isMedical
+                  ? "Recevez des alertes instantanées pour les nouvelles prises de rendez-vous"
+                  : "Recevez des alertes instantanées pour les nouvelles réservations"}
+              </p>
             </div>
             <PushNotificationToggle />
           </div>
@@ -152,7 +171,7 @@ export default function DashboardProfilePage() {
           <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">
             <Input
               id="businessName"
-              label="Nom du commerce"
+              label={isMedical ? "Nom du cabinet" : "Nom du commerce"}
               value={form.businessName}
               onChange={(e) =>
                 setForm({ ...form, businessName: e.target.value })
@@ -164,7 +183,7 @@ export default function DashboardProfilePage() {
                 htmlFor="sectorId"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Secteur
+                {isMedical ? "Spécialité" : "Secteur"}
               </label>
               <select
                 id="sectorId"
@@ -175,7 +194,7 @@ export default function DashboardProfilePage() {
                 className="block w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
                 required
               >
-                <option value="">Choisir un secteur</option>
+                <option value="">{isMedical ? "Choisir une spécialité" : "Choisir un secteur"}</option>
                 {sectors.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.name}
@@ -198,6 +217,7 @@ export default function DashboardProfilePage() {
                 }
                 className="block w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm resize-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
                 rows={4}
+                placeholder={isMedical ? "Décrivez votre pratique, vos spécialités..." : "Décrivez votre activité..."}
               />
             </div>
             <Input
@@ -231,7 +251,11 @@ export default function DashboardProfilePage() {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all duration-300 disabled:opacity-50"
+              className={`inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-xl text-white hover:shadow-lg transition-all duration-300 disabled:opacity-50 ${
+                isMedical
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-emerald-500/25"
+                  : "bg-gradient-to-r from-[#0066FF] to-[#00B4D8] hover:shadow-[#0066FF]/25"
+              }`}
             >
               {loading ? "..." : "Enregistrer"}
             </button>

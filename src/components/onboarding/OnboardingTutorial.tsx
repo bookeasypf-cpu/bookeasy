@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   Sparkles,
   CheckCircle,
+  Heart,
 } from "lucide-react";
 
 export interface OnboardingStep {
@@ -24,7 +25,32 @@ interface OnboardingTutorialProps {
   onComplete?: () => void;
   welcomeTitle: string;
   welcomeSubtitle: string;
+  accentColor?: "blue" | "emerald";
 }
+
+// Color schemes
+const colors = {
+  blue: {
+    gradient: "from-[#0066FF] to-[#00B4D8]",
+    shadow: "shadow-blue-500/25",
+    text: "text-[#0066FF]",
+    iconBg: "from-[#0066FF]/10 to-[#00B4D8]/10",
+    dotActive: "bg-[#0066FF]",
+    dotPast: "bg-[#0066FF]/30",
+    hoverBg: "hover:bg-[#0066FF]/5",
+    btnGradient: "bg-gradient-to-r from-[#0066FF] to-[#00B4D8]",
+  },
+  emerald: {
+    gradient: "from-emerald-500 to-teal-500",
+    shadow: "shadow-emerald-500/25",
+    text: "text-emerald-600",
+    iconBg: "from-emerald-500/10 to-teal-500/10",
+    dotActive: "bg-emerald-500",
+    dotPast: "bg-emerald-500/30",
+    hoverBg: "hover:bg-emerald-500/5",
+    btnGradient: "bg-gradient-to-r from-emerald-500 to-teal-500",
+  },
+};
 
 export default function OnboardingTutorial({
   storageKey,
@@ -32,10 +58,14 @@ export default function OnboardingTutorial({
   onComplete,
   welcomeTitle,
   welcomeSubtitle,
+  accentColor = "blue",
 }: OnboardingTutorialProps) {
   const [visible, setVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(-1); // -1 = welcome screen
   const [direction, setDirection] = useState(1);
+
+  const c = colors[accentColor];
+  const isMedical = accentColor === "emerald";
 
   useEffect(() => {
     const seen = localStorage.getItem(storageKey);
@@ -109,7 +139,7 @@ export default function OnboardingTutorial({
         {!isWelcome && (
           <div className="h-1 bg-gray-100">
             <motion.div
-              className="h-full bg-gradient-to-r from-[#0066FF] to-[#00B4D8]"
+              className={`h-full bg-gradient-to-r ${c.gradient}`}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.3 }}
@@ -128,8 +158,12 @@ export default function OnboardingTutorial({
               transition={{ duration: 0.3 }}
               className="p-8 text-center"
             >
-              <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <Sparkles className="h-10 w-10 text-white" />
+              <div className={`w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br ${c.gradient} flex items-center justify-center shadow-lg ${c.shadow}`}>
+                {isMedical ? (
+                  <Heart className="h-10 w-10 text-white" />
+                ) : (
+                  <Sparkles className="h-10 w-10 text-white" />
+                )}
               </div>
               <h2 className="text-2xl font-bold text-[#0C1B2A] mb-3">
                 {welcomeTitle}
@@ -158,7 +192,7 @@ export default function OnboardingTutorial({
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleNext}
-                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white font-semibold text-base hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+                  className={`w-full py-3.5 px-6 rounded-2xl ${c.btnGradient} text-white font-semibold text-base hover:shadow-lg ${c.shadow} transition-all duration-300`}
                 >
                   Commencer le tutoriel
                 </button>
@@ -182,12 +216,12 @@ export default function OnboardingTutorial({
               className="p-8"
             >
               {/* Step counter */}
-              <div className="text-xs font-semibold text-[#0066FF] mb-4">
+              <div className={`text-xs font-semibold ${c.text} mb-4`}>
                 Étape {currentStep + 1} / {steps.length}
               </div>
 
               {/* Icon */}
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 flex items-center justify-center mb-5 text-[#0066FF]">
+              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${c.iconBg} flex items-center justify-center mb-5 ${c.text}`}>
                 {step!.icon}
               </div>
 
@@ -204,7 +238,7 @@ export default function OnboardingTutorial({
                 <div className="bg-gray-50 rounded-2xl p-4 mb-6 space-y-2.5">
                   {step!.tips.map((tip, i) => (
                     <div key={i} className="flex items-start gap-2.5">
-                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                      <CheckCircle className={`h-4 w-4 ${isMedical ? "text-emerald-500" : "text-green-500"} mt-0.5 shrink-0`} />
                       <span className="text-sm text-gray-600">{tip}</span>
                     </div>
                   ))}
@@ -227,9 +261,9 @@ export default function OnboardingTutorial({
                       key={i}
                       className={`w-2 h-2 rounded-full transition-all duration-300 ${
                         i === currentStep
-                          ? "bg-[#0066FF] w-6"
+                          ? `${c.dotActive} w-6`
                           : i < currentStep
-                            ? "bg-[#0066FF]/30"
+                            ? c.dotPast
                             : "bg-gray-200"
                       }`}
                     />
@@ -240,8 +274,8 @@ export default function OnboardingTutorial({
                   onClick={handleNext}
                   className={`flex items-center gap-1 text-sm font-semibold transition-all px-4 py-2 rounded-xl ${
                     isLast
-                      ? "bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-md"
-                      : "text-[#0066FF] hover:bg-[#0066FF]/5"
+                      ? `${c.btnGradient} text-white hover:shadow-md`
+                      : `${c.text} ${c.hoverBg}`
                   }`}
                 >
                   {isLast ? "Terminé !" : "Suivant"}

@@ -4,6 +4,8 @@ import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
+import { sendWelcomeEmail } from "./email";
+import { generateReferralCode } from "./referral";
 
 export const authOptions: NextAuthOptions = {
   // No PrismaAdapter — we handle OAuth user creation manually in signIn callback
@@ -80,15 +82,20 @@ export const authOptions: NextAuthOptions = {
 
           if (!dbUser) {
             // Create new user from OAuth
+            const userName = user.name || profile?.name || "Utilisateur";
             dbUser = await prisma.user.create({
               data: {
                 email,
-                name: user.name || profile?.name || "Utilisateur",
+                name: userName,
                 image: user.image || null,
                 role: "CLIENT",
                 emailVerified: new Date(),
               },
             });
+
+            // Send welcome email + generate referral code (async, non-blocking)
+            sendWelcomeEmail(email, userName).catch(() => {});
+            generateReferralCode(dbUser.id).catch(() => {});
           } else if (!dbUser.image && user.image) {
             // Update image if missing
             await prisma.user.update({

@@ -14,8 +14,13 @@ import {
   Star,
   Users,
   Clock,
+  Activity,
+  UserCheck,
+  Stethoscope,
+  Heart,
 } from "lucide-react";
 import Link from "next/link";
+import { isMedicalSectorName } from "@/lib/medical";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -23,6 +28,7 @@ export default async function DashboardPage() {
 
   const merchant = await prisma.merchant.findUnique({
     where: { userId: session.user.id },
+    include: { sector: { select: { name: true } } },
   });
 
   if (!merchant) {
@@ -44,6 +50,8 @@ export default async function DashboardPage() {
     );
   }
 
+  const isMedical = isMedicalSectorName(merchant.sector?.name);
+
   const today = new Date().toISOString().split("T")[0];
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
@@ -52,7 +60,7 @@ export default async function DashboardPage() {
   monthStart.setDate(1);
   const monthStartStr = monthStart.toISOString().split("T")[0];
 
-  const [todayBookings, weekBookings, monthBookings, reviews, upcomingBookings] =
+  const [todayBookings, weekBookings, monthBookings, reviews, upcomingBookings, uniquePatients] =
     await Promise.all([
       prisma.booking.count({
         where: {
@@ -93,6 +101,14 @@ export default async function DashboardPage() {
         orderBy: { startTime: "asc" },
         take: 10,
       }),
+      // Nombre de patients uniques (seulement pour médical)
+      isMedical
+        ? prisma.booking.findMany({
+            where: { merchantId: merchant.id },
+            select: { clientId: true },
+            distinct: ["clientId"],
+          })
+        : Promise.resolve([]),
     ]);
 
   const monthRevenue = monthBookings.reduce((s, b) => s + b.totalPrice, 0);
@@ -101,42 +117,84 @@ export default async function DashboardPage() {
       ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
       : 0;
 
-  const stats = [
-    {
-      label: "RDV aujourd'hui",
-      value: todayBookings,
-      icon: CalendarDays,
-      gradient: "from-[#0066FF]/10 to-[#00B4D8]/10",
-      iconColor: "text-[#0066FF]",
-    },
-    {
-      label: "Cette semaine",
-      value: weekBookings,
-      icon: Users,
-      gradient: "from-emerald-500/10 to-teal-500/10",
-      iconColor: "text-emerald-600",
-    },
-    {
-      label: "Revenu du mois",
-      value: formatPrice(monthRevenue),
-      icon: DollarSign,
-      gradient: "from-violet-500/10 to-purple-500/10",
-      iconColor: "text-violet-600",
-    },
-    {
-      label: "Note moyenne",
-      value: avgRating > 0 ? `${avgRating.toFixed(1)} / 5` : "\u2014",
-      icon: Star,
-      gradient: "from-amber-400/10 to-orange-400/10",
-      iconColor: "text-amber-500",
-    },
-  ];
+  // Stats différentes selon le type
+  const stats = isMedical
+    ? [
+        {
+          label: "Consultations du jour",
+          value: todayBookings,
+          icon: Stethoscope,
+          gradient: "from-emerald-500/10 to-teal-500/10",
+          iconColor: "text-emerald-600",
+        },
+        {
+          label: "Cette semaine",
+          value: weekBookings,
+          icon: CalendarDays,
+          gradient: "from-blue-500/10 to-cyan-500/10",
+          iconColor: "text-blue-600",
+        },
+        {
+          label: "Total patients",
+          value: uniquePatients.length,
+          icon: Users,
+          gradient: "from-violet-500/10 to-purple-500/10",
+          iconColor: "text-violet-600",
+        },
+        {
+          label: "Note moyenne",
+          value: avgRating > 0 ? `${avgRating.toFixed(1)} / 5` : "\u2014",
+          icon: Star,
+          gradient: "from-amber-400/10 to-orange-400/10",
+          iconColor: "text-amber-500",
+        },
+      ]
+    : [
+        {
+          label: "RDV aujourd'hui",
+          value: todayBookings,
+          icon: CalendarDays,
+          gradient: "from-[#0066FF]/10 to-[#00B4D8]/10",
+          iconColor: "text-[#0066FF]",
+        },
+        {
+          label: "Cette semaine",
+          value: weekBookings,
+          icon: Users,
+          gradient: "from-emerald-500/10 to-teal-500/10",
+          iconColor: "text-emerald-600",
+        },
+        {
+          label: "Revenu du mois",
+          value: formatPrice(monthRevenue),
+          icon: DollarSign,
+          gradient: "from-violet-500/10 to-purple-500/10",
+          iconColor: "text-violet-600",
+        },
+        {
+          label: "Note moyenne",
+          value: avgRating > 0 ? `${avgRating.toFixed(1)} / 5` : "\u2014",
+          icon: Star,
+          gradient: "from-amber-400/10 to-orange-400/10",
+          iconColor: "text-amber-500",
+        },
+      ];
+
+  const greeting = isMedical ? "Docteur" : "Pro";
 
   return (
     <div className="page-transition">
-      <h1 className="text-2xl font-bold text-[#0C1B2A] mb-6 animate-fade-in-up">
-        Bonjour, {session.user.name || "Pro"} !
-      </h1>
+      <div className="flex items-center gap-3 mb-6 animate-fade-in-up">
+        <h1 className="text-2xl font-bold text-[#0C1B2A]">
+          Bonjour, {session.user.name || greeting} !
+        </h1>
+        {isMedical && (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+            <Heart className="h-3 w-3" />
+            {merchant.sector?.name}
+          </span>
+        )}
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
@@ -163,11 +221,15 @@ export default async function DashboardPage() {
       <Card className="rounded-2xl border-0 shadow-sm animate-fade-in-up">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <h2 className="font-semibold text-[#0C1B2A]">
-            Rendez-vous du jour
+            {isMedical ? "Consultations du jour" : "Rendez-vous du jour"}
           </h2>
           <Link
             href="/dashboard/bookings"
-            className="text-sm text-[#0066FF] font-medium hover:text-[#00B4D8] transition-colors"
+            className={`text-sm font-medium transition-colors ${
+              isMedical
+                ? "text-emerald-600 hover:text-emerald-700"
+                : "text-[#0066FF] hover:text-[#00B4D8]"
+            }`}
           >
             Voir tout
           </Link>
@@ -187,7 +249,7 @@ export default async function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-[#0C1B2A]">
-                        {booking.client.name || "Client"}
+                        {booking.client.name || (isMedical ? "Patient" : "Client")}
                       </p>
                       <p className="text-xs text-gray-500">
                         {booking.service.name}
@@ -204,11 +266,37 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <p className="text-gray-500 text-sm py-4">
-              Aucun rendez-vous prévu aujourd'hui
+              {isMedical
+                ? "Aucune consultation prévue aujourd'hui"
+                : "Aucun rendez-vous prévu aujourd'hui"}
             </p>
           )}
         </CardContent>
       </Card>
+
+      {/* Quick links pour médical */}
+      {isMedical && (
+        <div className="grid grid-cols-2 gap-4 mt-6 animate-fade-in-up">
+          <Link href="/dashboard/patients">
+            <Card className="rounded-2xl border-0 shadow-sm card-hover cursor-pointer bg-gradient-to-br from-emerald-50 to-teal-50">
+              <CardContent className="py-5 px-4 text-center">
+                <Users className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
+                <p className="font-medium text-emerald-900 text-sm">Voir mes patients</p>
+                <p className="text-xs text-emerald-600 mt-1">Historique et suivi</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/dashboard/analytics">
+            <Card className="rounded-2xl border-0 shadow-sm card-hover cursor-pointer bg-gradient-to-br from-blue-50 to-cyan-50">
+              <CardContent className="py-5 px-4 text-center">
+                <Activity className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                <p className="font-medium text-blue-900 text-sm">Statistiques</p>
+                <p className="text-xs text-blue-600 mt-1">Activité du cabinet</p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

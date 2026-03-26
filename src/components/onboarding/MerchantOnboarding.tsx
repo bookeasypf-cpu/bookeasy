@@ -7,10 +7,18 @@ import {
   Star,
   BarChart3,
   Gift,
+  Stethoscope,
+  ClipboardList,
+  Users,
+  Activity,
+  Bell,
 } from "lucide-react";
 import OnboardingTutorial from "./OnboardingTutorial";
 import type { OnboardingStep } from "./OnboardingTutorial";
 
+// ─────────────────────────────────────────
+// ONBOARDING STANDARD (commerce classique)
+// ─────────────────────────────────────────
 const merchantSteps: OnboardingStep[] = [
   {
     icon: <UserCircle className="h-7 w-7" />,
@@ -80,13 +88,98 @@ const merchantSteps: OnboardingStep[] = [
   },
 ];
 
-export default function MerchantOnboarding() {
+// ─────────────────────────────────────────
+// ONBOARDING MÉDICAL (professionnels santé)
+// ─────────────────────────────────────────
+const medicalSteps: OnboardingStep[] = [
+  {
+    icon: <Stethoscope className="h-7 w-7" />,
+    title: "Configurez votre cabinet",
+    description:
+      "Renseignez les informations de votre cabinet : nom, spécialité, adresse et coordonnées. Ces informations seront visibles par vos patients.",
+    tips: [
+      "Indiquez votre adresse exacte pour apparaître sur la carte",
+      "Ajoutez une description de votre pratique et vos spécialités",
+      "Votre numéro de téléphone sera visible pour les urgences",
+    ],
+  },
+  {
+    icon: <ClipboardList className="h-7 w-7" />,
+    title: "Ajoutez vos consultations",
+    description:
+      "Listez les types de consultations que vous proposez avec leur tarif et durée. Vos patients pourront réserver directement en ligne.",
+    tips: [
+      "Consultation générale, suivi, certificat médical, bilan...",
+      "Définissez une durée précise pour chaque type de consultation",
+      "Les tarifs affichés aident les patients à se préparer",
+    ],
+  },
+  {
+    icon: <CalendarClock className="h-7 w-7" />,
+    title: "Définissez vos horaires",
+    description:
+      "Configurez vos jours et heures de consultation. Les patients ne pourront réserver que sur les créneaux que vous avez ouverts.",
+    tips: [
+      "Définissez des plages matin/après-midi (ex: 8h-12h, 13h-17h)",
+      "Bloquez des créneaux pour les urgences ou réunions",
+      "Les créneaux sont découpés automatiquement selon la durée de consultation",
+    ],
+  },
+  {
+    icon: <Users className="h-7 w-7" />,
+    title: "Suivi de vos patients",
+    description:
+      "Votre dashboard est adapté au secteur médical. Pas de système de réductions ou cartes cadeaux — à la place, vous avez un suivi patient complet.",
+    tips: [
+      "L'onglet « Patients » affiche l'historique de chaque patient",
+      "Voyez les patients réguliers, les nouveaux et les annulations",
+      "Le taux d'honoration vous aide à optimiser votre planning",
+    ],
+  },
+  {
+    icon: <Activity className="h-7 w-7" />,
+    title: "Statistiques de votre cabinet",
+    description:
+      "Suivez l'activité de votre cabinet : nombre de consultations, nouveaux patients, taux d'honoration et évolution mensuelle.",
+    tips: [
+      "Consultez le nombre de patients par mois",
+      "Identifiez vos consultations les plus fréquentes",
+      "Le taux de fiabilité mesure les annulations de dernière minute",
+    ],
+  },
+  {
+    icon: <Bell className="h-7 w-7" />,
+    title: "Rappels automatiques",
+    description:
+      "Vos patients reçoivent un email de rappel la veille de leur rendez-vous. Cela réduit les oublis et les rendez-vous non honorés.",
+    tips: [
+      "Les rappels sont envoyés automatiquement à 18h la veille",
+      "Email de confirmation envoyé dès la réservation",
+      "Les patients peuvent annuler depuis leur espace si besoin",
+    ],
+  },
+];
+
+interface MerchantOnboardingProps {
+  isMedical?: boolean;
+}
+
+export default function MerchantOnboarding({ isMedical = false }: MerchantOnboardingProps) {
   return (
     <OnboardingTutorial
-      storageKey="bookeasy-merchant-onboarding-seen"
-      steps={merchantSteps}
-      welcomeTitle="Bienvenue sur BookEasy Pro ! 🎉"
-      welcomeSubtitle="En quelques étapes, configurez votre espace professionnel et commencez à recevoir des réservations en ligne."
+      storageKey={isMedical ? "bookeasy-medical-onboarding-seen" : "bookeasy-merchant-onboarding-seen"}
+      steps={isMedical ? medicalSteps : merchantSteps}
+      welcomeTitle={
+        isMedical
+          ? "Bienvenue sur BookEasy Santé ! 🏥"
+          : "Bienvenue sur BookEasy Pro ! 🎉"
+      }
+      welcomeSubtitle={
+        isMedical
+          ? "Configurez votre cabinet en quelques étapes et permettez à vos patients de prendre rendez-vous en ligne, 24h/24."
+          : "En quelques étapes, configurez votre espace professionnel et commencez à recevoir des réservations en ligne."
+      }
+      accentColor={isMedical ? "emerald" : "blue"}
     />
   );
 }

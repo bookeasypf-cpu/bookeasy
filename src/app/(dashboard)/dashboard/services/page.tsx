@@ -253,7 +253,7 @@ export default function DashboardServicesPage() {
       <div className="space-y-3 stagger-children">
         {services.map((service) => (
           <Card key={service.id} className="rounded-2xl card-hover border-0 shadow-sm">
-            <CardContent className="py-4 flex items-center justify-between">
+            <CardContent className="py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <h3 className="font-medium text-[#0C1B2A]">{service.name}</h3>
                 {service.description && (

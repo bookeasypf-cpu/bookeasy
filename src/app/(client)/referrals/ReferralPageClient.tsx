@@ -6,7 +6,7 @@ import {
   Copy,
   Check,
   MessageCircle,
-  Smartphone,
+  Send,
   Link as LinkIcon,
   Gift,
   Star,
@@ -67,10 +67,12 @@ export function ReferralPageClient() {
     );
   };
 
-  const shareSMS = () => {
+  const shareMessenger = () => {
     if (!data) return;
-    const text = `Rejoins BookEasy ! Utilise mon code ${data.referralCode} pour gagner 2 XP : ${data.referralLink}`;
-    window.open(`sms:?body=${encodeURIComponent(text)}`, "_blank");
+    window.open(
+      `https://www.facebook.com/dialog/send?link=${encodeURIComponent(data.referralLink)}&app_id=1196589471477498&redirect_uri=${encodeURIComponent(data.referralLink)}`,
+      "_blank"
+    );
   };
 
   const statusLabel = (status: string) => {
@@ -174,11 +176,11 @@ export function ReferralPageClient() {
               <span className="text-[#25D366] text-xs font-medium">WhatsApp</span>
             </button>
             <button
-              onClick={shareSMS}
-              className="flex flex-col items-center gap-2 p-3 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 transition-colors group"
+              onClick={shareMessenger}
+              className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#0084FF]/20 hover:bg-[#0084FF]/30 transition-colors group"
             >
-              <Smartphone className="h-6 w-6 text-blue-400 group-hover:scale-110 transition-transform" />
-              <span className="text-blue-400 text-xs font-medium">SMS</span>
+              <Send className="h-6 w-6 text-[#0084FF] group-hover:scale-110 transition-transform" />
+              <span className="text-[#0084FF] text-xs font-medium">Messenger</span>
             </button>
             <button
               onClick={() => copyToClipboard(data.referralLink, "link")}

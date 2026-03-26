@@ -206,7 +206,7 @@ export default function DashboardCalendarPage() {
         <button
           onClick={goToPrevMonth}
           className={cn(
-            "p-2 rounded-xl border border-gray-200 transition-all hover:shadow-sm",
+            "p-3 rounded-xl border border-gray-200 transition-all hover:shadow-sm",
             accentMap.hoverBg
           )}
           aria-label="Mois précédent"
@@ -217,7 +217,7 @@ export default function DashboardCalendarPage() {
         <button
           onClick={goToNextMonth}
           className={cn(
-            "p-2 rounded-xl border border-gray-200 transition-all hover:shadow-sm",
+            "p-3 rounded-xl border border-gray-200 transition-all hover:shadow-sm",
             accentMap.hoverBg
           )}
           aria-label="Mois suivant"

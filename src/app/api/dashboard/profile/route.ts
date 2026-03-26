@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geocodeAddress } from "@/lib/geocode";
+import { isMedicalSectorName } from "@/lib/medical";
 
 export async function GET() {
   try {
@@ -14,7 +15,10 @@ export async function GET() {
       include: { sector: true },
     });
 
-    return NextResponse.json(merchant || { error: "No profile" });
+    if (!merchant) return NextResponse.json({ error: "No profile" });
+
+    const medical = isMedicalSectorName(merchant.sector?.name);
+    return NextResponse.json({ ...merchant, isMedical: medical });
   } catch {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }

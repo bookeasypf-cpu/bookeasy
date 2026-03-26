@@ -161,9 +161,9 @@ export default function PatientList({ patients, totalCount }: PatientListProps) 
 
                       {/* Contact */}
                       <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Mail className="h-3 w-3" />
-                          {patient.email}
+                        <span className="flex items-center gap-1 truncate max-w-[180px]">
+                          <Mail className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{patient.email}</span>
                         </span>
                         {patient.phone && (
                           <span className="flex items-center gap-1">

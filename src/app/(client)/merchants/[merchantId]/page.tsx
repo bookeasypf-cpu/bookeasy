@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { MapPin, Phone, Star, Clock, ChevronRight, MessageSquare, Info, Briefcase, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
@@ -11,6 +12,47 @@ import Link from "next/link";
 
 interface MerchantPageProps {
   params: Promise<{ merchantId: string }>;
+}
+
+// ── SEO: Dynamic metadata ────────────────────────
+export async function generateMetadata({ params }: MerchantPageProps): Promise<Metadata> {
+  const { merchantId } = await params;
+  const merchant = await prisma.merchant.findUnique({
+    where: { id: merchantId, isActive: true },
+    include: {
+      sector: { select: { name: true } },
+      reviews: { select: { rating: true } },
+    },
+  });
+
+  if (!merchant) return { title: "Professionnel introuvable - BookEasy" };
+
+  const avgRating = merchant.reviews.length > 0
+    ? (merchant.reviews.reduce((s, r) => s + r.rating, 0) / merchant.reviews.length).toFixed(1)
+    : null;
+
+  const title = `${merchant.businessName} - ${merchant.sector?.name || "Professionnel"} | BookEasy`;
+  const description = merchant.description
+    ? merchant.description.substring(0, 160)
+    : `Réservez en ligne chez ${merchant.businessName}${merchant.city ? ` à ${merchant.city}` : ""}. ${merchant.sector?.name || ""}${avgRating ? ` · ${avgRating}★` : ""}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      siteName: "BookEasy",
+      locale: "fr_FR",
+      url: `https://bookeasy.me/merchants/${merchantId}`,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+  };
 }
 
 export default async function MerchantPage({ params }: MerchantPageProps) {
@@ -53,8 +95,45 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
         : 0,
   }));
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: merchant.businessName,
+    description: merchant.description || undefined,
+    address: merchant.address || merchant.city ? {
+      "@type": "PostalAddress",
+      streetAddress: merchant.address || undefined,
+      addressLocality: merchant.city || undefined,
+      postalCode: merchant.postalCode || undefined,
+      addressCountry: "PF",
+    } : undefined,
+    telephone: merchant.phone || undefined,
+    geo: merchant.latitude && merchant.longitude ? {
+      "@type": "GeoCoordinates",
+      latitude: merchant.latitude,
+      longitude: merchant.longitude,
+    } : undefined,
+    url: `https://bookeasy.me/merchants/${merchant.id}`,
+    image: merchant.coverImage || undefined,
+    ...(merchant.reviews.length > 0 ? {
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: avgRating.toFixed(1),
+        reviewCount: merchant._count.reviews,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    } : {}),
+  };
+
   return (
     <div className="page-transition min-h-screen bg-[#F8FAFC]">
+      {/* JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero Section */}
       <div className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
         {merchant.coverImage ? (

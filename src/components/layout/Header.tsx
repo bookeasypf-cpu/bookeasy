@@ -80,11 +80,13 @@ export function Header() {
               {activeIndicator("/search")}
             </Link>
 
-            <Link href="/gift-cards" className={navLinkClass("/gift-cards")}>
-              <Gift className="h-4 w-4" />
-              <span className="hidden xl:inline">Cartes</span> Cadeaux
-              {activeIndicator("/gift-cards")}
-            </Link>
+            {session?.user?.role !== "MERCHANT" && (
+              <Link href="/gift-cards" className={navLinkClass("/gift-cards")}>
+                <Gift className="h-4 w-4" />
+                <span className="hidden xl:inline">Cartes</span> Cadeaux
+                {activeIndicator("/gift-cards")}
+              </Link>
+            )}
 
             {session?.user?.role === "MERCHANT" && (
               <Link href="/dashboard" className={navLinkClass("/dashboard")}>
@@ -255,18 +257,20 @@ export function Header() {
               Rechercher
             </Link>
 
-            <Link
-              href="/gift-cards"
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive("/gift-cards")
-                  ? "text-[#0066FF] bg-[#0066FF]/5"
-                  : "text-[#0C1B2A]/70 hover:bg-gray-50"
-              }`}
-              onClick={() => setMobileOpen(false)}
-            >
-              <Gift className="h-4.5 w-4.5" />
-              Cartes cadeaux
-            </Link>
+            {session?.user?.role !== "MERCHANT" && (
+              <Link
+                href="/gift-cards"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  isActive("/gift-cards")
+                    ? "text-[#0066FF] bg-[#0066FF]/5"
+                    : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                }`}
+                onClick={() => setMobileOpen(false)}
+              >
+                <Gift className="h-4.5 w-4.5" />
+                Cartes cadeaux
+              </Link>
+            )}
 
             {session?.user ? (
               <>
