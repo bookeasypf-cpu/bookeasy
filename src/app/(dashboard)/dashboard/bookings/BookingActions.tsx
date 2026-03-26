@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   cancelBooking,
   confirmBooking,
   completeBooking,
 } from "@/actions/booking";
-import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -18,7 +17,17 @@ export function BookingActions({
   status: string;
 }) {
   const [loading, setLoading] = useState(false);
+  const [isMedical, setIsMedical] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    fetch("/api/dashboard/profile")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.isMedical) setIsMedical(true);
+      })
+      .catch(() => {});
+  }, []);
 
   async function handleAction(action: "confirm" | "cancel" | "complete") {
     setLoading(true);
@@ -42,6 +51,10 @@ export function BookingActions({
     setLoading(false);
   }
 
+  const confirmBg = isMedical
+    ? "bg-emerald-500 hover:bg-emerald-600 hover:shadow-emerald-500/25"
+    : "bg-[#0066FF] hover:bg-[#0055DD] hover:shadow-[#0066FF]/25";
+
   return (
     <div className="flex gap-2">
       {status === "PENDING" && (
@@ -49,7 +62,7 @@ export function BookingActions({
           <button
             onClick={() => handleAction("confirm")}
             disabled={loading}
-            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-[#0066FF] text-white hover:bg-[#0055DD] shadow-sm hover:shadow-md hover:shadow-[#0066FF]/25 transition-all duration-200 disabled:opacity-50"
+            className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg ${confirmBg} text-white shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50`}
           >
             Confirmer
           </button>
