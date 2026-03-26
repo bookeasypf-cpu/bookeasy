@@ -105,7 +105,9 @@ export default async function DashboardBookingsPage() {
 
   return (
     <div className="page-transition">
-      <h1 className="text-2xl font-bold text-[#0C1B2A] mb-6 animate-fade-in-up">Rendez-vous</h1>
+      <h1 className="text-2xl font-bold text-[#0C1B2A] mb-6 animate-fade-in-up">
+        {isMedical ? "Agenda des consultations" : "Rendez-vous"}
+      </h1>
       <BookingList items={pending} title="En attente" />
       <BookingList items={confirmed} title="Confirmés" />
       <BookingList items={other} title="Passés / Annulés" />
