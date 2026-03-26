@@ -67,10 +67,33 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      // For OAuth providers, ensure the user has a role
+      if (account?.provider === "google" || account?.provider === "facebook") {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+        });
+        if (dbUser && !dbUser.role) {
+          await prisma.user.update({
+            where: { id: dbUser.id },
+            data: { role: "CLIENT" },
+          });
+        }
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as { role: string }).role;
+        // For OAuth, fetch role from DB since user object doesn't have it
+        if (account?.provider === "google" || account?.provider === "facebook") {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+          });
+          token.role = dbUser?.role || "CLIENT";
+        } else {
+          token.role = (user as { role: string }).role;
+        }
       }
       return token;
     },
@@ -80,6 +103,12 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // After sign in, redirect to home page
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     },
   },
   pages: {
