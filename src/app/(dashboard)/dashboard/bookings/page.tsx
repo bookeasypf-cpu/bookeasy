@@ -8,6 +8,7 @@ import {
   BOOKING_STATUS_COLORS,
 } from "@/lib/constants";
 import { BookingActions } from "./BookingActions";
+import { isMedicalSectorName } from "@/lib/medical";
 
 export default async function DashboardBookingsPage() {
   const session = await getSession();
@@ -15,8 +16,11 @@ export default async function DashboardBookingsPage() {
 
   const merchant = await prisma.merchant.findUnique({
     where: { userId: session.user.id },
+    include: { sector: { select: { name: true } } },
   });
   if (!merchant) redirect("/dashboard/profile");
+
+  const isMedical = isMedicalSectorName(merchant.sector?.name);
 
   const bookings = await prisma.booking.findMany({
     where: { merchantId: merchant.id },
@@ -33,6 +37,8 @@ export default async function DashboardBookingsPage() {
   const other = bookings.filter(
     (b) => !["PENDING", "CONFIRMED"].includes(b.status)
   );
+
+  const accentText = isMedical ? "text-emerald-600" : "text-[#0066FF]";
 
   function BookingList({
     items,
@@ -77,7 +83,7 @@ export default async function DashboardBookingsPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-semibold text-[#0C1B2A]">
+                      <span className={`font-semibold ${accentText}`}>
                         {formatPrice(b.totalPrice)}
                       </span>
                       <BookingActions

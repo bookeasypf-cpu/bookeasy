@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 
 export default function DashboardSupportPage() {
   const [plan, setPlan] = useState<string>("FREE");
+  const [isMedical, setIsMedical] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -21,6 +22,7 @@ export default function DashboardSupportPage() {
       .then((data) => {
         if (data && !data.error) {
           setPlan(data.plan || "FREE");
+          if (data.isMedical) setIsMedical(true);
         }
         setLoading(false);
       });
@@ -47,10 +49,26 @@ export default function DashboardSupportPage() {
     setSending(false);
   }
 
+  // Colors
+  const btnGradient = isMedical
+    ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+    : "bg-gradient-to-r from-[#0066FF] to-[#00B4D8]";
+  const btnShadow = isMedical
+    ? "hover:shadow-emerald-500/25"
+    : "hover:shadow-[#0066FF]/25";
+  const accentBg = isMedical ? "bg-emerald-500/10" : "bg-[#0066FF]/10";
+  const accentText = isMedical ? "text-emerald-600" : "text-[#0066FF]";
+  const focusRing = isMedical
+    ? "focus:ring-emerald-500/20 focus:border-emerald-500"
+    : "focus:ring-[#0066FF]/20 focus:border-[#0066FF]";
+  const proGradient = isMedical
+    ? "bg-gradient-to-br from-emerald-500 to-teal-500"
+    : "bg-gradient-to-br from-[#0066FF] to-[#00B4D8]";
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 border-2 border-[#0066FF] border-t-transparent rounded-full animate-spin" />
+        <div className={`h-8 w-8 border-2 ${isMedical ? "border-emerald-500" : "border-[#0066FF]"} border-t-transparent rounded-full animate-spin`} />
       </div>
     );
   }
@@ -67,9 +85,7 @@ export default function DashboardSupportPage() {
         <CardContent className="p-5">
           <div className="flex items-center gap-4">
             <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${
-              plan === "PRO"
-                ? "bg-gradient-to-br from-[#0066FF] to-[#00B4D8]"
-                : "bg-gray-100"
+              plan === "PRO" ? proGradient : "bg-gray-100"
             }`}>
               <Headphones className={`h-5 w-5 ${plan === "PRO" ? "text-white" : "text-gray-400"}`} />
             </div>
@@ -89,7 +105,7 @@ export default function DashboardSupportPage() {
             {plan !== "PRO" && (
               <Link
                 href="/pricing"
-                className="inline-flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-md transition-all shrink-0"
+                className={`inline-flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-lg ${btnGradient} text-white hover:shadow-md transition-all shrink-0`}
               >
                 <Zap className="h-3 w-3" />
                 Pro
@@ -118,7 +134,7 @@ export default function DashboardSupportPage() {
                 setSent(false);
                 setForm({ subject: "", message: "" });
               }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-[#0066FF]/10 text-[#0066FF] hover:bg-[#0066FF]/20 transition-colors"
+              className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl ${accentBg} ${accentText} hover:opacity-80 transition-colors`}
             >
               Envoyer un autre message
             </button>
@@ -150,7 +166,7 @@ export default function DashboardSupportPage() {
                   placeholder="Décrivez votre problème ou question en détail..."
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="block w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm resize-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                  className={`block w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm resize-none focus:ring-2 ${focusRing} transition-colors`}
                   rows={6}
                   required
                   maxLength={2000}
@@ -162,7 +178,7 @@ export default function DashboardSupportPage() {
               <button
                 type="submit"
                 disabled={sending || !form.subject.trim() || !form.message.trim()}
-                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all duration-300 disabled:opacity-50"
+                className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl ${btnGradient} text-white hover:shadow-lg ${btnShadow} transition-all duration-300 disabled:opacity-50`}
               >
                 {sending ? (
                   "Envoi..."
@@ -182,7 +198,7 @@ export default function DashboardSupportPage() {
       <div className="mt-6 text-center animate-fade-in-up">
         <p className="text-sm text-gray-400">
           Consultez aussi notre{" "}
-          <Link href="/pricing" className="text-[#0066FF] hover:underline font-medium">
+          <Link href="/pricing" className={`${accentText} hover:underline font-medium`}>
             page tarifs & FAQ
           </Link>
         </p>

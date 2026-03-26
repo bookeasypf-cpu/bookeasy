@@ -4,14 +4,18 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/Card";
 import { StarRating } from "@/components/ui/StarRating";
 import { formatDate } from "@/lib/utils";
+import { isMedicalSectorName } from "@/lib/medical";
 
 export default async function DashboardReviewsPage() {
   const session = await getSession();
   if (!session?.user) redirect("/login");
   const merchant = await prisma.merchant.findUnique({
     where: { userId: session.user.id },
+    include: { sector: { select: { name: true } } },
   });
   if (!merchant) redirect("/dashboard/profile");
+
+  const isMedical = isMedicalSectorName(merchant.sector?.name);
 
   const reviews = await prisma.review.findMany({
     where: { merchantId: merchant.id },
@@ -27,13 +31,23 @@ export default async function DashboardReviewsPage() {
       ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
       : 0;
 
+  const avatarGradient = isMedical
+    ? "from-emerald-500/10 to-teal-500/10"
+    : "from-[#0066FF]/10 to-[#00B4D8]/10";
+  const avatarText = isMedical ? "text-emerald-600" : "text-[#0066FF]";
+  const ratingGradient = isMedical
+    ? "from-emerald-500 to-teal-500"
+    : "from-[#0066FF] to-[#00B4D8]";
+
   return (
     <div className="page-transition">
-      <h1 className="text-2xl font-bold text-[#0C1B2A] mb-2 animate-fade-in-up">Avis clients</h1>
+      <h1 className="text-2xl font-bold text-[#0C1B2A] mb-2 animate-fade-in-up">
+        {isMedical ? "Avis patients" : "Avis clients"}
+      </h1>
       {reviews.length > 0 && (
         <div className="flex items-center gap-3 mb-6 animate-fade-in-up">
           <StarRating rating={avgRating} size={20} />
-          <span className="text-lg font-bold bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent">
+          <span className={`text-lg font-bold bg-gradient-to-r ${ratingGradient} bg-clip-text text-transparent`}>
             {avgRating.toFixed(1)}
           </span>
           <span className="text-gray-500">({reviews.length} avis)</span>
@@ -44,7 +58,7 @@ export default async function DashboardReviewsPage() {
           <Card key={review.id} className="rounded-2xl card-hover border-0 shadow-sm">
             <CardContent className="py-4">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 flex items-center justify-center text-sm font-semibold text-[#0066FF]">
+                <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center text-sm font-semibold ${avatarText}`}>
                   {review.client.name?.[0] || "?"}
                 </div>
                 <div>

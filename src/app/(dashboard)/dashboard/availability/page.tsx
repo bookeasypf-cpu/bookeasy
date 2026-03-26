@@ -20,6 +20,16 @@ export default function DashboardAvailabilityPage() {
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isMedical, setIsMedical] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/dashboard/profile")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.isMedical) setIsMedical(true);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/dashboard/availability")
@@ -63,6 +73,24 @@ export default function DashboardAvailabilityPage() {
     setSaving(false);
   }
 
+  // Colors
+  const accentColor = isMedical ? "emerald" : "blue";
+  const btnGradient = isMedical
+    ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+    : "bg-gradient-to-r from-[#0066FF] to-[#00B4D8]";
+  const btnShadow = isMedical
+    ? "hover:shadow-emerald-500/25"
+    : "hover:shadow-[#0066FF]/25";
+  const addColor = isMedical
+    ? "text-emerald-600 hover:text-emerald-700"
+    : "text-[#0066FF] hover:text-[#00B4D8]";
+  const checkboxColor = isMedical
+    ? "text-emerald-500 focus:ring-emerald-500/20 accent-emerald-500"
+    : "text-[#0066FF] focus:ring-[#0066FF]/20 accent-[#0066FF]";
+  const focusRing = isMedical
+    ? "focus:ring-emerald-500/20 focus:border-emerald-500"
+    : "focus:ring-[#0066FF]/20 focus:border-[#0066FF]";
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -78,7 +106,7 @@ export default function DashboardAvailabilityPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all duration-300 disabled:opacity-50"
+          className={`inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-xl ${btnGradient} text-white hover:shadow-lg ${btnShadow} transition-all duration-300 disabled:opacity-50`}
         >
           {saving ? "..." : "Enregistrer"}
         </button>
@@ -98,7 +126,7 @@ export default function DashboardAvailabilityPage() {
                   </h3>
                   <button
                     onClick={() => addSlot(day)}
-                    className="flex items-center gap-1 text-sm text-[#0066FF] hover:text-[#00B4D8] font-medium transition-colors"
+                    className={`flex items-center gap-1 text-sm ${addColor} font-medium transition-colors`}
                   >
                     <Plus className="h-4 w-4" /> Ajouter
                   </button>
@@ -120,7 +148,7 @@ export default function DashboardAvailabilityPage() {
                               e.target.checked
                             )
                           }
-                          className="rounded border-gray-300 text-[#0066FF] focus:ring-[#0066FF]/20 accent-[#0066FF]"
+                          className={`rounded border-gray-300 ${checkboxColor}`}
                         />
                         <input
                           type="time"
@@ -132,7 +160,7 @@ export default function DashboardAvailabilityPage() {
                               e.target.value
                             )
                           }
-                          className="rounded-xl border border-gray-300 px-2 py-1 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                          className={`rounded-xl border border-gray-300 px-2 py-1 text-sm focus:ring-2 ${focusRing} transition-colors`}
                         />
                         <span className="text-gray-400">—</span>
                         <input
@@ -145,7 +173,7 @@ export default function DashboardAvailabilityPage() {
                               e.target.value
                             )
                           }
-                          className="rounded-xl border border-gray-300 px-2 py-1 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                          className={`rounded-xl border border-gray-300 px-2 py-1 text-sm focus:ring-2 ${focusRing} transition-colors`}
                         />
                         <button
                           onClick={() => removeSlot(slot.originalIndex)}
@@ -157,7 +185,9 @@ export default function DashboardAvailabilityPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-400">Fermé</p>
+                  <p className="text-sm text-gray-400">
+                    {isMedical ? "Pas de consultations" : "Fermé"}
+                  </p>
                 )}
               </CardContent>
             </Card>

@@ -49,6 +49,7 @@ export default function DashboardLoyaltyPage() {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [settings, setSettings] = useState<XpSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMedical, setIsMedical] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -61,6 +62,16 @@ export default function DashboardLoyaltyPage() {
     type: "DISCOUNT",
     value: "10",
   });
+
+  // Check if medical — XP not available for medical professionals
+  useEffect(() => {
+    fetch("/api/dashboard/profile")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.isMedical) setIsMedical(true);
+      })
+      .catch(() => {});
+  }, []);
 
   async function fetchData() {
     const [rewardsRes, settingsRes] = await Promise.all([
@@ -247,6 +258,30 @@ export default function DashboardLoyaltyPage() {
     FREE_SERVICE: "Prestation gratuite",
     GIFT: "Cadeau",
   };
+
+  // Medical professionals can't use XP/loyalty system
+  if (isMedical) {
+    return (
+      <div className="page-transition">
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center max-w-md">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 flex items-center justify-center">
+              <Star className="h-8 w-8 text-emerald-500" />
+            </div>
+            <h2 className="text-xl font-bold text-[#0C1B2A] mb-2">
+              Programme fidélité non disponible
+            </h2>
+            <p className="text-gray-500 leading-relaxed">
+              En tant que professionnel de santé, le programme de fidélité XP avec réductions et promotions n&apos;est pas compatible avec la réglementation médicale.
+            </p>
+            <p className="text-sm text-gray-400 mt-3">
+              Consultez la page <a href="/dashboard/patients" className="text-emerald-600 hover:underline font-medium">Patients</a> pour suivre vos consultations.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
