@@ -34,6 +34,7 @@ model User {
   favorites         Favorite[]
   referralsSent     Referral[]     @relation("ReferralsSent")
   referralsReceived Referral[]     @relation("ReferralsReceived")
+  patientNotes      PatientNote[]
 
   @@map("users")
 }
@@ -126,6 +127,7 @@ model Merchant {
   xpPerBooking   Int             @default(10)
   giftCards      GiftCard[]
   favorites      Favorite[]
+  patientNotes   PatientNote[]
 
   @@index([city])
   @@index([sectorId])
@@ -401,6 +403,25 @@ model PushSubscription {
 
   @@index([userId])
   @@map("push_subscriptions")
+}
+
+// ─────────────────────────────────────────────
+// PATIENT NOTES (Private notes per merchant)
+// ─────────────────────────────────────────────
+
+model PatientNote {
+  id         String   @id @default(cuid())
+  merchantId String
+  clientId   String
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  client   User     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([merchantId, clientId])
+  @@map("patient_notes")
 }
 
 // ─────────────────────────────────────────────
