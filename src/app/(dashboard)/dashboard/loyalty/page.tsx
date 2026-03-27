@@ -268,7 +268,7 @@ export default function DashboardLoyaltyPage() {
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 flex items-center justify-center">
               <Star className="h-8 w-8 text-emerald-500" />
             </div>
-            <h2 className="text-xl font-bold text-[#0C1B2A] mb-2">
+            <h2 className="text-xl font-bold text-[#0C1B2A] dark:text-white mb-2">
               Programme fidélité non disponible
             </h2>
             <p className="text-gray-500 leading-relaxed">
@@ -295,10 +295,10 @@ export default function DashboardLoyaltyPage() {
     <div className="page-transition">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#0C1B2A] animate-fade-in-up">
+          <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white animate-fade-in-up">
             Programme Fidélité XP
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Récompensez vos clients fidèles avec des points XP
           </p>
         </div>
@@ -319,37 +319,37 @@ export default function DashboardLoyaltyPage() {
           <Card className="rounded-2xl border-0 shadow-sm">
             <CardContent className="py-4 text-center">
               <Star className="h-5 w-5 text-yellow-500 mx-auto mb-1" />
-              <p className="text-2xl font-bold text-[#0C1B2A]">
+              <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
                 {settings.xpPerBooking}
               </p>
-              <p className="text-xs text-gray-500">XP / réservation</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">XP / réservation</p>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-0 shadow-sm">
             <CardContent className="py-4 text-center">
               <TrendingUp className="h-5 w-5 text-[#0066FF] mx-auto mb-1" />
-              <p className="text-2xl font-bold text-[#0C1B2A]">
+              <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
                 {settings.totalXpDistributed}
               </p>
-              <p className="text-xs text-gray-500">XP distribués</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">XP distribués</p>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-0 shadow-sm">
             <CardContent className="py-4 text-center">
               <Gift className="h-5 w-5 text-green-500 mx-auto mb-1" />
-              <p className="text-2xl font-bold text-[#0C1B2A]">
+              <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
                 {settings.activeRewards}
               </p>
-              <p className="text-xs text-gray-500">Récompenses actives</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Récompenses actives</p>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-0 shadow-sm">
             <CardContent className="py-4 text-center">
               <Users className="h-5 w-5 text-purple-500 mx-auto mb-1" />
-              <p className="text-2xl font-bold text-[#0C1B2A]">
+              <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
                 {settings.totalRedemptions}
               </p>
-              <p className="text-xs text-gray-500">Échanges effectués</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Échanges effectués</p>
             </CardContent>
           </Card>
         </div>
@@ -360,11 +360,11 @@ export default function DashboardLoyaltyPage() {
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <Settings className="h-5 w-5 text-gray-400" />
-            <h3 className="font-semibold text-[#0C1B2A]">Paramètres XP</h3>
+            <h3 className="font-semibold text-[#0C1B2A] dark:text-white">Paramètres XP</h3>
           </div>
           <div className="flex items-end gap-4">
             <div className="flex-1 max-w-xs">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 XP gagnés par réservation
               </label>
               <input
@@ -373,13 +373,13 @@ export default function DashboardLoyaltyPage() {
                 max="100"
                 value={xpPerBooking}
                 onChange={(e) => setXpPerBooking(e.target.value)}
-                className="block w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
               />
             </div>
             <button
               onClick={saveXpSettings}
               disabled={savingSettings}
-              className="px-4 py-2 text-sm font-medium rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
             >
               {savingSettings ? "..." : "Enregistrer"}
             </button>
@@ -406,7 +406,7 @@ export default function DashboardLoyaltyPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <QrCode className="h-5 w-5 text-gray-400" />
-              <h3 className="font-semibold text-[#0C1B2A]">Valider un code client</h3>
+              <h3 className="font-semibold text-[#0C1B2A] dark:text-white">Valider un code client</h3>
             </div>
           </div>
 
@@ -421,10 +421,10 @@ export default function DashboardLoyaltyPage() {
 
           <div className="relative mb-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-gray-200 dark:border-gray-700" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-white text-gray-400">ou entrez le code manuellement</span>
+              <span className="px-3 bg-white dark:bg-gray-900 text-gray-400">ou entrez le code manuellement</span>
             </div>
           </div>
 
@@ -438,7 +438,7 @@ export default function DashboardLoyaltyPage() {
                   setCodeInput(e.target.value);
                   setValidationResult(null);
                 }}
-                className="block w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-mono uppercase focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm font-mono uppercase focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
               />
             </div>
             <button
@@ -477,7 +477,7 @@ export default function DashboardLoyaltyPage() {
       {showForm && (
         <Card className="mb-6 rounded-2xl border-0 shadow-sm animate-fade-in-up">
           <CardContent className="p-6">
-            <h3 className="font-semibold text-[#0C1B2A] mb-4">
+            <h3 className="font-semibold text-[#0C1B2A] dark:text-white mb-4">
               {editingId
                 ? "Modifier la récompense"
                 : "Nouvelle récompense"}
@@ -513,7 +513,7 @@ export default function DashboardLoyaltyPage() {
                   required
                 />
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Type
                   </label>
                   <select
@@ -521,7 +521,7 @@ export default function DashboardLoyaltyPage() {
                     onChange={(e) =>
                       setForm({ ...form, type: e.target.value })
                     }
-                    className="block w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                    className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
                   >
                     <option value="DISCOUNT">Réduction (%)</option>
                     <option value="FREE_SERVICE">Prestation gratuite</option>
@@ -577,7 +577,7 @@ export default function DashboardLoyaltyPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-[#0C1B2A]">
+                    <h3 className="font-medium text-[#0C1B2A] dark:text-white">
                       {reward.name}
                     </h3>
                     {!reward.isActive && (
@@ -587,7 +587,7 @@ export default function DashboardLoyaltyPage() {
                     )}
                   </div>
                   {reward.description && (
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {reward.description}
                     </p>
                   )}

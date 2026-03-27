@@ -128,7 +128,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
   };
 
   return (
-    <div className="page-transition min-h-screen bg-[#F8FAFC]">
+    <div className="page-transition min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
       {/* JSON-LD */}
       <script
         type="application/ld+json"
@@ -204,7 +204,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
           {merchant.phone && (
             <a
               href={`tel:${merchant.phone}`}
-              className="flex items-center gap-2.5 text-sm text-[#0C1B2A] hover:text-[#0066FF] transition-colors group"
+              className="flex items-center gap-2.5 text-sm text-[#0C1B2A] dark:text-white hover:text-[#0066FF] transition-colors group"
             >
               <div className="w-9 h-9 rounded-xl bg-[#0066FF]/10 flex items-center justify-center group-hover:bg-[#0066FF]/20 transition-colors">
                 <Phone className="h-4 w-4 text-[#0066FF]" />
@@ -213,7 +213,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             </a>
           )}
           {merchant.address && (
-            <div className="flex items-center gap-2.5 text-sm text-[#0C1B2A]">
+            <div className="flex items-center gap-2.5 text-sm text-[#0C1B2A] dark:text-white">
               <div className="w-9 h-9 rounded-xl bg-[#00B4D8]/10 flex items-center justify-center">
                 <MapPin className="h-4 w-4 text-[#00B4D8]" />
               </div>
@@ -223,7 +223,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             </div>
           )}
           {!merchant.address && merchant.city && (
-            <div className="flex items-center gap-2.5 text-sm text-[#0C1B2A]">
+            <div className="flex items-center gap-2.5 text-sm text-[#0C1B2A] dark:text-white">
               <div className="w-9 h-9 rounded-xl bg-[#00B4D8]/10 flex items-center justify-center">
                 <MapPin className="h-4 w-4 text-[#00B4D8]" />
               </div>
@@ -245,7 +245,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
 
       {/* Tab Navigation (anchor-based, no JS) */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <nav className="flex items-center gap-1 bg-white rounded-xl p-1 shadow-sm border border-gray-100">
+        <nav className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-xl p-1 shadow-sm border border-gray-100 dark:border-gray-800">
           <a
             href="#services"
             className="flex items-center gap-1.5 flex-1 justify-center text-sm font-semibold text-[#0066FF] bg-[#0066FF]/5 px-4 py-2.5 rounded-lg transition-colors hover:bg-[#0066FF]/10"
@@ -256,7 +256,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
           {merchant.plan === "PRO" && (
             <a
               href="#avis"
-              className="flex items-center gap-1.5 flex-1 justify-center text-sm font-medium text-gray-500 px-4 py-2.5 rounded-lg transition-colors hover:bg-gray-50 hover:text-[#0C1B2A]"
+              className="flex items-center gap-1.5 flex-1 justify-center text-sm font-medium text-gray-500 dark:text-gray-400 px-4 py-2.5 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0C1B2A] dark:hover:text-white"
             >
               <MessageSquare className="h-4 w-4" />
               Avis ({merchant._count.reviews})
@@ -264,7 +264,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
           )}
           <a
             href="#infos"
-            className="flex items-center gap-1.5 flex-1 justify-center text-sm font-medium text-gray-500 px-4 py-2.5 rounded-lg transition-colors hover:bg-gray-50 hover:text-[#0C1B2A]"
+            className="flex items-center gap-1.5 flex-1 justify-center text-sm font-medium text-gray-500 dark:text-gray-400 px-4 py-2.5 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0C1B2A] dark:hover:text-white"
           >
             <Info className="h-4 w-4" />
             Infos
@@ -279,20 +279,20 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
         <section id="services" className="scroll-mt-24">
           <div className="flex items-center gap-2 mb-5">
             <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#0066FF] to-[#00B4D8]" />
-            <h2 className="text-lg font-bold text-[#0C1B2A]">Services</h2>
+            <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white dark:text-white">Services</h2>
           </div>
           <div className="stagger-children space-y-3">
             {merchant.services.map((service) => (
               <div
                 key={service.id}
-                className="card-hover group bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between gap-4"
+                className="card-hover group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5 flex items-center justify-between gap-4"
               >
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-[#0C1B2A] group-hover:text-[#0066FF] transition-colors">
+                  <h3 className="font-semibold text-[#0C1B2A] dark:text-white group-hover:text-[#0066FF] transition-colors">
                     {service.name}
                   </h3>
                   {service.description && (
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                       {service.description}
                     </p>
                   )}
@@ -302,7 +302,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
                   </span>
                 </div>
                 <div className="flex flex-col items-end gap-2 shrink-0">
-                  <span className="text-lg font-bold text-[#0C1B2A]">
+                  <span className="text-lg font-bold text-[#0C1B2A] dark:text-white dark:text-white">
                     {formatPrice(service.price)}
                   </span>
                   <Link
@@ -323,7 +323,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
           <section id="avis" className="scroll-mt-24">
             <div className="flex items-center gap-2 mb-5">
               <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#0066FF] to-[#00B4D8]" />
-              <h2 className="text-lg font-bold text-[#0C1B2A]">
+              <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white dark:text-white">
                 Avis ({merchant._count.reviews})
               </h2>
             </div>
@@ -331,11 +331,11 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             {merchant.reviews.length > 0 ? (
               <div className="space-y-5">
                 {/* Rating Summary Card */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5 sm:p-6">
                   <div className="flex flex-col sm:flex-row items-center gap-6">
                     {/* Big rating number */}
                     <div className="text-center shrink-0">
-                      <div className="text-5xl font-black text-[#0C1B2A]">
+                      <div className="text-5xl font-black text-[#0C1B2A] dark:text-white">
                         {avgRating.toFixed(1)}
                       </div>
                       <StarRating rating={avgRating} size={18} className="mt-1.5 justify-center" />
@@ -369,14 +369,14 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
                   {merchant.reviews.map((review) => (
                     <div
                       key={review.id}
-                      className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+                      className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5"
                     >
                       <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-sm font-bold text-white shrink-0">
                           {review.client.name?.[0]?.toUpperCase() || "?"}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-semibold text-[#0C1B2A] block">
+                          <span className="text-sm font-semibold text-[#0C1B2A] dark:text-white block">
                             {review.client.name || "Anonyme"}
                           </span>
                           <StarRating
@@ -387,7 +387,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
                         </div>
                       </div>
                       {review.comment && (
-                        <p className="text-sm text-gray-600 leading-relaxed">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                           {review.comment}
                         </p>
                       )}
@@ -396,7 +396,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-8 text-center">
                 <MessageSquare className="h-10 w-10 text-gray-200 mx-auto mb-3" />
                 <p className="text-sm text-gray-400">Aucun avis pour le moment</p>
               </div>
@@ -408,23 +408,23 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
         <section id="infos" className="scroll-mt-24">
           <div className="flex items-center gap-2 mb-5">
             <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#0066FF] to-[#00B4D8]" />
-            <h2 className="text-lg font-bold text-[#0C1B2A]">Informations</h2>
+            <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white dark:text-white">Informations</h2>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm divide-y divide-gray-50 dark:divide-gray-800">
             {merchant.description && (
               <div className="p-5">
-                <h3 className="text-sm font-semibold text-[#0C1B2A] mb-2">Description</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <h3 className="text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2">Description</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                   {merchant.description}
                 </p>
               </div>
             )}
             {(merchant.address || merchant.city) && (
               <div className="p-5">
-                <h3 className="text-sm font-semibold text-[#0C1B2A] mb-2">Adresse</h3>
+                <h3 className="text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2">Adresse</h3>
                 <div className="flex items-start gap-2.5">
                   <MapPin className="h-4 w-4 text-[#00B4D8] mt-0.5 shrink-0" />
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
                     {merchant.address && `${merchant.address}, `}
                     {merchant.city}
                   </span>
@@ -433,7 +433,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             )}
             {merchant.phone && (
               <div className="p-5">
-                <h3 className="text-sm font-semibold text-[#0C1B2A] mb-2">Telephone</h3>
+                <h3 className="text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2">Telephone</h3>
                 <a
                   href={`tel:${merchant.phone}`}
                   className="flex items-center gap-2.5 text-sm text-[#0066FF] hover:underline"

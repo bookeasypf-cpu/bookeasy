@@ -45,7 +45,7 @@ export default async function HomePage() {
   }));
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC] dark:bg-gray-950">
       <Header />
       <ClientOnboardingWrapper />
 
@@ -93,14 +93,14 @@ export default async function HomePage() {
         </div>
 
         {/* Bottom gradient fade into content */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#F8FAFC] to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#F8FAFC] dark:from-gray-950 to-transparent" />
       </section>
 
       {/* ===== EXPLORE MAP CTA ===== */}
       <ScrollReveal direction="scale" className="max-w-7xl mx-auto px-4 sm:px-6 w-full -mt-8 relative z-10">
         <Link
           href="/map"
-          className="group block rounded-2xl bg-white shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-400"
+          className="group block rounded-2xl bg-white dark:bg-gray-900 shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-xl transition-all duration-400"
           style={{ transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)" }}
         >
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-5 sm:p-6">
@@ -109,10 +109,10 @@ export default async function HomePage() {
             </div>
 
             <div className="flex-1 text-center sm:text-left">
-              <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#0066FF] transition-colors">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-[#0066FF] transition-colors">
                 Explorer la carte interactive
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Découvrez les professionnels autour de vous sur notre carte interactive
               </p>
             </div>
@@ -187,7 +187,7 @@ export default async function HomePage() {
       )}
 
       {/* ===== STATS SECTION (with CountUp) ===== */}
-      <section className="border-y border-gray-100 bg-white">
+      <section className="border-y border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4">
             <ScrollReveal delay={0}>
@@ -195,10 +195,10 @@ export default async function HomePage() {
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 mb-4 glow-pulse">
                   <Users className="h-6 w-6 text-[#0066FF]" />
                 </div>
-                <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-1">
+                <div className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-1">
                   <CountUp end={50} suffix="+" />
                 </div>
-                <div className="text-sm text-gray-500 font-medium">
+                <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                   Professionnels
                 </div>
               </div>
@@ -209,10 +209,10 @@ export default async function HomePage() {
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 mb-4 glow-pulse">
                   <Grid3X3 className="h-6 w-6 text-[#0066FF]" />
                 </div>
-                <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-1">
+                <div className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-1">
                   <CountUp end={10} />
                 </div>
-                <div className="text-sm text-gray-500 font-medium">
+                <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                   Secteurs d'activité
                 </div>
               </div>
@@ -223,10 +223,10 @@ export default async function HomePage() {
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 mb-4 glow-pulse">
                   <Globe className="h-6 w-6 text-[#0066FF]" />
                 </div>
-                <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-1">
+                <div className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-1">
                   <CountUp end={100} suffix="%" />
                 </div>
-                <div className="text-sm text-gray-500 font-medium">
+                <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                   Polynésie
                 </div>
               </div>

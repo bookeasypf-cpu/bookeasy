@@ -76,7 +76,7 @@ export default function DashboardSupportPage() {
   return (
     <div className="page-transition">
       <div className="flex items-center gap-3 mb-6 animate-fade-in-up">
-        <h1 className="text-2xl font-bold text-[#0C1B2A]">Support</h1>
+        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white">Support</h1>
         {plan === "PRO" && <ProBadge size="md" />}
       </div>
 
@@ -92,13 +92,13 @@ export default function DashboardSupportPage() {
             <div className="flex-1">
               {plan === "PRO" ? (
                 <>
-                  <p className="font-semibold text-[#0C1B2A]">Support prioritaire activé</p>
-                  <p className="text-sm text-gray-500">Vos demandes sont traitées en priorité. Réponse sous 24h ouvrées.</p>
+                  <p className="font-semibold text-[#0C1B2A] dark:text-white">Support prioritaire activé</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Vos demandes sont traitées en priorité. Réponse sous 24h ouvrées.</p>
                 </>
               ) : (
                 <>
-                  <p className="font-semibold text-[#0C1B2A]">Support standard</p>
-                  <p className="text-sm text-gray-500">Réponse sous 48-72h. Passez au Pro pour un support prioritaire.</p>
+                  <p className="font-semibold text-[#0C1B2A] dark:text-white">Support standard</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Réponse sous 48-72h. Passez au Pro pour un support prioritaire.</p>
                 </>
               )}
             </div>
@@ -123,7 +123,7 @@ export default function DashboardSupportPage() {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-50 flex items-center justify-center">
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
-            <h2 className="text-xl font-bold text-[#0C1B2A] mb-2">Message envoyé !</h2>
+            <h2 className="text-xl font-bold text-[#0C1B2A] dark:text-white mb-2">Message envoyé !</h2>
             <p className="text-gray-500 mb-6">
               {plan === "PRO"
                 ? "Notre équipe va traiter votre demande en priorité. Réponse sous 24h ouvrées."
@@ -144,7 +144,7 @@ export default function DashboardSupportPage() {
         /* Contact form */
         <Card className="rounded-2xl border-0 shadow-sm animate-fade-in-up">
           <CardContent className="p-6">
-            <h3 className="font-semibold text-[#0C1B2A] mb-4">Contactez-nous</h3>
+            <h3 className="font-semibold text-[#0C1B2A] dark:text-white mb-4">Contactez-nous</h3>
             <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
               <Input
                 id="support-subject"
@@ -157,7 +157,7 @@ export default function DashboardSupportPage() {
               <div>
                 <label
                   htmlFor="support-message"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Message
                 </label>
@@ -166,7 +166,7 @@ export default function DashboardSupportPage() {
                   placeholder="Décrivez votre problème ou question en détail..."
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className={`block w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm resize-none focus:ring-2 ${focusRing} transition-colors`}
+                  className={`block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm resize-none focus:ring-2 ${focusRing} transition-colors`}
                   rows={6}
                   required
                   maxLength={2000}

@@ -34,10 +34,10 @@ export default async function DashboardPage() {
   if (!merchant) {
     return (
       <div className="text-center py-16 animate-fade-in-up">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
           Configurez votre profil
         </h2>
-        <p className="text-gray-500 mb-6">
+        <p className="text-gray-500 dark:text-gray-400 mb-6">
           Pour commencer à recevoir des rendez-vous, créez votre profil professionnel.
         </p>
         <Link
@@ -185,7 +185,7 @@ export default async function DashboardPage() {
   return (
     <div className="page-transition">
       <div className="flex items-center gap-3 mb-6 animate-fade-in-up">
-        <h1 className="text-2xl font-bold text-[#0C1B2A]">
+        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
           Bonjour, {session.user.name || greeting} !
         </h1>
         {isMedical && (
@@ -206,10 +206,10 @@ export default async function DashboardPage() {
                   <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-[#0C1B2A]">
+                  <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
                     {stat.value}
                   </p>
-                  <p className="text-xs text-gray-500">{stat.label}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{stat.label}</p>
                 </div>
               </div>
             </CardContent>
@@ -219,8 +219,8 @@ export default async function DashboardPage() {
 
       {/* Today's bookings */}
       <Card className="rounded-2xl border-0 shadow-sm animate-fade-in-up">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="font-semibold text-[#0C1B2A]">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+          <h2 className="font-semibold text-[#0C1B2A] dark:text-white">
             {isMedical ? "Consultations du jour" : "Rendez-vous du jour"}
           </h2>
           <Link
@@ -236,11 +236,11 @@ export default async function DashboardPage() {
         </div>
         <CardContent>
           {upcomingBookings.length > 0 ? (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
               {upcomingBookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="flex items-center justify-between py-3 hover:bg-gray-50/50 -mx-2 px-2 rounded-lg transition-colors"
+                  className="flex items-center justify-between py-3 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 -mx-2 px-2 rounded-lg transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1 text-sm font-medium text-gray-500 min-w-[60px]">
@@ -248,10 +248,10 @@ export default async function DashboardPage() {
                       {formatTime(booking.startTime)}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-[#0C1B2A]">
+                      <p className="text-sm font-medium text-[#0C1B2A] dark:text-white">
                         {booking.client.name || (isMedical ? "Patient" : "Client")}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         {booking.service.name}
                       </p>
                     </div>
@@ -265,7 +265,7 @@ export default async function DashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm py-4">
+            <p className="text-gray-500 dark:text-gray-400 text-sm py-4">
               {isMedical
                 ? "Aucune consultation prévue aujourd'hui"
                 : "Aucun rendez-vous prévu aujourd'hui"}

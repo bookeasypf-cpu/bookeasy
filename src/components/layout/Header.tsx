@@ -21,6 +21,7 @@ import {
   Heart,
   Users,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export function Header() {
   const { data: session } = useSession();
@@ -34,7 +35,7 @@ export function Header() {
     `relative flex items-center gap-1.5 text-sm font-medium transition-colors px-1 py-1 ${
       isActive(path)
         ? "text-[#0066FF]"
-        : "text-[#0C1B2A]/70 hover:text-[#0066FF]"
+        : "text-[#0C1B2A]/70 dark:text-gray-300 hover:text-[#0066FF]"
     }`;
 
   const activeIndicator = (path: string) =>
@@ -43,7 +44,7 @@ export function Header() {
     ) : null;
 
   return (
-    <header className="glass sticky top-0 z-50">
+    <header className="glass dark:bg-gray-900/80 dark:border-gray-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -57,7 +58,7 @@ export function Header() {
               priority
             />
             <span className="hidden sm:flex items-center gap-0.5">
-              <span className="text-xl font-bold text-[#0C1B2A] tracking-tight">
+              <span className="text-xl font-bold text-[#0C1B2A] dark:text-white tracking-tight">
                 Book
               </span>
               <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent">
@@ -125,7 +126,7 @@ export function Header() {
             {session?.user && (
               <Link
                 href={session.user.role === "MERCHANT" ? "/dashboard/bookings" : "/my-bookings"}
-                className="relative p-2 text-[#0C1B2A]/50 hover:text-[#0066FF] transition-colors rounded-lg hover:bg-[#0066FF]/5"
+                className="relative p-2 text-[#0C1B2A]/50 dark:text-gray-400 hover:text-[#0066FF] transition-colors rounded-lg hover:bg-[#0066FF]/5"
                 title="Notifications"
               >
                 <Bell className="h-4.5 w-4.5" />
@@ -133,13 +134,14 @@ export function Header() {
             )}
 
             {/* Separator + Auth section */}
-            <div className="h-6 w-px bg-[#0C1B2A]/10 mx-1" />
+            <ThemeToggle />
+            <div className="h-6 w-px bg-[#0C1B2A]/10 dark:bg-gray-700 mx-1" />
 
             {session?.user ? (
               <div className="relative">
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 text-sm font-medium text-[#0C1B2A]/70 hover:text-[#0066FF] transition-colors rounded-full py-1 pl-1 pr-2"
+                  className="flex items-center gap-2 text-sm font-medium text-[#0C1B2A]/70 dark:text-gray-300 hover:text-[#0066FF] transition-colors rounded-full py-1 pl-1 pr-2"
                 >
                   <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-xs font-semibold shrink-0">
                     {session.user.name
@@ -163,19 +165,19 @@ export function Header() {
                       className="fixed inset-0 z-40"
                       onClick={() => setProfileOpen(false)}
                     />
-                    <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-50 animate-scale-in origin-top-right">
-                      <div className="px-3.5 py-2.5 border-b border-gray-100">
-                        <p className="text-sm font-semibold text-[#0C1B2A] truncate">
+                    <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1.5 z-50 animate-scale-in origin-top-right">
+                      <div className="px-3.5 py-2.5 border-b border-gray-100 dark:border-gray-700">
+                        <p className="text-sm font-semibold text-[#0C1B2A] dark:text-white truncate">
                           {session.user.name || "Utilisateur"}
                         </p>
-                        <p className="text-xs text-[#0C1B2A]/50 truncate">
+                        <p className="text-xs text-[#0C1B2A]/50 dark:text-gray-400 truncate">
                           {session.user.email}
                         </p>
                       </div>
                       <Link
                         href="/profile"
                         onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2.5 px-3.5 py-2 text-sm text-[#0C1B2A]/70 hover:text-[#0066FF] hover:bg-[#0066FF]/5 transition-colors"
+                        className="flex items-center gap-2.5 px-3.5 py-2 text-sm text-[#0C1B2A]/70 dark:text-gray-300 hover:text-[#0066FF] hover:bg-[#0066FF]/5 transition-colors"
                       >
                         <User className="h-4 w-4" />
                         Mon profil
@@ -185,7 +187,7 @@ export function Header() {
                           setProfileOpen(false);
                           signOut({ callbackUrl: "/" });
                         }}
-                        className="flex items-center gap-2.5 w-full px-3.5 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                        className="flex items-center gap-2.5 w-full px-3.5 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                       >
                         <LogOut className="h-4 w-4" />
                         Déconnexion
@@ -198,7 +200,7 @@ export function Header() {
               <div className="flex items-center gap-2.5">
                 <Link
                   href="/login"
-                  className="text-sm font-medium text-[#0C1B2A]/70 hover:text-[#0066FF] transition-colors px-3 py-1.5"
+                  className="text-sm font-medium text-[#0C1B2A]/70 dark:text-gray-300 hover:text-[#0066FF] transition-colors px-3 py-1.5"
                 >
                   Connexion
                 </Link>
@@ -214,7 +216,7 @@ export function Header() {
 
           {/* Mobile menu button */}
           <button
-            className="lg:hidden p-2 text-[#0C1B2A]/70 hover:text-[#0066FF] transition-colors rounded-lg"
+            className="lg:hidden p-2 text-[#0C1B2A]/70 dark:text-gray-300 hover:text-[#0066FF] transition-colors rounded-lg"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
           >
@@ -229,14 +231,14 @@ export function Header() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="lg:hidden border-t border-[#0C1B2A]/5 animate-slide-down">
+        <div className="lg:hidden border-t border-[#0C1B2A]/5 dark:border-gray-800 animate-slide-down">
           <div className="px-4 py-3 space-y-1">
             <Link
               href="/map"
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive("/map")
                   ? "text-[#0066FF] bg-[#0066FF]/5"
-                  : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                  : "text-[#0C1B2A]/70 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
               }`}
               onClick={() => setMobileOpen(false)}
             >
@@ -249,7 +251,7 @@ export function Header() {
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive("/search")
                   ? "text-[#0066FF] bg-[#0066FF]/5"
-                  : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                  : "text-[#0C1B2A]/70 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
               }`}
               onClick={() => setMobileOpen(false)}
             >
@@ -263,7 +265,7 @@ export function Header() {
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive("/gift-cards")
                     ? "text-[#0066FF] bg-[#0066FF]/5"
-                    : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                    : "text-[#0C1B2A]/70 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                 }`}
                 onClick={() => setMobileOpen(false)}
               >
@@ -280,7 +282,7 @@ export function Header() {
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isActive("/dashboard")
                         ? "text-[#0066FF] bg-[#0066FF]/5"
-                        : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                        : "text-[#0C1B2A]/70 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                     }`}
                     onClick={() => setMobileOpen(false)}
                   >
@@ -296,7 +298,7 @@ export function Header() {
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         isActive("/my-bookings")
                           ? "text-[#0066FF] bg-[#0066FF]/5"
-                          : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                          : "text-[#0C1B2A]/70 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                       }`}
                       onClick={() => setMobileOpen(false)}
                     >
@@ -308,7 +310,7 @@ export function Header() {
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         isActive("/my-rewards")
                           ? "text-[#0066FF] bg-[#0066FF]/5"
-                          : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                          : "text-[#0C1B2A]/70 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                       }`}
                       onClick={() => setMobileOpen(false)}
                     >
@@ -320,7 +322,7 @@ export function Header() {
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         isActive("/favorites")
                           ? "text-[#0066FF] bg-[#0066FF]/5"
-                          : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                          : "text-[#0C1B2A]/70 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                       }`}
                       onClick={() => setMobileOpen(false)}
                     >
@@ -332,7 +334,7 @@ export function Header() {
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         isActive("/referrals")
                           ? "text-[#0066FF] bg-[#0066FF]/5"
-                          : "text-[#0C1B2A]/70 hover:bg-gray-50"
+                          : "text-[#0C1B2A]/70 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                       }`}
                       onClick={() => setMobileOpen(false)}
                     >
@@ -342,11 +344,11 @@ export function Header() {
                   </>
                 )}
 
-                <div className="border-t border-[#0C1B2A]/5 my-1.5" />
+                <div className="border-t border-[#0C1B2A]/5 dark:border-gray-800 my-1.5" />
 
                 <Link
                   href="/profile"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#0C1B2A]/70 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#0C1B2A]/70 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
                   <div className="h-7 w-7 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-[10px] font-semibold">
@@ -362,7 +364,7 @@ export function Header() {
                     setMobileOpen(false);
                     signOut({ callbackUrl: "/" });
                   }}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                 >
                   <LogOut className="h-4.5 w-4.5" />
                   Déconnexion
@@ -370,11 +372,11 @@ export function Header() {
               </>
             ) : (
               <>
-                <div className="border-t border-[#0C1B2A]/5 my-1.5" />
+                <div className="border-t border-[#0C1B2A]/5 dark:border-gray-800 my-1.5" />
                 <div className="flex gap-2 px-3 pt-1 pb-2">
                   <Link
                     href="/login"
-                    className="flex-1 text-center text-sm font-medium text-[#0C1B2A]/70 border border-[#0C1B2A]/10 py-2.5 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 text-center text-sm font-medium text-[#0C1B2A]/70 dark:text-gray-300 border border-[#0C1B2A]/10 dark:border-gray-700 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     onClick={() => setMobileOpen(false)}
                   >
                     Connexion

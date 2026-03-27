@@ -98,7 +98,7 @@ export default function ProfilePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#0C1B2A]">Mon profil</h1>
+        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white">Mon profil</h1>
         {!editing && (
           <button
             onClick={startEdit}
@@ -123,12 +123,12 @@ export default function ProfilePage() {
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="text-lg font-semibold text-[#0C1B2A] border border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors w-full"
+                  className="text-lg font-semibold text-[#0C1B2A] dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors w-full"
                   placeholder="Votre nom"
                   autoFocus
                 />
               ) : (
-                <h2 className="text-lg font-semibold text-[#0C1B2A]">
+                <h2 className="text-lg font-semibold text-[#0C1B2A] dark:text-white">
                   {profile.name || "Utilisateur"}
                 </h2>
               )}
@@ -140,15 +140,15 @@ export default function ProfilePage() {
 
           {/* Info fields */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
               <Mail className="h-4 w-4 text-gray-400 shrink-0" />
               <div className="flex-1">
                 <p className="text-xs text-gray-400 font-medium">Email</p>
-                <p className="text-sm text-[#0C1B2A]">{profile.email}</p>
+                <p className="text-sm text-[#0C1B2A] dark:text-white">{profile.email}</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
               <Phone className="h-4 w-4 text-gray-400 shrink-0" />
               <div className="flex-1">
                 <p className="text-xs text-gray-400 font-medium">Téléphone</p>
@@ -157,11 +157,11 @@ export default function ProfilePage() {
                     type="tel"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="text-sm text-[#0C1B2A] border border-gray-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors w-full mt-0.5"
+                    className="text-sm text-[#0C1B2A] dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors w-full mt-0.5"
                     placeholder="+689 87 00 00 00"
                   />
                 ) : (
-                  <p className="text-sm text-[#0C1B2A]">
+                  <p className="text-sm text-[#0C1B2A] dark:text-white">
                     {profile.phone || "Non renseigné"}
                   </p>
                 )}
@@ -171,7 +171,7 @@ export default function ProfilePage() {
 
           {/* Edit buttons */}
           {editing && (
-            <div className="flex gap-2 mt-6 pt-4 border-t border-gray-100">
+            <div className="flex gap-2 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
               <button
                 onClick={handleSave}
                 disabled={saving}
@@ -183,7 +183,7 @@ export default function ProfilePage() {
               <button
                 onClick={cancelEdit}
                 disabled={saving}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-medium rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
               >
                 <X className="h-4 w-4" />
                 Annuler

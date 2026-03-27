@@ -102,10 +102,10 @@ export default async function DashboardAnalyticsPage() {
     return (
       <div className="page-transition">
         <div className="mb-6 animate-fade-in-up">
-          <h1 className="text-2xl font-bold text-[#0C1B2A]">
+          <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
             Statistiques du cabinet
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Vue d&apos;ensemble de votre activité médicale
           </p>
         </div>
@@ -115,37 +115,37 @@ export default async function DashboardAnalyticsPage() {
           <Card className="rounded-2xl border-0 shadow-sm card-hover">
             <CardContent className="py-5 text-center">
               <Users className="h-6 w-6 text-emerald-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-[#0C1B2A]">{uniqueClients}</p>
-              <p className="text-xs text-gray-500 mt-1">Patients</p>
+              <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">{uniqueClients}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Patients</p>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-0 shadow-sm card-hover">
             <CardContent className="py-5 text-center">
               <CalendarDays className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-[#0C1B2A]">{completedBookings}</p>
-              <p className="text-xs text-gray-500 mt-1">Consultations effectuées</p>
+              <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">{completedBookings}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Consultations effectuées</p>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-0 shadow-sm card-hover">
             <CardContent className="py-5 text-center">
               <CheckCircle className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
               <p className="text-2xl font-bold text-emerald-600">{honorationRate}%</p>
-              <p className="text-xs text-gray-500 mt-1">Taux d&apos;honoration</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Taux d&apos;honoration</p>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-0 shadow-sm card-hover">
             <CardContent className="py-5 text-center">
               <UserCheck className="h-6 w-6 text-violet-600 mx-auto mb-2" />
               <p className="text-2xl font-bold text-violet-600">{newPatientsLast30}</p>
-              <p className="text-xs text-gray-500 mt-1">Nouveaux patients (30j)</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Nouveaux patients (30j)</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Graphique activité mensuelle */}
         <Card className="rounded-2xl border-0 shadow-sm mb-6 animate-fade-in-up">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-[#0C1B2A]">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+            <h2 className="font-semibold text-[#0C1B2A] dark:text-white">
               Activité mensuelle
             </h2>
           </div>
@@ -173,8 +173,8 @@ export default async function DashboardAnalyticsPage() {
         {/* Top consultations + Annulations */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="rounded-2xl border-0 shadow-sm animate-fade-in-up">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="font-semibold text-[#0C1B2A]">
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+              <h2 className="font-semibold text-[#0C1B2A] dark:text-white">
                 Consultations les plus fréquentes
               </h2>
             </div>
@@ -195,7 +195,7 @@ export default async function DashboardAnalyticsPage() {
                         >
                           {i + 1}
                         </span>
-                        <span className="text-sm text-[#0C1B2A] font-medium">
+                        <span className="text-sm text-[#0C1B2A] dark:text-white font-medium">
                           {name}
                         </span>
                       </div>
@@ -212,8 +212,8 @@ export default async function DashboardAnalyticsPage() {
           </Card>
 
           <Card className="rounded-2xl border-0 shadow-sm animate-fade-in-up">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="font-semibold text-[#0C1B2A]">
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+              <h2 className="font-semibold text-[#0C1B2A] dark:text-white">
                 Résumé des annulations
               </h2>
             </div>
@@ -222,24 +222,24 @@ export default async function DashboardAnalyticsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 text-amber-500" />
-                    <span className="text-sm text-gray-600">Annulations patient</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Annulations patient</span>
                   </div>
-                  <span className="font-semibold text-[#0C1B2A]">
+                  <span className="font-semibold text-[#0C1B2A] dark:text-white">
                     {allBookings.filter((b) => b.status === "CANCELLED_BY_CLIENT").length}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 text-red-500" />
-                    <span className="text-sm text-gray-600">Annulations praticien</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Annulations praticien</span>
                   </div>
-                  <span className="font-semibold text-[#0C1B2A]">
+                  <span className="font-semibold text-[#0C1B2A] dark:text-white">
                     {allBookings.filter((b) => b.status === "CANCELLED_BY_MERCHANT").length}
                   </span>
                 </div>
-                <div className="pt-3 border-t border-gray-100">
+                <div className="pt-3 border-t border-gray-100 dark:border-gray-800">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Taux de fiabilité</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Taux de fiabilité</span>
                     <span className="font-bold text-emerald-600">{honorationRate}%</span>
                   </div>
                   <div className="mt-2 w-full bg-gray-100 rounded-full h-2">
@@ -262,20 +262,20 @@ export default async function DashboardAnalyticsPage() {
   // ─────────────────────────────────────────
   return (
     <div className="page-transition">
-      <h1 className="text-2xl font-bold text-[#0C1B2A] mb-6 animate-fade-in-up">Statistiques</h1>
+      <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white mb-6 animate-fade-in-up">Statistiques</h1>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
           <CardContent className="py-5 text-center">
-            <p className="text-2xl font-bold text-[#0C1B2A]">{totalBookings}</p>
-            <p className="text-xs text-gray-500 mt-1">Total RDV</p>
+            <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">{totalBookings}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Total RDV</p>
           </CardContent>
         </Card>
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
           <CardContent className="py-5 text-center">
-            <p className="text-2xl font-bold text-[#0C1B2A]">
+            <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
               {completedBookings}
             </p>
-            <p className="text-xs text-gray-500 mt-1">Terminés</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Terminés</p>
           </CardContent>
         </Card>
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
@@ -283,7 +283,7 @@ export default async function DashboardAnalyticsPage() {
             <p className="text-2xl font-bold bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent">
               {formatPrice(totalRevenue)}
             </p>
-            <p className="text-xs text-gray-500 mt-1">Revenu total</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Revenu total</p>
           </CardContent>
         </Card>
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
@@ -291,15 +291,15 @@ export default async function DashboardAnalyticsPage() {
             <p className="text-2xl font-bold text-emerald-600">
               {formatPrice(recentRevenue)}
             </p>
-            <p className="text-xs text-gray-500 mt-1">30 derniers jours</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">30 derniers jours</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Graphique activité mensuelle */}
       <Card className="rounded-2xl border-0 shadow-sm mb-6 animate-fade-in-up">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="font-semibold text-[#0C1B2A]">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="font-semibold text-[#0C1B2A] dark:text-white">
             Activité mensuelle
           </h2>
         </div>
@@ -325,8 +325,8 @@ export default async function DashboardAnalyticsPage() {
       </Card>
 
       <Card className="rounded-2xl border-0 shadow-sm animate-fade-in-up">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="font-semibold text-[#0C1B2A]">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="font-semibold text-[#0C1B2A] dark:text-white">
             Services les plus populaires
           </h2>
         </div>
@@ -350,7 +350,7 @@ export default async function DashboardAnalyticsPage() {
                     }`}>
                       {i + 1}
                     </span>
-                    <span className="text-sm text-[#0C1B2A] font-medium">{name}</span>
+                    <span className="text-sm text-[#0C1B2A] dark:text-white font-medium">{name}</span>
                   </div>
                   <span className="text-sm font-medium text-gray-500">
                     {count} réservation{count > 1 ? "s" : ""}

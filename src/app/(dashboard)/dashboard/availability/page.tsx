@@ -102,7 +102,7 @@ export default function DashboardAvailabilityPage() {
   return (
     <div className="page-transition">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#0C1B2A] animate-fade-in-up">Horaires</h1>
+        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white animate-fade-in-up">Horaires</h1>
         <button
           onClick={handleSave}
           disabled={saving}
@@ -121,7 +121,7 @@ export default function DashboardAvailabilityPage() {
             <Card key={day} className="rounded-2xl border-0 shadow-sm card-hover">
               <CardContent className="py-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium text-[#0C1B2A]">
+                  <h3 className="font-medium text-[#0C1B2A] dark:text-white">
                     {DAYS_OF_WEEK[day]}
                   </h3>
                   <button
@@ -160,7 +160,7 @@ export default function DashboardAvailabilityPage() {
                               e.target.value
                             )
                           }
-                          className={`rounded-xl border border-gray-300 px-2 py-1 text-sm focus:ring-2 ${focusRing} transition-colors`}
+                          className={`rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-2 py-1 text-sm focus:ring-2 ${focusRing} transition-colors`}
                         />
                         <span className="text-gray-400">—</span>
                         <input
@@ -173,7 +173,7 @@ export default function DashboardAvailabilityPage() {
                               e.target.value
                             )
                           }
-                          className={`rounded-xl border border-gray-300 px-2 py-1 text-sm focus:ring-2 ${focusRing} transition-colors`}
+                          className={`rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-2 py-1 text-sm focus:ring-2 ${focusRing} transition-colors`}
                         />
                         <button
                           onClick={() => removeSlot(slot.originalIndex)}

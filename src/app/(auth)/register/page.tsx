@@ -101,10 +101,10 @@ function RegisterForm() {
   return (
     <Card className="w-full max-w-md">
       <CardContent className="p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">
           Créer un compte
         </h1>
-        <p className="text-sm text-gray-500 text-center mb-6">
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
           Rejoignez BookEasy gratuitement
         </p>
 
@@ -123,7 +123,7 @@ function RegisterForm() {
           <div className="mb-6">
             {showRefInput ? (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Code de parrainage <span className="text-gray-400">(optionnel)</span>
                 </label>
                 <div className="flex gap-2">
@@ -136,7 +136,7 @@ function RegisterForm() {
                     }}
                     onBlur={() => validateRefCode(refCode)}
                     placeholder="Ex: BK-A7X3"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono tracking-wider"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono tracking-wider"
                   />
                   <button
                     type="button"
@@ -169,7 +169,7 @@ function RegisterForm() {
               "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
               role === "CLIENT"
                 ? "border-indigo-600 bg-indigo-50"
-                : "border-gray-200 hover:border-gray-300"
+                : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
             )}
           >
             <User
@@ -181,12 +181,12 @@ function RegisterForm() {
             <span
               className={cn(
                 "text-sm font-medium",
-                role === "CLIENT" ? "text-indigo-700" : "text-gray-600"
+                role === "CLIENT" ? "text-indigo-700" : "text-gray-600 dark:text-gray-300"
               )}
             >
               Client
             </span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-400 dark:text-gray-500">
               Je veux réserver
             </span>
           </button>
@@ -197,7 +197,7 @@ function RegisterForm() {
               "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
               role === "MERCHANT"
                 ? "border-indigo-600 bg-indigo-50"
-                : "border-gray-200 hover:border-gray-300"
+                : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
             )}
           >
             <Store
@@ -209,12 +209,12 @@ function RegisterForm() {
             <span
               className={cn(
                 "text-sm font-medium",
-                role === "MERCHANT" ? "text-indigo-700" : "text-gray-600"
+                role === "MERCHANT" ? "text-indigo-700" : "text-gray-600 dark:text-gray-300"
               )}
             >
               Professionnel
             </span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-400 dark:text-gray-500">
               Je propose des services
             </span>
           </button>
@@ -258,7 +258,7 @@ function RegisterForm() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
           Déjà un compte ?{" "}
           <Link
             href="/login"

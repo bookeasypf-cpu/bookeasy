@@ -141,7 +141,7 @@ export default function DashboardServicesPage() {
   return (
     <div className="page-transition">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#0C1B2A] animate-fade-in-up">
+        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white animate-fade-in-up">
           {isMedical ? "Consultations" : "Services"}
         </h1>
         <button
@@ -158,7 +158,7 @@ export default function DashboardServicesPage() {
       {showForm && (
         <Card className="mb-6 rounded-2xl border-0 shadow-sm animate-fade-in-up">
           <CardContent className="p-6">
-            <h3 className="font-semibold text-[#0C1B2A] mb-4">
+            <h3 className="font-semibold text-[#0C1B2A] dark:text-white mb-4">
               {editingId
                 ? isMedical ? "Modifier la consultation" : "Modifier le service"
                 : isMedical ? "Nouvelle consultation" : "Nouveau service"}
@@ -182,7 +182,7 @@ export default function DashboardServicesPage() {
               />
               <div className={`grid ${isMedical ? "grid-cols-2" : "grid-cols-3"} gap-4`}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Durée (min)
                   </label>
                   <select
@@ -190,7 +190,7 @@ export default function DashboardServicesPage() {
                     onChange={(e) =>
                       setForm({ ...form, duration: e.target.value })
                     }
-                    className={`block w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-2 ${focusRing} transition-colors`}
+                    className={`block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-2 ${focusRing} transition-colors`}
                   >
                     {[15, 20, 30, 45, 60, 75, 90, 120, 150, 180, 240].map(
                       (d) => (
@@ -213,7 +213,7 @@ export default function DashboardServicesPage() {
                 />
                 {!isMedical && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       XP gagnés
                     </label>
                     <input
@@ -225,7 +225,7 @@ export default function DashboardServicesPage() {
                       onChange={(e) =>
                         setForm({ ...form, xpAmount: e.target.value })
                       }
-                      className={`block w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:ring-2 ${focusRing} transition-colors placeholder:text-gray-300`}
+                      className={`block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-2 ${focusRing} transition-colors placeholder:text-gray-300`}
                     />
                     <p className="text-[10px] text-gray-400 mt-0.5">
                       Vide = défaut ({`paramètres XP`})
@@ -255,9 +255,9 @@ export default function DashboardServicesPage() {
           <Card key={service.id} className="rounded-2xl card-hover border-0 shadow-sm">
             <CardContent className="py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <h3 className="font-medium text-[#0C1B2A]">{service.name}</h3>
+                <h3 className="font-medium text-[#0C1B2A] dark:text-white">{service.name}</h3>
                 {service.description && (
-                  <p className="text-sm text-gray-500">{service.description}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{service.description}</p>
                 )}
                 <span className="flex items-center gap-1 text-sm text-gray-400 mt-1">
                   <Clock className="h-3.5 w-3.5" />

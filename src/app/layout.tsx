@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "react-hot-toast";
 import { InstallBanner } from "@/components/ui/InstallBanner";
 import { ServiceWorkerProvider } from "@/components/providers/ServiceWorkerProvider";
@@ -56,9 +57,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
-      <body className={`${inter.variable} font-sans antialiased bg-gray-50`}>
+    <html lang="fr" suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased bg-gray-50 dark:bg-gray-950`}>
         <SessionProvider>
+          <ThemeProvider>
           {children}
           <ServiceWorkerProvider />
           <InstallBanner />
@@ -73,6 +75,7 @@ export default function RootLayout({
               },
             }}
           />
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>

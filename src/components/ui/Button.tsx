@@ -24,11 +24,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary:
         "bg-gradient-to-b from-[#0066FF] to-[#0052CC] text-white hover:from-[#0052CC] hover:to-[#003D99] shadow-lg shadow-blue-500/25 focus:ring-[#0066FF]/40",
       secondary:
-        "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm focus:ring-gray-300/40",
+        "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 shadow-sm focus:ring-gray-300/40",
       outline:
         "border border-[#0066FF]/30 text-[#0066FF] hover:bg-[#0066FF]/5 focus:ring-[#0066FF]/20",
       ghost:
-        "text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:ring-gray-300/40",
+        "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white focus:ring-gray-300/40",
       danger:
         "bg-gradient-to-b from-[#FF6B6B] to-[#E05555] text-white hover:from-[#E05555] hover:to-[#C94444] shadow-lg shadow-red-500/25 focus:ring-red-500/40",
       gradient:

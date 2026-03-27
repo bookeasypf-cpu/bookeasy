@@ -103,7 +103,7 @@ export function DashboardMobileNav({ isMedical = false }: DashboardSidebarProps)
   const navItems = isMedical ? medicalNavItems : standardNavItems;
 
   return (
-    <div className="lg:hidden overflow-x-auto border-b border-gray-200 bg-white">
+    <div className="lg:hidden overflow-x-auto border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
       <nav className="flex px-4 gap-1 min-w-max">
         {navItems.map((item) => {
           const isActive =
@@ -119,7 +119,7 @@ export function DashboardMobileNav({ isMedical = false }: DashboardSidebarProps)
                   ? isMedical
                     ? "border-emerald-500 text-emerald-600 bg-emerald-50"
                     : "border-[#0066FF] text-[#0066FF] bg-[#0066FF]/5"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               )}
             >
               <item.icon className="h-4 w-4" />

@@ -50,10 +50,10 @@ function LoginForm() {
   return (
     <Card className="w-full max-w-md">
       <CardContent className="p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">
           Connexion
         </h1>
-        <p className="text-sm text-gray-500 text-center mb-6">
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
           Connectez-vous pour gérer vos rendez-vous
         </p>
 
@@ -98,10 +98,10 @@ function LoginForm() {
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-gray-200 dark:border-gray-700" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-2 text-gray-500">ou</span>
+              <span className="bg-white dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">ou</span>
             </div>
           </div>
 
@@ -146,7 +146,7 @@ function LoginForm() {
           </div>
         </div>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
           Pas encore de compte ?{" "}
           <Link
             href={callbackUrl !== "/" ? `/register?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/register"}

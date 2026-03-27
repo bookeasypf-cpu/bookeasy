@@ -41,7 +41,7 @@ export default async function DashboardReviewsPage() {
 
   return (
     <div className="page-transition">
-      <h1 className="text-2xl font-bold text-[#0C1B2A] mb-2 animate-fade-in-up">
+      <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white mb-2 animate-fade-in-up">
         {isMedical ? "Avis patients" : "Avis clients"}
       </h1>
       {reviews.length > 0 && (
@@ -62,7 +62,7 @@ export default async function DashboardReviewsPage() {
                   {review.client.name?.[0] || "?"}
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-[#0C1B2A]">
+                  <span className="text-sm font-medium text-[#0C1B2A] dark:text-white">
                     {review.client.name || "Anonyme"}
                   </span>
                   <p className="text-xs text-gray-400">
@@ -74,7 +74,7 @@ export default async function DashboardReviewsPage() {
                 </div>
               </div>
               {review.comment && (
-                <p className="text-sm text-gray-600 leading-relaxed">{review.comment}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{review.comment}</p>
               )}
             </CardContent>
           </Card>

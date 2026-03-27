@@ -206,23 +206,23 @@ export default function DashboardCalendarPage() {
         <button
           onClick={goToPrevMonth}
           className={cn(
-            "p-3 rounded-xl border border-gray-200 transition-all hover:shadow-sm",
+            "p-3 rounded-xl border border-gray-200 dark:border-gray-700 transition-all hover:shadow-sm",
             accentMap.hoverBg
           )}
           aria-label="Mois précédent"
         >
-          <ChevronLeft className="w-5 h-5 text-gray-600" />
+          <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </button>
-        <h1 className="text-2xl font-bold text-[#0C1B2A]">{monthLabel}</h1>
+        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white">{monthLabel}</h1>
         <button
           onClick={goToNextMonth}
           className={cn(
-            "p-3 rounded-xl border border-gray-200 transition-all hover:shadow-sm",
+            "p-3 rounded-xl border border-gray-200 dark:border-gray-700 transition-all hover:shadow-sm",
             accentMap.hoverBg
           )}
           aria-label="Mois suivant"
         >
-          <ChevronRight className="w-5 h-5 text-gray-600" />
+          <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </button>
       </div>
 
@@ -279,7 +279,7 @@ export default function DashboardCalendarPage() {
                           isSelected &&
                             `${accentMap.bgLight} ring-2 ${accentMap.ring} border-transparent shadow-md`,
                           !isToday && !isSelected &&
-                            "border-gray-100 hover:border-gray-200 hover:shadow-sm"
+                            "border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-sm"
                         )}
                       >
                         <div className="flex items-center justify-between mb-1">
@@ -288,7 +288,7 @@ export default function DashboardCalendarPage() {
                               "font-semibold",
                               isToday || isSelected
                                 ? accentMap.textAccent
-                                : "text-gray-700"
+                                : "text-gray-700 dark:text-gray-300"
                             )}
                           >
                             {day}
@@ -361,17 +361,17 @@ export default function DashboardCalendarPage() {
                   "fixed bottom-0 left-0 right-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl shadow-2xl",
                   // Desktop: side panel
                   "lg:static lg:w-96 lg:max-h-none lg:rounded-2xl lg:z-auto",
-                  "bg-white border border-gray-100"
+                  "bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800"
                 )}
               >
                 {/* Panel header */}
                 <div
                   className={cn(
-                    "sticky top-0 bg-white z-10 px-5 py-4 border-b border-gray-100 rounded-t-2xl flex items-center justify-between"
+                    "sticky top-0 bg-white dark:bg-gray-900 z-10 px-5 py-4 border-b border-gray-100 dark:border-gray-800 rounded-t-2xl flex items-center justify-between"
                   )}
                 >
                   <div>
-                    <p className="text-sm text-gray-500 capitalize">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
                       {selectedDateFormatted}
                     </p>
                     <p className={cn("text-lg font-bold", accentMap.textAccent)}>
@@ -390,7 +390,7 @@ export default function DashboardCalendarPage() {
                       setPanelOpen(false);
                       setSelectedDate(null);
                     }}
-                    className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     aria-label="Fermer"
                   >
                     <X className="w-5 h-5 text-gray-400" />
@@ -421,14 +421,14 @@ export default function DashboardCalendarPage() {
                               className={cn(
                                 "rounded-xl border p-4 transition-all hover:shadow-md cursor-pointer",
                                 accentMap.hoverBg,
-                                "border-gray-100"
+                                "border-gray-100 dark:border-gray-800"
                               )}
                             >
                               {/* Time + Status */}
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
                                   <Clock className={cn("w-4 h-4", accentMap.textAccent)} />
-                                  <span className="font-semibold text-gray-800">
+                                  <span className="font-semibold text-gray-800 dark:text-gray-200">
                                     {formatTime(b.startTime)} - {formatTime(b.endTime)}
                                   </span>
                                 </div>
@@ -443,13 +443,13 @@ export default function DashboardCalendarPage() {
                               </div>
 
                               {/* Client */}
-                              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mb-1">
                                 <User className="w-3.5 h-3.5" />
                                 <span>{b.clientName}</span>
                               </div>
 
                               {/* Service */}
-                              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mb-1">
                                 {isMedical ? (
                                   <Stethoscope className="w-3.5 h-3.5" />
                                 ) : (
@@ -460,7 +460,7 @@ export default function DashboardCalendarPage() {
 
                               {/* Phone */}
                               {b.clientPhone && (
-                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                                   <Phone className="w-3.5 h-3.5" />
                                   <span>{b.clientPhone}</span>
                                 </div>

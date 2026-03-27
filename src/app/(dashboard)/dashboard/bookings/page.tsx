@@ -49,7 +49,7 @@ export default async function DashboardBookingsPage() {
   }) {
     return (
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-[#0C1B2A] mb-4">
+        <h2 className="text-lg font-semibold text-[#0C1B2A] dark:text-white mb-4">
           {title} ({items.length})
         </h2>
         {items.length > 0 ? (
@@ -60,7 +60,7 @@ export default async function DashboardBookingsPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-[#0C1B2A]">
+                        <span className="font-medium text-[#0C1B2A] dark:text-white">
                           {b.client.name || b.client.email}
                         </span>
                         <span
@@ -69,10 +69,10 @@ export default async function DashboardBookingsPage() {
                           {BOOKING_STATUS_LABELS[b.status] || b.status}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
                         {b.service.name}
                       </p>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-gray-400 dark:text-gray-500">
                         {formatDate(b.date)} ·{" "}
                         {formatTime(b.startTime)} - {formatTime(b.endTime)}
                       </p>
@@ -105,7 +105,7 @@ export default async function DashboardBookingsPage() {
 
   return (
     <div className="page-transition">
-      <h1 className="text-2xl font-bold text-[#0C1B2A] mb-6 animate-fade-in-up">
+      <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white mb-6 animate-fade-in-up">
         {isMedical ? "Agenda des consultations" : "Rendez-vous"}
       </h1>
       <BookingList items={pending} title="En attente" />

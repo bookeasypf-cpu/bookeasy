@@ -286,7 +286,7 @@ export default function DashboardProfilePage() {
   return (
     <div className="page-transition">
       <div className="flex items-center justify-between mb-6 animate-fade-in-up">
-        <h1 className="text-2xl font-bold text-[#0C1B2A]">
+        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white dark:text-white">
           {isMedical ? "Mon cabinet" : "Mon commerce"}
         </h1>
         {merchantId && (
@@ -403,8 +403,8 @@ export default function DashboardProfilePage() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-semibold text-[#0C1B2A]">Galerie photos</h3>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <h3 className="font-semibold text-[#0C1B2A] dark:text-white">Galerie photos</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                 Ajoutez des photos pour mettre en valeur votre{" "}
                 {isMedical ? "cabinet" : "commerce"}
               </p>
@@ -490,12 +490,12 @@ export default function DashboardProfilePage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-[#0C1B2A]">
+                  <h3 className="font-bold text-[#0C1B2A] dark:text-white">
                     Plan {plan === "PRO" ? "Pro" : "Gratuit"}
                   </h3>
                   {plan === "PRO" && <ProBadge size="sm" />}
                 </div>
-                <p className="text-sm text-gray-500 mt-0.5">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                   {plan === "PRO"
                     ? isMedical
                       ? "Consultations illimitees, badge Pro verifie, mise en avant dans les recherches"
@@ -528,10 +528,10 @@ export default function DashboardProfilePage() {
         <CardContent className="p-5">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-[#0C1B2A]">
+              <h3 className="font-semibold text-[#0C1B2A] dark:text-white">
                 Notifications push
               </h3>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                 {isMedical
                   ? "Recevez des alertes instantanees pour les nouvelles prises de rendez-vous"
                   : "Recevez des alertes instantanees pour les nouvelles reservations"}
@@ -557,7 +557,7 @@ export default function DashboardProfilePage() {
             <div>
               <label
                 htmlFor="sectorId"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
                 {isMedical ? "Specialite" : "Secteur"}
               </label>
@@ -567,7 +567,7 @@ export default function DashboardProfilePage() {
                 onChange={(e) =>
                   setForm({ ...form, sectorId: e.target.value })
                 }
-                className="block w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
                 required
               >
                 <option value="">
@@ -585,7 +585,7 @@ export default function DashboardProfilePage() {
             <div>
               <label
                 htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
                 Description
               </label>
@@ -595,7 +595,7 @@ export default function DashboardProfilePage() {
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
                 }
-                className="block w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm resize-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm resize-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
                 rows={4}
                 placeholder={
                   isMedical
