@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useRef, useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import {
   Scissors,
   Sparkles,
@@ -68,6 +69,8 @@ function SectorCard({
 }) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const Icon = iconMap[sector.icon || "Store"] || Store;
   const accent = SECTOR_ACCENTS[sector.slug] || "0, 102, 255";
 
@@ -127,7 +130,7 @@ function SectorCard({
       href={`/search?sector=${sector.slug}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="card-glow group flex flex-col items-center gap-3 p-4 sm:p-5 rounded-2xl bg-white border border-gray-100 transition-all duration-400"
+      className="card-glow group flex flex-col items-center gap-3 p-4 sm:p-5 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700 transition-all duration-400"
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible
@@ -137,16 +140,19 @@ function SectorCard({
         transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
         transitionDuration: "0.6s",
         willChange: "transform, opacity, filter",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+        boxShadow: isDark
+          ? "0 2px 12px rgba(0,0,0,0.3)"
+          : "0 2px 12px rgba(0,0,0,0.04)",
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget;
-        el.style.boxShadow = `0 20px 50px -12px rgba(${accent}, 0.2), 0 0 0 1px rgba(${accent}, 0.1)`;
-        el.style.borderColor = `rgba(${accent}, 0.25)`;
+        el.style.boxShadow = `0 20px 50px -12px rgba(${accent}, 0.3), 0 0 0 1px rgba(${accent}, 0.2)`;
+        el.style.borderColor = `rgba(${accent}, 0.35)`;
       }}
       onMouseOut={(e) => {
         const el = e.currentTarget;
-        el.style.boxShadow = "0 2px 12px rgba(0,0,0,0.04)";
+        const dk = document.documentElement.classList.contains('dark');
+        el.style.boxShadow = dk ? "0 2px 12px rgba(0,0,0,0.3)" : "0 2px 12px rgba(0,0,0,0.04)";
         el.style.borderColor = "";
       }}
     >
@@ -171,7 +177,7 @@ function SectorCard({
       </div>
 
       {/* Label */}
-      <span className="relative z-10 text-xs sm:text-sm font-medium text-gray-700 text-center leading-tight group-hover:text-gray-900 transition-colors duration-300">
+      <span className="relative z-10 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 text-center leading-tight group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
         {sector.name}
       </span>
     </Link>

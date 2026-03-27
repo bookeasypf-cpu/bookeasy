@@ -47,18 +47,18 @@ export default async function SectorsPage() {
             <Link
               key={sector.id}
               href={`/search?sector=${sector.slug}`}
-              className="group flex items-center justify-between p-5 rounded-2xl bg-white border border-gray-100 hover:border-[#0066FF]/20 hover:shadow-lg hover:shadow-[#0066FF]/5 transition-all duration-300"
+              className="group flex items-center justify-between p-5 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700 hover:border-[#0066FF]/20 hover:shadow-lg hover:shadow-[#0066FF]/5 transition-all duration-300"
             >
               <div>
-                <h3 className="font-semibold text-gray-900 group-hover:text-[#0066FF] transition-colors">
+                <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-[#0066FF] transition-colors">
                   {sector.name}
                 </h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {sector._count.merchants} professionnel
                   {sector._count.merchants > 1 ? "s" : ""}
                 </p>
               </div>
-              <ArrowRight className="h-5 w-5 text-gray-300 group-hover:text-[#0066FF] group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="h-5 w-5 text-gray-300 dark:text-gray-500 group-hover:text-[#0066FF] group-hover:translate-x-1 transition-all" />
             </Link>
           ))}
         </div>
