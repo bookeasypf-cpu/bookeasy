@@ -98,7 +98,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const mapLink = `/map${mapParams.toString() ? `?${mapParams.toString()}` : ""}`;
 
   return (
-    <div className="page-transition min-h-screen bg-[#F8FAFC]">
+    <div className="page-transition min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
       {/* Header / Search Section */}
       <div className="relative bg-gradient-to-br from-[#0C1B2A] via-[#0C1B2A] to-[#003D99] overflow-hidden">
         {/* Background decorative elements */}
@@ -119,14 +119,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         {/* Results header card */}
         <div className="glass rounded-2xl shadow-lg px-5 py-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-[#0C1B2A]">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#0C1B2A] dark:text-white">
               {sectorName
                 ? `${sectorName}${city ? ` à ${city}` : ""}`
                 : q
                   ? `Résultats pour "${q}"${city ? ` à ${city}` : ""}`
                   : "Tous les professionnels"}
             </h1>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               <span className="inline-flex items-center gap-1.5">
                 <span className="inline-block w-2 h-2 rounded-full bg-[#00B4D8]" />
                 {merchantsWithRating.length} résultat
@@ -182,10 +182,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 flex items-center justify-center mb-6">
               <SearchX className="h-10 w-10 text-[#0066FF]/40" />
             </div>
-            <h2 className="text-xl font-bold text-[#0C1B2A] mb-2">
+            <h2 className="text-xl font-bold text-[#0C1B2A] dark:text-white mb-2">
               Aucun résultat trouvé
             </h2>
-            <p className="text-gray-500 text-sm text-center max-w-sm mb-6">
+            <p className="text-gray-500 dark:text-gray-400 text-sm text-center max-w-sm mb-6">
               Nous n'avons trouvé aucun professionnel correspondant à vos critères.
               Essayez de modifier votre recherche.
             </p>

@@ -64,7 +64,7 @@ export function MerchantCard({ merchant }: MerchantCardProps) {
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="card-glow rounded-2xl bg-white border border-gray-100 overflow-hidden transition-all duration-400"
+        className="card-glow rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-400"
         style={{
           willChange: "transform",
           transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)",
@@ -129,10 +129,10 @@ export function MerchantCard({ merchant }: MerchantCardProps) {
 
         {/* Info area */}
         <div className="p-4 relative z-10">
-          <h3 className="font-bold text-gray-900 text-base mb-1.5 group-hover:text-[#0066FF] transition-colors duration-300">
+          <h3 className="font-bold text-gray-900 dark:text-white text-base mb-1.5 group-hover:text-[#0066FF] transition-colors duration-300">
             {merchant.businessName}
           </h3>
-          <div className="flex items-center gap-3 text-sm text-gray-500">
+          <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
             {merchant.city && (
               <span className="flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5 text-gray-400" />
@@ -142,7 +142,7 @@ export function MerchantCard({ merchant }: MerchantCardProps) {
             {merchant.avgRating !== undefined && merchant.avgRating > 0 && (
               <span className="flex items-center gap-1">
                 <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                <span className="font-medium text-gray-700">
+                <span className="font-medium text-gray-700 dark:text-gray-200">
                   {merchant.avgRating.toFixed(1)}
                 </span>
                 {merchant._count?.reviews !== undefined && (

@@ -30,7 +30,7 @@ export default async function BookingConfirmationPage({
   });
 
   return (
-    <div className="page-transition min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center px-4 sm:px-6 py-12">
+    <div className="page-transition min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex flex-col items-center justify-center px-4 sm:px-6 py-12">
       {/* Success animation area */}
       <div className="animate-scale-in mb-6">
         <div className="relative w-24 h-24 mx-auto">
@@ -74,7 +74,7 @@ export default async function BookingConfirmationPage({
 
       {/* Success text */}
       <div className="animate-fade-in-up text-center mb-8">
-        <h1 className="text-2xl sm:text-3xl font-black text-[#0C1B2A] mb-2">
+        <h1 className="text-2xl sm:text-3xl font-black text-[#0C1B2A] dark:text-white mb-2">
           Rendez-vous confirmé !
         </h1>
         <p className="text-gray-500 text-sm max-w-xs mx-auto">
@@ -84,7 +84,7 @@ export default async function BookingConfirmationPage({
 
       {/* Summary card */}
       <div className="animate-fade-in-up w-full max-w-md" style={{ animationDelay: "0.15s" }}>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden">
           {/* Card header with gradient */}
           <div className="bg-gradient-to-r from-[#0066FF] to-[#00B4D8] px-5 py-4">
             <div className="flex items-center gap-3">
@@ -107,7 +107,7 @@ export default async function BookingConfirmationPage({
                 <Briefcase className="h-3.5 w-3.5" />
                 Service
               </span>
-              <span className="font-semibold text-[#0C1B2A] text-sm">
+              <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
                 {booking.service.name}
               </span>
             </div>
@@ -116,7 +116,7 @@ export default async function BookingConfirmationPage({
                 <Calendar className="h-3.5 w-3.5" />
                 Date
               </span>
-              <span className="font-semibold text-[#0C1B2A] text-sm">
+              <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
                 {formatDate(booking.date)}
               </span>
             </div>
@@ -125,7 +125,7 @@ export default async function BookingConfirmationPage({
                 <Clock className="h-3.5 w-3.5" />
                 Heure
               </span>
-              <span className="font-semibold text-[#0C1B2A] text-sm">
+              <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
                 {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
               </span>
             </div>
@@ -134,14 +134,14 @@ export default async function BookingConfirmationPage({
                 <Clock className="h-3.5 w-3.5" />
                 Duree
               </span>
-              <span className="font-semibold text-[#0C1B2A] text-sm">
+              <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
                 {formatDuration(booking.service.duration)}
               </span>
             </div>
 
             {/* Price */}
-            <div className="border-t border-dashed border-gray-200 pt-4 flex items-center justify-between">
-              <span className="font-bold text-[#0C1B2A]">Total</span>
+            <div className="border-t border-dashed border-gray-200 dark:border-gray-700 pt-4 flex items-center justify-between">
+              <span className="font-bold text-[#0C1B2A] dark:text-white">Total</span>
               <span className="text-2xl font-black bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent">
                 {formatPrice(booking.totalPrice)}
               </span>
@@ -175,7 +175,7 @@ export default async function BookingConfirmationPage({
           </button>
         </Link>
         <Link href="/" className="flex-1">
-          <button className="btn-press w-full inline-flex items-center justify-center gap-2 border-2 border-gray-200 bg-white text-[#0C1B2A] font-semibold px-6 py-3.5 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all text-sm">
+          <button className="btn-press w-full inline-flex items-center justify-center gap-2 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-[#0C1B2A] dark:text-white font-semibold px-6 py-3.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 transition-all text-sm">
             <Home className="h-4 w-4" />
             Retour à l'accueil
           </button>

@@ -65,12 +65,12 @@ export function MerchantPopup({ merchant }: MerchantPopupProps) {
 
       {/* Content */}
       <div className="p-3">
-        <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1">
+        <h3 className="font-bold text-gray-900 dark:text-white text-sm leading-tight mb-1">
           {merchant.businessName}
         </h3>
 
         {(merchant.address || merchant.city) && (
-          <p className="flex items-center gap-1 text-xs text-gray-500 mb-2.5">
+          <p className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-2.5">
             <MapPin className="h-3 w-3 shrink-0 text-gray-400" />
             <span className="truncate">
               {merchant.address || merchant.city}
@@ -84,9 +84,9 @@ export function MerchantPopup({ merchant }: MerchantPopupProps) {
             {merchant.services.slice(0, 2).map((service) => (
               <div
                 key={service.id}
-                className="flex items-center justify-between text-xs bg-gray-50 rounded-lg px-2.5 py-1.5"
+                className="flex items-center justify-between text-xs bg-gray-50 dark:bg-gray-800 rounded-lg px-2.5 py-1.5"
               >
-                <span className="text-gray-700 font-medium truncate mr-2">
+                <span className="text-gray-700 dark:text-gray-200 font-medium truncate mr-2">
                   {service.name}
                 </span>
                 <div className="flex items-center gap-2 shrink-0">
@@ -107,7 +107,7 @@ export function MerchantPopup({ merchant }: MerchantPopupProps) {
         <div className="flex gap-2">
           <Link
             href={`/merchants/${merchant.id}`}
-            className="flex-1 text-center text-xs font-medium text-gray-700 border border-gray-200 rounded-lg py-2 hover:bg-gray-50 transition-colors"
+            className="flex-1 text-center text-xs font-medium text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-lg py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
             Voir le profil
           </Link>

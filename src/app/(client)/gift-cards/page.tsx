@@ -143,7 +143,7 @@ function GiftCardsContent() {
             className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all ${
               tab === "buy"
                 ? "bg-[#0066FF] text-white shadow-lg shadow-[#0066FF]/25"
-                : "bg-white text-gray-600 border border-gray-200"
+                : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
             }`}
           >
             <Gift className="h-4 w-4 inline mr-2" />
@@ -154,7 +154,7 @@ function GiftCardsContent() {
             className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all ${
               tab === "check"
                 ? "bg-[#0066FF] text-white shadow-lg shadow-[#0066FF]/25"
-                : "bg-white text-gray-600 border border-gray-200"
+                : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
             }`}
           >
             <Search className="h-4 w-4 inline mr-2" />
@@ -168,7 +168,7 @@ function GiftCardsContent() {
               <form onSubmit={handleBuy} className="space-y-6">
                 {/* Montant */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Choisissez un montant
                   </label>
                   <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -180,7 +180,7 @@ function GiftCardsContent() {
                         className={`py-3 px-2 rounded-xl text-sm font-bold transition-all ${
                           selectedAmount === a.value
                             ? "bg-[#0066FF] text-white shadow-lg shadow-[#0066FF]/25 scale-105"
-                            : "bg-gray-50 text-gray-700 border border-gray-200 hover:border-[#0066FF]"
+                            : "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-[#0066FF]"
                         }`}
                       >
                         {a.label}
@@ -191,7 +191,7 @@ function GiftCardsContent() {
 
                 {/* De */}
                 <div className="space-y-3">
-                  <h3 className="font-semibold text-gray-900">De la part de</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">De la part de</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <Input
                       id="senderName"
@@ -213,7 +213,7 @@ function GiftCardsContent() {
 
                 {/* Pour */}
                 <div className="space-y-3">
-                  <h3 className="font-semibold text-gray-900">Pour</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Pour</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <Input
                       id="recipientName"
@@ -235,7 +235,7 @@ function GiftCardsContent() {
 
                 {/* Message */}
                 <div>
-                  <label htmlFor="giftMessage" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="giftMessage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Message (optionnel)
                   </label>
                   <textarea
@@ -243,7 +243,7 @@ function GiftCardsContent() {
                     placeholder="Un petit mot pour accompagner votre cadeau..."
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    className="block w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm resize-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                    className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm resize-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
                     rows={3}
                     maxLength={500}
                   />
@@ -274,8 +274,8 @@ function GiftCardsContent() {
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-50 flex items-center justify-center">
                 <CheckCircle className="h-8 w-8 text-green-500" />
               </div>
-              <h2 className="text-xl font-bold text-[#0C1B2A] mb-2">Carte cadeau créée !</h2>
-              <div className="bg-gray-50 rounded-xl p-4 mb-4 inline-block">
+              <h2 className="text-xl font-bold text-[#0C1B2A] dark:text-white mb-2">Carte cadeau créée !</h2>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-4 inline-block">
                 <p className="text-2xl font-mono font-bold text-[#0066FF] tracking-wider">
                   {sent.code}
                 </p>
@@ -292,7 +292,7 @@ function GiftCardsContent() {
               {/* QR Code */}
               <div className="my-6">
                 <p className="text-sm text-gray-500 mb-3">Scannez pour vérifier le solde :</p>
-                <div className="inline-block bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                <div className="inline-block bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
                   <canvas ref={qrCanvasRef} />
                 </div>
                 <div className="mt-3">
@@ -326,14 +326,14 @@ function GiftCardsContent() {
         {tab === "check" && (
           <Card className="rounded-2xl border-0 shadow-sm">
             <CardContent className="p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Vérifier le solde d&apos;une carte cadeau</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Vérifier le solde d&apos;une carte cadeau</h3>
               <div className="flex gap-2">
                 <input
                   type="text"
                   placeholder="Ex: BE-ABCD-1234-EFGH"
                   value={checkCode}
                   onChange={(e) => setCheckCode(e.target.value.toUpperCase())}
-                  className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-mono tracking-wider focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                  className="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-4 py-2.5 text-sm font-mono tracking-wider focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
                 />
                 <button
                   onClick={handleCheck}
@@ -351,7 +351,7 @@ function GiftCardsContent() {
                   </div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gray-500">Solde restant</span>
-                    <span className="text-xl font-bold text-[#0C1B2A]">{checkResult.balanceXPF.toLocaleString()} F CFP</span>
+                    <span className="text-xl font-bold text-[#0C1B2A] dark:text-white">{checkResult.balanceXPF.toLocaleString()} F CFP</span>
                   </div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gray-500">Valable chez</span>

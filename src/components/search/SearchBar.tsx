@@ -76,7 +76,7 @@ export function SearchBar({
               placeholder="Coiffeur, barber, massage, médecin..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 sm:py-4 rounded-xl bg-white/60 sm:bg-transparent text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white/80 transition-colors"
+              className="w-full pl-12 pr-4 py-3.5 sm:py-4 rounded-xl bg-white/60 dark:bg-white/10 sm:bg-transparent text-base text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:bg-white/80 dark:focus:bg-white/15 transition-colors"
             />
           </div>
 
@@ -95,7 +95,7 @@ export function SearchBar({
                 setShowDropdown(true);
               }}
               onFocus={() => setShowDropdown(true)}
-              className="w-full pl-12 pr-10 py-3.5 sm:py-4 rounded-xl bg-white/60 sm:bg-transparent text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white/80 transition-colors"
+              className="w-full pl-12 pr-10 py-3.5 sm:py-4 rounded-xl bg-white/60 dark:bg-white/10 sm:bg-transparent text-base text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:bg-white/80 dark:focus:bg-white/15 transition-colors"
             />
             <button
               type="button"
@@ -107,14 +107,14 @@ export function SearchBar({
 
             {/* Dropdown */}
             {showDropdown && filteredCommunes.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-50 max-h-60 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-1.5 z-50 max-h-60 overflow-y-auto">
                 {filteredCommunes.map((commune) => (
                   <button
                     key={commune}
                     type="button"
                     onClick={() => selectCity(commune)}
-                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#0066FF]/5 transition-colors flex items-center gap-2.5 ${
-                      city === commune ? "text-[#0066FF] font-semibold bg-[#0066FF]/5" : "text-gray-700"
+                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#0066FF]/5 dark:hover:bg-[#0066FF]/10 transition-colors flex items-center gap-2.5 ${
+                      city === commune ? "text-[#0066FF] font-semibold bg-[#0066FF]/5" : "text-gray-700 dark:text-gray-200"
                     }`}
                   >
                     <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-400" />

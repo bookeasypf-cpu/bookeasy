@@ -41,7 +41,7 @@ export default async function FavoritesPage() {
     }));
 
   return (
-    <div className="page-transition min-h-screen bg-[#F8FAFC]">
+    <div className="page-transition min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
       {/* Header */}
       <div className="bg-gradient-to-br from-[#0C1B2A] via-[#0C1B2A] to-[#003D99]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 text-center">
@@ -65,14 +65,14 @@ export default async function FavoritesPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-12 text-center">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
               <Heart className="h-8 w-8 text-gray-300" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-2">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
               Aucun favori pour le moment
             </h2>
-            <p className="text-gray-500 text-sm mb-6">
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
               Explorez nos professionnels et ajoutez-les à vos favoris en cliquant sur le coeur.
             </p>
             <Link

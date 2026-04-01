@@ -111,7 +111,7 @@ export default function MyRewardsPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
       {/* Hero */}
       <div className="bg-gradient-to-b from-[#0C1B2A] to-[#132D46] text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 text-center">
@@ -132,9 +132,9 @@ export default function MyRewardsPage() {
       {/* Code modal */}
       {showCode && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center animate-fade-in-up">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 max-w-sm w-full text-center animate-fade-in-up">
             <Sparkles className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-[#0C1B2A] mb-2">
+            <h3 className="text-xl font-bold text-[#0C1B2A] dark:text-white mb-2">
               Récompense obtenue !
             </h3>
             <p className="text-gray-500 mb-4">
@@ -146,7 +146,7 @@ export default function MyRewardsPage() {
               <QRCodeDisplay code={showCode.code} size={160} />
             </div>
 
-            <div className="bg-gray-100 rounded-xl py-3 px-6 mb-4">
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-xl py-3 px-6 mb-4">
               <p className="text-xs text-gray-500 mb-1">Ou donnez ce code</p>
               <p className="text-2xl font-mono font-bold text-[#0066FF] tracking-wider">
                 {showCode.code}
@@ -168,13 +168,13 @@ export default function MyRewardsPage() {
 
       {/* Tabs */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
-        <div className="flex gap-1 bg-gray-200/60 p-1 rounded-xl w-fit">
+        <div className="flex gap-1 bg-gray-200/60 dark:bg-gray-800 p-1 rounded-xl w-fit">
           <button
             onClick={() => setTab("rewards")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               tab === "rewards"
-                ? "bg-white text-[#0C1B2A] shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-white dark:bg-gray-700 text-[#0C1B2A] dark:text-white shadow-sm"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             }`}
           >
             <Gift className="h-4 w-4" />
@@ -184,8 +184,8 @@ export default function MyRewardsPage() {
             onClick={() => setTab("history")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               tab === "history"
-                ? "bg-white text-[#0C1B2A] shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-white dark:bg-gray-700 text-[#0C1B2A] dark:text-white shadow-sm"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             }`}
           >
             <History className="h-4 w-4" />
@@ -218,16 +218,16 @@ export default function MyRewardsPage() {
               {balances.map((item) => (
                 <div
                   key={item.merchantId}
-                  className="bg-white rounded-2xl shadow-sm overflow-hidden"
+                  className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"
                 >
                   {/* Merchant header */}
-                  <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                  <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 flex items-center justify-center">
                         <LucideIcon name={item.merchant?.sector.icon} className="h-5 w-5 text-[#0066FF]" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-[#0C1B2A]">
+                        <h3 className="font-semibold text-[#0C1B2A] dark:text-white">
                           {item.merchant?.businessName || "Commerçant"}
                         </h3>
                         <p className="text-xs text-gray-500">
@@ -347,12 +347,12 @@ export default function MyRewardsPage() {
                 return (
                   <div
                     key={r.id}
-                    className={`bg-white rounded-xl border p-4 ${
+                    className={`bg-white dark:bg-gray-900 rounded-xl border p-4 ${
                       isActive
-                        ? "border-green-200"
+                        ? "border-green-200 dark:border-green-800"
                         : isUsed
-                          ? "border-gray-200 opacity-70"
-                          : "border-red-200 opacity-60"
+                          ? "border-gray-200 dark:border-gray-700 opacity-70"
+                          : "border-red-200 dark:border-red-800 opacity-60"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -375,7 +375,7 @@ export default function MyRewardsPage() {
                           )}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-[#0C1B2A]">
+                          <p className="text-sm font-semibold text-[#0C1B2A] dark:text-white">
                             {r.reward.name}
                           </p>
                           <p className="text-xs text-gray-500">

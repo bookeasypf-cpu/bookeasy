@@ -329,7 +329,7 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
           "shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap",
           activeSector === null
             ? "bg-[#0066FF] text-white shadow-md shadow-blue-500/25"
-            : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+            : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
         )}
       >
         Tous
@@ -345,7 +345,7 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
               "shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap",
               isActive
                 ? "text-white shadow-md"
-                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
             )}
             style={
               isActive
@@ -368,7 +368,7 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Rechercher un professionnel..."
-        className="w-full pl-9 pr-9 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-all placeholder:text-gray-400"
+        className="w-full pl-9 pr-9 py-2.5 text-sm bg-white dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-all placeholder:text-gray-400"
       />
       {searchQuery && (
         <button
@@ -397,8 +397,8 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
         className={cn(
           "p-3.5 rounded-xl border cursor-pointer transition-all duration-200 hover:shadow-md",
           isSelected
-            ? "border-[#0066FF] bg-blue-50/50 shadow-md ring-1 ring-[#0066FF]/20"
-            : "border-gray-100 bg-white hover:border-gray-200"
+            ? "border-[#0066FF] bg-blue-50/50 dark:bg-blue-950/30 shadow-md ring-1 ring-[#0066FF]/20"
+            : "border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-200 dark:hover:border-gray-600"
         )}
       >
         <div className="flex gap-3">
@@ -426,13 +426,13 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
           {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-semibold text-sm text-gray-900 truncate">
+              <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate">
                 {merchant.businessName}
               </h3>
               {avgRating > 0 && (
                 <span className="flex items-center gap-0.5 text-xs shrink-0">
                   <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                  <span className="font-medium text-gray-700">
+                  <span className="font-medium text-gray-700 dark:text-gray-200">
                     {avgRating.toFixed(1)}
                   </span>
                 </span>
@@ -462,7 +462,7 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
 
             {firstService && (
               <div className="flex items-center justify-between mt-2 text-xs">
-                <span className="text-gray-500 truncate mr-2">
+                <span className="text-gray-500 dark:text-gray-400 truncate mr-2">
                   {firstService.name}
                 </span>
                 <span className="font-semibold text-[#0066FF] shrink-0">
@@ -482,10 +482,10 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
         filteredMerchants.map(renderMerchantCard)
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+          <div className="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
             <MapPin className="h-6 w-6 text-gray-400" />
           </div>
-          <p className="text-sm font-medium text-gray-600 mb-1">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
             Aucun professionnel trouvé
           </p>
           <p className="text-xs text-gray-400">
@@ -551,9 +551,9 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
   const renderDesktop = () => (
     <div className="hidden md:flex h-full">
       {/* Side panel */}
-      <div className="w-[420px] shrink-0 flex flex-col border-r border-gray-100 bg-gray-50/50">
+      <div className="w-[420px] shrink-0 flex flex-col border-r border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950">
         {/* Search + filters */}
-        <div className="p-4 space-y-3 border-b border-gray-100 bg-white">
+        <div className="p-4 space-y-3 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
           {renderSearchBar()}
           {renderSectorChips()}
           <p className="text-xs text-gray-400">
@@ -577,7 +577,7 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
   const renderMobile = () => (
     <div className="md:hidden flex flex-col h-full relative">
       {/* Search + filter bar (always visible) */}
-      <div className="p-3 space-y-2.5 bg-white border-b border-gray-100 z-10">
+      <div className="p-3 space-y-2.5 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 z-10">
         {renderSearchBar()}
         {renderSectorChips()}
       </div>
@@ -603,7 +603,7 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.2 }}
-              className="absolute inset-0 overflow-y-auto p-3 bg-gray-50/50"
+              className="absolute inset-0 overflow-y-auto p-3 bg-gray-50/50 dark:bg-gray-950"
             >
               <p className="text-xs text-gray-400 mb-2">
                 {filteredMerchants.length} professionnel

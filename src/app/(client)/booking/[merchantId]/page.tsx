@@ -182,18 +182,18 @@ export default function BookingPage() {
   }
 
   return (
-    <div className="page-transition min-h-screen bg-[#F8FAFC]">
+    <div className="page-transition min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
       {/* Top bar */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-30">
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-30">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            className="btn-press w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-[#0C1B2A] transition-colors shrink-0"
+            className="btn-press w-9 h-9 rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-[#0C1B2A] dark:hover:text-white transition-colors shrink-0"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="text-sm font-bold text-[#0C1B2A] truncate">
+            <h1 className="text-sm font-bold text-[#0C1B2A] dark:text-white truncate">
               Reserver chez {merchant.businessName}
             </h1>
           </div>
@@ -218,7 +218,7 @@ export default function BookingPage() {
                         ? "bg-gradient-to-br from-[#0066FF] to-[#00B4D8] text-white shadow-lg shadow-blue-500/25"
                         : isCurrent
                           ? "bg-[#0066FF]/10 text-[#0066FF] ring-2 ring-[#0066FF] ring-offset-2"
-                          : "bg-gray-100 text-gray-300"
+                          : "bg-gray-100 dark:bg-gray-800 text-gray-300"
                     )}
                   >
                     {isCompleted ? (
@@ -262,7 +262,7 @@ export default function BookingPage() {
         {/* Step 1: Select service */}
         {step === 1 && (
           <div className="animate-fade-in-up">
-            <h2 className="text-lg font-bold text-[#0C1B2A] mb-1">
+            <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white mb-1">
               Choisissez un service
             </h2>
             <p className="text-sm text-gray-400 mb-5">
@@ -274,16 +274,16 @@ export default function BookingPage() {
                   key={service.id}
                   onClick={() => setSelectedService(service)}
                   className={cn(
-                    "card-hover w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 bg-white",
+                    "card-hover w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 bg-white dark:bg-gray-900",
                     selectedService?.id === service.id
                       ? "border-[#0066FF] bg-[#0066FF]/[0.03] shadow-lg shadow-blue-500/10"
-                      : "border-gray-100 hover:border-gray-200 hover:shadow-md"
+                      : "border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-md"
                   )}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-[#0C1B2A]">
+                        <h3 className="font-semibold text-[#0C1B2A] dark:text-white">
                           {service.name}
                         </h3>
                         {selectedService?.id === service.id && (
@@ -293,7 +293,7 @@ export default function BookingPage() {
                         )}
                       </div>
                       {service.description && (
-                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                           {service.description}
                         </p>
                       )}
@@ -313,7 +313,7 @@ export default function BookingPage() {
                     <div className="shrink-0">
                       <span className={cn(
                         "text-lg font-bold",
-                        selectedService?.id === service.id ? "text-[#0066FF]" : "text-[#0C1B2A]"
+                        selectedService?.id === service.id ? "text-[#0066FF]" : "text-[#0C1B2A] dark:text-white"
                       )}>
                         {formatPrice(service.price)}
                       </span>
@@ -339,7 +339,7 @@ export default function BookingPage() {
         {/* Step 2: Date & Time */}
         {step === 2 && (
           <div className="animate-fade-in-up">
-            <h2 className="text-lg font-bold text-[#0C1B2A] mb-1">
+            <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white mb-1">
               Choisissez une date et un creneau
             </h2>
             <p className="text-sm text-gray-400 mb-5">
@@ -353,7 +353,7 @@ export default function BookingPage() {
 
             {/* Date picker */}
             <div className="mb-6">
-              <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] mb-3">
+              <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] dark:text-white mb-3">
                 <Calendar className="h-4 w-4 text-[#0066FF]" />
                 Date
               </label>
@@ -377,7 +377,7 @@ export default function BookingPage() {
                         "flex flex-col items-center min-w-[72px] px-3 py-3 rounded-2xl border-2 text-sm transition-all duration-200 shrink-0",
                         isSelected
                           ? "border-[#0066FF] bg-gradient-to-b from-[#0066FF] to-[#0052CC] text-white shadow-lg shadow-blue-500/25"
-                          : "border-gray-100 bg-white hover:border-[#0066FF]/30 hover:shadow-md text-gray-600"
+                          : "border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-[#0066FF]/30 hover:shadow-md text-gray-600 dark:text-gray-300"
                       )}
                     >
                       <span className={cn(
@@ -388,7 +388,7 @@ export default function BookingPage() {
                       </span>
                       <span className={cn(
                         "text-xl font-bold mt-0.5",
-                        isSelected ? "text-white" : "text-[#0C1B2A]"
+                        isSelected ? "text-white" : "text-[#0C1B2A] dark:text-white"
                       )}>
                         {dayNum}
                       </span>
@@ -407,7 +407,7 @@ export default function BookingPage() {
             {/* Time slots */}
             {selectedDate && (
               <div className="animate-fade-in">
-                <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] mb-3">
+                <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] dark:text-white mb-3">
                   <Clock className="h-4 w-4 text-[#00B4D8]" />
                   Creneau horaire
                 </label>
@@ -426,7 +426,7 @@ export default function BookingPage() {
                           "py-3 px-3 rounded-xl border-2 text-sm font-semibold transition-all duration-200",
                           selectedSlot?.startTime === slot.startTime
                             ? "border-[#0066FF] bg-gradient-to-b from-[#0066FF] to-[#0052CC] text-white shadow-lg shadow-blue-500/25"
-                            : "border-gray-100 bg-white text-[#0C1B2A] hover:border-[#0066FF]/30 hover:shadow-md"
+                            : "border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 text-[#0C1B2A] dark:text-white hover:border-[#0066FF]/30 hover:shadow-md"
                         )}
                       >
                         {slot.startTime}
@@ -434,7 +434,7 @@ export default function BookingPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                  <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 text-center">
                     <Clock className="h-8 w-8 text-gray-200 mx-auto mb-2" />
                     <p className="text-gray-400 text-sm">
                       Aucun creneau disponible pour cette date
@@ -464,7 +464,7 @@ export default function BookingPage() {
         {/* Step 3: Confirmation */}
         {step === 3 && selectedService && selectedSlot && (
           <div className="animate-fade-in-up">
-            <h2 className="text-lg font-bold text-[#0C1B2A] mb-1">
+            <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white mb-1">
               Confirmez votre rendez-vous
             </h2>
             <p className="text-sm text-gray-400 mb-5">
@@ -472,15 +472,15 @@ export default function BookingPage() {
             </p>
 
             {/* Summary card */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden mb-6">
               {/* Card header */}
-              <div className="bg-gradient-to-r from-[#0066FF]/5 to-[#00B4D8]/5 px-5 py-4 border-b border-gray-50">
+              <div className="bg-gradient-to-r from-[#0066FF]/5 to-[#00B4D8]/5 dark:from-[#0066FF]/10 dark:to-[#00B4D8]/10 px-5 py-4 border-b border-gray-50 dark:border-gray-800">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white font-bold text-sm">
                     {merchant.businessName[0]}
                   </div>
                   <div>
-                    <h3 className="font-bold text-[#0C1B2A] text-sm">
+                    <h3 className="font-bold text-[#0C1B2A] dark:text-white text-sm">
                       {merchant.businessName}
                     </h3>
                     <p className="text-xs text-gray-400">Recapitulatif</p>
@@ -491,45 +491,45 @@ export default function BookingPage() {
               {/* Card body */}
               <div className="p-5 space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm text-gray-500">
+                  <span className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                     <Briefcase className="h-3.5 w-3.5" />
                     Service
                   </span>
-                  <span className="font-semibold text-[#0C1B2A] text-sm">
+                  <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
                     {selectedService.name}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm text-gray-500">
+                  <span className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                     <Calendar className="h-3.5 w-3.5" />
                     Date
                   </span>
-                  <span className="font-semibold text-[#0C1B2A] text-sm">
+                  <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
                     {formatDate(selectedDate)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm text-gray-500">
+                  <span className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                     <Clock className="h-3.5 w-3.5" />
                     Heure
                   </span>
-                  <span className="font-semibold text-[#0C1B2A] text-sm">
+                  <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
                     {formatTime(selectedSlot.startTime)} - {formatTime(selectedSlot.endTime)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm text-gray-500">
+                  <span className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                     <Clock className="h-3.5 w-3.5" />
                     Duree
                   </span>
-                  <span className="font-semibold text-[#0C1B2A] text-sm">
+                  <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
                     {formatDuration(selectedService.duration)}
                   </span>
                 </div>
 
                 {/* Price divider */}
-                <div className="border-t border-dashed border-gray-200 pt-4 flex items-center justify-between">
-                  <span className="font-bold text-[#0C1B2A]">Total</span>
+                <div className="border-t border-dashed border-gray-200 dark:border-gray-700 pt-4 flex items-center justify-between">
+                  <span className="font-bold text-[#0C1B2A] dark:text-white">Total</span>
                   <span className="text-2xl font-black bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent">
                     {formatPrice(selectedService.price)}
                   </span>
@@ -552,7 +552,7 @@ export default function BookingPage() {
 
             {/* Gift Card */}
             <div className="mb-6">
-              <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] mb-2">
+              <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2">
                 <Gift className="h-4 w-4 text-[#0066FF]" />
                 Carte cadeau (optionnel)
               </label>
@@ -583,7 +583,7 @@ export default function BookingPage() {
                     placeholder="Ex: BE-ABCD-1234-EFGH"
                     value={giftCardCode}
                     onChange={(e) => setGiftCardCode(e.target.value.toUpperCase())}
-                    className="flex-1 rounded-xl border-2 border-gray-100 bg-white px-4 py-2.5 text-sm font-mono tracking-wider text-[#0C1B2A] placeholder:text-gray-300 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 transition-all"
+                    className="flex-1 rounded-xl border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-mono tracking-wider text-[#0C1B2A] dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-500 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 transition-all"
                   />
                   <button
                     type="button"
@@ -601,7 +601,7 @@ export default function BookingPage() {
             <div className="mb-6">
               <label
                 htmlFor="notes"
-                className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] mb-2"
+                className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2"
               >
                 <FileText className="h-4 w-4 text-gray-400" />
                 Notes (optionnel)
@@ -611,7 +611,7 @@ export default function BookingPage() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Des précisions pour votre rendez-vous..."
-                className="w-full rounded-2xl border-2 border-gray-100 bg-white px-4 py-3 text-sm text-[#0C1B2A] placeholder:text-gray-300 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 resize-none transition-all"
+                className="w-full rounded-2xl border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-[#0C1B2A] dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-500 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 resize-none transition-all"
                 rows={3}
               />
             </div>
