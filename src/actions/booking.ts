@@ -60,7 +60,8 @@ export async function createBooking(data: {
         const card = await tx.giftCard.findUnique({
           where: { code: data.giftCardCode },
         });
-        if (card && card.status === "ACTIVE" && card.balance > 0 && card.expiresAt > new Date()) {
+        if (card && card.status === "ACTIVE" && card.balance > 0 && card.expiresAt > new Date() &&
+            (!card.merchantId || card.merchantId === data.merchantId)) {
           // Deduct service price from gift card (convert XPF price to EUR)
           const priceEUR = service.price / 119.33;
           const newBalance = Math.max(0, card.balance - priceEUR);

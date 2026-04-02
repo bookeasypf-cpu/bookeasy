@@ -116,7 +116,7 @@ export default function BookingPage() {
     if (!giftCardCode.trim()) return;
     setCheckingGiftCard(true);
     try {
-      const res = await fetch(`/api/gift-cards?code=${encodeURIComponent(giftCardCode)}`);
+      const res = await fetch(`/api/gift-cards?code=${encodeURIComponent(giftCardCode)}&merchantId=${merchantId}`);
       const data = await res.json();
       if (res.ok && data.balanceXPF > 0) {
         setGiftCardApplied({ code: data.code, balanceXPF: data.balanceXPF });

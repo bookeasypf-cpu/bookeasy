@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { Gift, Send, CheckCircle, Search, Download } from "lucide-react";
+import { Gift, Send, CheckCircle, Search, Download, Store, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import toast from "react-hot-toast";
@@ -16,6 +16,12 @@ const amounts = [
   { value: 50000, label: "50 000 F" },
 ];
 
+interface MerchantOption {
+  id: string;
+  businessName: string;
+  sector: string;
+}
+
 function GiftCardsContent() {
   const searchParams = useSearchParams();
   const codeFromUrl = searchParams.get("code");
@@ -23,7 +29,7 @@ function GiftCardsContent() {
   const [tab, setTab] = useState<"buy" | "check">(codeFromUrl ? "check" : "buy");
   const [selectedAmount, setSelectedAmount] = useState<number>(5000);
   const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState<{ code: string; amountXPF: number; xpEarned: number } | null>(null);
+  const [sent, setSent] = useState<{ code: string; amountXPF: number; xpEarned: number; merchantName: string | null } | null>(null);
   const [checkCode, setCheckCode] = useState(codeFromUrl || "");
   const [checkResult, setCheckResult] = useState<{
     code: string;
@@ -39,8 +45,32 @@ function GiftCardsContent() {
     recipientEmail: "",
     message: "",
   });
+  const [selectedMerchant, setSelectedMerchant] = useState<string>("");
+  const [merchants, setMerchants] = useState<MerchantOption[]>([]);
+  const [merchantSearch, setMerchantSearch] = useState("");
+  const [showMerchantDropdown, setShowMerchantDropdown] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const merchantDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load merchants list
+  useEffect(() => {
+    fetch("/api/merchants/list")
+      .then((res) => res.json())
+      .then((data) => setMerchants(data.merchants || []))
+      .catch(() => {});
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (merchantDropdownRef.current && !merchantDropdownRef.current.contains(e.target as Node)) {
+        setShowMerchantDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Auto-check if code is in URL
   useEffect(() => {
@@ -72,14 +102,21 @@ function GiftCardsContent() {
     e.preventDefault();
     setSending(true);
     try {
+      const merchantName = selectedMerchant
+        ? merchants.find((m) => m.id === selectedMerchant)?.businessName || null
+        : null;
       const res = await fetch("/api/gift-cards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, amountXPF: selectedAmount }),
+        body: JSON.stringify({
+          ...form,
+          amountXPF: selectedAmount,
+          merchantId: selectedMerchant || null,
+        }),
       });
       const data = await res.json();
       if (res.ok) {
-        setSent({ code: data.code, amountXPF: data.amountXPF, xpEarned: data.xpEarned || 0 });
+        setSent({ code: data.code, amountXPF: data.amountXPF, xpEarned: data.xpEarned || 0, merchantName });
         toast.success("Carte cadeau créée !");
       } else {
         toast.error(data.error);
@@ -130,7 +167,7 @@ function GiftCardsContent() {
             Cartes Cadeaux
           </h1>
           <p className="text-white/60 max-w-xl mx-auto text-lg">
-            Offrez du bien-être à vos proches. Valable chez tous nos partenaires en Polynésie.
+            Offrez du bien-être à vos proches. Choisissez un commercant ou offrez une carte valable partout.
           </p>
         </div>
       </div>
@@ -233,6 +270,87 @@ function GiftCardsContent() {
                   </div>
                 </div>
 
+                {/* Commercant */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Valable chez
+                  </label>
+                  <div className="relative" ref={merchantDropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setShowMerchantDropdown(!showMerchantDropdown)}
+                      className="w-full flex items-center justify-between gap-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 text-sm transition-colors focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Store className="h-4 w-4 text-gray-400 shrink-0" />
+                        <span className={selectedMerchant ? "text-[#0C1B2A] dark:text-white font-medium truncate" : "text-gray-400 truncate"}>
+                          {selectedMerchant
+                            ? merchants.find((m) => m.id === selectedMerchant)?.businessName
+                            : "Tous les partenaires"}
+                        </span>
+                      </div>
+                      <ChevronDown className={`h-4 w-4 text-gray-400 shrink-0 transition-transform ${showMerchantDropdown ? "rotate-180" : ""}`} />
+                    </button>
+
+                    {showMerchantDropdown && (
+                      <div className="absolute z-50 top-full mt-1 w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl max-h-64 overflow-hidden">
+                        <div className="p-2 border-b border-gray-100 dark:border-gray-700">
+                          <input
+                            type="text"
+                            placeholder="Rechercher un commercant..."
+                            value={merchantSearch}
+                            onChange={(e) => setMerchantSearch(e.target.value)}
+                            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#0066FF]"
+                            autoFocus
+                          />
+                        </div>
+                        <div className="overflow-y-auto max-h-48">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedMerchant("");
+                              setShowMerchantDropdown(false);
+                              setMerchantSearch("");
+                            }}
+                            className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 ${
+                              !selectedMerchant ? "text-[#0066FF] font-semibold bg-[#0066FF]/5" : "text-gray-700 dark:text-gray-300"
+                            }`}
+                          >
+                            🌐 Tous les partenaires
+                          </button>
+                          {merchants
+                            .filter((m) =>
+                              m.businessName.toLowerCase().includes(merchantSearch.toLowerCase()) ||
+                              m.sector.toLowerCase().includes(merchantSearch.toLowerCase())
+                            )
+                            .map((m) => (
+                              <button
+                                key={m.id}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedMerchant(m.id);
+                                  setShowMerchantDropdown(false);
+                                  setMerchantSearch("");
+                                }}
+                                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                                  selectedMerchant === m.id ? "text-[#0066FF] font-semibold bg-[#0066FF]/5" : "text-gray-700 dark:text-gray-300"
+                                }`}
+                              >
+                                <span className="block font-medium">{m.businessName}</span>
+                                <span className="block text-xs text-gray-400">{m.sector}</span>
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1.5">
+                    {selectedMerchant
+                      ? `La carte sera utilisable uniquement chez ${merchants.find((m) => m.id === selectedMerchant)?.businessName}`
+                      : "La carte sera utilisable chez tous nos partenaires"}
+                  </p>
+                </div>
+
                 {/* Message */}
                 <div>
                   <label htmlFor="giftMessage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -280,8 +398,11 @@ function GiftCardsContent() {
                   {sent.code}
                 </p>
               </div>
-              <p className="text-gray-500 mb-2">
+              <p className="text-gray-500 mb-1">
                 Montant : <strong>{sent.amountXPF.toLocaleString()} F CFP</strong>
+              </p>
+              <p className="text-sm text-gray-400 mb-2">
+                Valable chez : <strong className="text-gray-600 dark:text-gray-300">{sent.merchantName || "Tous les partenaires"}</strong>
               </p>
               {sent.xpEarned > 0 && (
                 <p className="text-sm font-semibold text-[#0066FF] mb-1">
@@ -307,12 +428,13 @@ function GiftCardsContent() {
               </div>
 
               <p className="text-sm text-gray-400 mb-6">
-                Le code et le QR code ont été envoyés par email au destinataire. Valable 1 an.
+                Partagez le code ou le QR code au destinataire. Valable 1 an.
               </p>
               <button
                 onClick={() => {
                   setSent(null);
                   setQrDataUrl(null);
+                  setSelectedMerchant("");
                   setForm({ senderName: "", senderEmail: "", recipientName: "", recipientEmail: "", message: "" });
                 }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-[#0066FF]/10 text-[#0066FF] hover:bg-[#0066FF]/20 transition-colors"

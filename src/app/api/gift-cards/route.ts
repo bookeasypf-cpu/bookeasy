@@ -19,13 +19,15 @@ function generateGiftCardCode(): string {
 // GET - Vérifier le solde d'une carte cadeau
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
+  const merchantId = req.nextUrl.searchParams.get("merchantId");
+
   if (!code) {
     return NextResponse.json({ error: "Code requis" }, { status: 400 });
   }
 
   const card = await prisma.giftCard.findUnique({
     where: { code: code.toUpperCase() },
-    include: { merchant: { select: { businessName: true } } },
+    include: { merchant: { select: { id: true, businessName: true } } },
   });
 
   if (!card) {
@@ -38,6 +40,13 @@ export async function GET(req: NextRequest) {
 
   if (card.expiresAt < new Date()) {
     return NextResponse.json({ error: "Cette carte cadeau a expiré", card: { code: card.code, status: "EXPIRED" } }, { status: 400 });
+  }
+
+  // Validate merchant scope if checking from booking page
+  if (merchantId && card.merchantId && card.merchantId !== merchantId) {
+    return NextResponse.json({
+      error: `Cette carte cadeau est uniquement valable chez ${card.merchant?.businessName || "un autre partenaire"}`,
+    }, { status: 400 });
   }
 
   // Convertir EUR en XPF pour l'affichage
