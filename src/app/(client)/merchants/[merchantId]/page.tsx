@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { MapPin, Phone, Star, Clock, ChevronRight, MessageSquare, Info, Briefcase, Calendar } from "lucide-react";
+import { MapPin, Phone, Star, Clock, ChevronRight, MessageSquare, Info, Briefcase, Calendar, Camera } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { ProBadge } from "@/components/ui/ProBadge";
 import { BackButton } from "@/components/ui/BackButton";
@@ -65,6 +65,10 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
       services: {
         where: { isActive: true },
         orderBy: { sortOrder: "asc" },
+      },
+      photos: {
+        orderBy: { sortOrder: "asc" },
+        select: { id: true, url: true, caption: true },
       },
       reviews: {
         include: { client: { select: { name: true, image: true } } },
@@ -253,6 +257,15 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             <Briefcase className="h-4 w-4" />
             Services
           </a>
+          {merchant.photos.length > 0 && (
+            <a
+              href="#photos"
+              className="flex items-center gap-1.5 flex-1 justify-center text-sm font-medium text-gray-500 dark:text-gray-400 px-4 py-2.5 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0C1B2A] dark:hover:text-white"
+            >
+              <Camera className="h-4 w-4" />
+              Photos
+            </a>
+          )}
           {merchant.plan === "PRO" && (
             <a
               href="#avis"
@@ -317,6 +330,36 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             ))}
           </div>
         </section>
+
+        {/* Photos Gallery */}
+        {merchant.photos.length > 0 && (
+          <section id="photos" className="scroll-mt-24">
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#0066FF] to-[#00B4D8]" />
+              <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white">Photos</h2>
+              <span className="text-sm text-gray-400 ml-1">({merchant.photos.length})</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {merchant.photos.map((photo) => (
+                <div
+                  key={photo.id}
+                  className="relative aspect-square rounded-2xl overflow-hidden group cursor-pointer"
+                >
+                  <img
+                    src={photo.url}
+                    alt={photo.caption || merchant.businessName}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {photo.caption && (
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <p className="text-xs text-white font-medium">{photo.caption}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Reviews Section — Pro only */}
         {merchant.plan === "PRO" && (
