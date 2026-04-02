@@ -90,6 +90,9 @@ export default function DashboardProfilePage() {
       .then((sectorsData) => {
         setSectors(sectorsData || []);
         setInitialLoading(false);
+      })
+      .catch(() => {
+        setInitialLoading(false);
       });
   }, []);
 
@@ -102,7 +105,8 @@ export default function DashboardProfilePage() {
           setCoverImage(data.coverImage || null);
           setPhotos(data.photos || []);
         }
-      });
+      })
+      .catch(() => {});
   }, []);
 
   // Upload helper
