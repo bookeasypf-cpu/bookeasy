@@ -22,6 +22,11 @@ import {
 import Link from "next/link";
 import { isMedicalSectorName } from "@/lib/medical";
 
+/** Return the current date in Tahiti (UTC-10) as YYYY-MM-DD */
+function getTahitiDate(): string {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Pacific/Tahiti' });
+}
+
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session?.user) redirect("/login");
@@ -52,13 +57,18 @@ export default async function DashboardPage() {
 
   const isMedical = isMedicalSectorName(merchant.sector?.name);
 
-  const today = new Date().toISOString().split("T")[0];
-  const weekStart = new Date();
+  const today = getTahitiDate();
+
+  // Build a Date object anchored to the Tahiti "now"
+  const tahitiNow = new Date(
+    new Date().toLocaleString('en-US', { timeZone: 'Pacific/Tahiti' })
+  );
+  const weekStart = new Date(tahitiNow);
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-  const weekStartStr = weekStart.toISOString().split("T")[0];
-  const monthStart = new Date();
+  const weekStartStr = weekStart.toLocaleDateString('en-CA', { timeZone: 'Pacific/Tahiti' });
+  const monthStart = new Date(tahitiNow);
   monthStart.setDate(1);
-  const monthStartStr = monthStart.toISOString().split("T")[0];
+  const monthStartStr = monthStart.toLocaleDateString('en-CA', { timeZone: 'Pacific/Tahiti' });
 
   const [todayBookings, weekBookings, monthBookings, reviews, upcomingBookings, uniquePatients] =
     await Promise.all([

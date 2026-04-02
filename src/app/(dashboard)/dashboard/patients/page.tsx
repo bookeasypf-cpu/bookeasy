@@ -136,7 +136,7 @@ export default async function PatientsPage() {
     <div className="page-transition">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white dark:text-white animate-fade-in-up">
+          <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white animate-fade-in-up">
             Mes patients
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -154,7 +154,7 @@ export default async function PatientsPage() {
                 <Users className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white dark:text-white">
+                <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
                   {totalPatients}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Total patients</p>
@@ -169,7 +169,7 @@ export default async function PatientsPage() {
                 <UserCheck className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white dark:text-white">
+                <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
                   {regularPatients}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Patients réguliers</p>
@@ -184,7 +184,7 @@ export default async function PatientsPage() {
                 <CalendarDays className="h-5 w-5 text-violet-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white dark:text-white">
+                <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
                   {todayBookings}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">RDV aujourd&apos;hui</p>
@@ -199,7 +199,7 @@ export default async function PatientsPage() {
                 <Activity className="h-5 w-5 text-amber-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white dark:text-white">
+                <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
                   {100 - noShowRate}%
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Taux d&apos;honoration</p>

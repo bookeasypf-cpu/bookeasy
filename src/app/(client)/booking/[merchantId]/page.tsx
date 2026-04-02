@@ -194,7 +194,7 @@ export default function BookingPage() {
           </button>
           <div className="flex-1 min-w-0">
             <h1 className="text-sm font-bold text-[#0C1B2A] dark:text-white truncate">
-              Reserver chez {merchant.businessName}
+              Réserver chez {merchant.businessName}
             </h1>
           </div>
         </div>
@@ -266,7 +266,7 @@ export default function BookingPage() {
               Choisissez un service
             </h2>
             <p className="text-sm text-gray-400 mb-5">
-              Selectionnez le service qui vous convient
+              Sélectionnez le service qui vous convient
             </p>
             <div className="space-y-3">
               {merchant.services.map((service) => (
@@ -340,7 +340,7 @@ export default function BookingPage() {
         {step === 2 && (
           <div className="animate-fade-in-up">
             <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white mb-1">
-              Choisissez une date et un creneau
+              Choisissez une date et un créneau
             </h2>
             <p className="text-sm text-gray-400 mb-5">
               {selectedService && (
@@ -414,7 +414,7 @@ export default function BookingPage() {
                 {loadingSlots ? (
                   <div className="flex flex-col items-center justify-center py-10 gap-2">
                     <Spinner className="h-6 w-6" />
-                    <p className="text-xs text-gray-400">Recherche des creneaux...</p>
+                    <p className="text-xs text-gray-400">Recherche des créneaux...</p>
                   </div>
                 ) : slots.length > 0 ? (
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
@@ -437,7 +437,7 @@ export default function BookingPage() {
                   <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 text-center">
                     <Clock className="h-8 w-8 text-gray-200 mx-auto mb-2" />
                     <p className="text-gray-400 text-sm">
-                      Aucun creneau disponible pour cette date
+                      Aucun créneau disponible pour cette date
                     </p>
                   </div>
                 )}
@@ -468,7 +468,7 @@ export default function BookingPage() {
               Confirmez votre rendez-vous
             </h2>
             <p className="text-sm text-gray-400 mb-5">
-              Verifiez les details avant de confirmer
+              Vérifiez les détails avant de confirmer
             </p>
 
             {/* Summary card */}
@@ -483,7 +483,7 @@ export default function BookingPage() {
                     <h3 className="font-bold text-[#0C1B2A] dark:text-white text-sm">
                       {merchant.businessName}
                     </h3>
-                    <p className="text-xs text-gray-400">Recapitulatif</p>
+                    <p className="text-xs text-gray-400">Récapitulatif</p>
                   </div>
                 </div>
               </div>
@@ -520,7 +520,7 @@ export default function BookingPage() {
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                     <Clock className="h-3.5 w-3.5" />
-                    Duree
+                    Durée
                   </span>
                   <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
                     {formatDuration(selectedService.duration)}
@@ -627,7 +627,7 @@ export default function BookingPage() {
                 size="lg"
               >
                 <Check className="h-4 w-4 mr-1.5" />
-                Confirmer la reservation
+                Confirmer la réservation
               </Button>
             </div>
           </div>

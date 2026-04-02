@@ -37,24 +37,26 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { schedule } = body;
 
-    // Delete existing and recreate
-    await prisma.weeklySchedule.deleteMany({
-      where: { merchantId: merchant.id },
-    });
+    // Delete existing and recreate atomically
+    await prisma.$transaction(async (tx) => {
+      await tx.weeklySchedule.deleteMany({
+        where: { merchantId: merchant.id },
+      });
 
-    if (schedule && schedule.length > 0) {
-      for (const s of schedule) {
-        await prisma.weeklySchedule.create({
-          data: {
-            merchantId: merchant.id,
-            dayOfWeek: s.dayOfWeek,
-            startTime: s.startTime,
-            endTime: s.endTime,
-            isActive: s.isActive,
-          },
-        });
+      if (schedule && schedule.length > 0) {
+        for (const s of schedule) {
+          await tx.weeklySchedule.create({
+            data: {
+              merchantId: merchant.id,
+              dayOfWeek: s.dayOfWeek,
+              startTime: s.startTime,
+              endTime: s.endTime,
+              isActive: s.isActive,
+            },
+          });
+        }
       }
-    }
+    });
 
     return NextResponse.json({ success: true });
   } catch {

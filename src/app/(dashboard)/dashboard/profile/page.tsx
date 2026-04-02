@@ -290,7 +290,7 @@ export default function DashboardProfilePage() {
   return (
     <div className="page-transition">
       <div className="flex items-center justify-between mb-6 animate-fade-in-up">
-        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white dark:text-white">
+        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
           {isMedical ? "Mon cabinet" : "Mon commerce"}
         </h1>
         {merchantId && (

@@ -241,7 +241,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
               className="btn-press inline-flex items-center gap-2 bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all text-sm"
             >
               <Calendar className="h-4 w-4" />
-              Reserver
+              Réserver
             </Link>
           </div>
         </div>
@@ -292,7 +292,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
         <section id="services" className="scroll-mt-24">
           <div className="flex items-center gap-2 mb-5">
             <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#0066FF] to-[#00B4D8]" />
-            <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white dark:text-white">Services</h2>
+            <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white">Services</h2>
           </div>
           <div className="stagger-children space-y-3">
             {merchant.services.map((service) => (
@@ -315,14 +315,14 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
                   </span>
                 </div>
                 <div className="flex flex-col items-end gap-2 shrink-0">
-                  <span className="text-lg font-bold text-[#0C1B2A] dark:text-white dark:text-white">
+                  <span className="text-lg font-bold text-[#0C1B2A] dark:text-white">
                     {formatPrice(service.price)}
                   </span>
                   <Link
                     href={`/booking/${merchant.id}?service=${service.id}`}
                     className="btn-press inline-flex items-center gap-1 bg-[#0066FF]/10 text-[#0066FF] text-xs font-semibold px-3.5 py-2 rounded-lg hover:bg-[#0066FF] hover:text-white transition-all duration-200"
                   >
-                    Reserver
+                    Réserver
                     <ChevronRight className="h-3 w-3" />
                   </Link>
                 </div>
@@ -366,7 +366,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
           <section id="avis" className="scroll-mt-24">
             <div className="flex items-center gap-2 mb-5">
               <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#0066FF] to-[#00B4D8]" />
-              <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white dark:text-white">
+              <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white">
                 Avis ({merchant._count.reviews})
               </h2>
             </div>
@@ -451,7 +451,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
         <section id="infos" className="scroll-mt-24">
           <div className="flex items-center gap-2 mb-5">
             <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#0066FF] to-[#00B4D8]" />
-            <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white dark:text-white">Informations</h2>
+            <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white">Informations</h2>
           </div>
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm divide-y divide-gray-50 dark:divide-gray-800">
             {merchant.description && (
@@ -476,7 +476,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             )}
             {merchant.phone && (
               <div className="p-5">
-                <h3 className="text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2">Telephone</h3>
+                <h3 className="text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2">Téléphone</h3>
                 <a
                   href={`tel:${merchant.phone}`}
                   className="flex items-center gap-2.5 text-sm text-[#0066FF] hover:underline"
@@ -498,7 +498,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             className="btn-press flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/30 text-base"
           >
             <Calendar className="h-5 w-5" />
-            Reserver maintenant
+            Réserver maintenant
           </Link>
         </div>
       </div>

@@ -22,7 +22,7 @@ import {
 import Link from "next/link";
 
 export default async function HomePage() {
-  const [sectors, merchants] = await Promise.all([
+  const [sectors, merchants, activeMerchantCount, activeSectorCount] = await Promise.all([
     prisma.sector.findMany({ orderBy: { name: "asc" } }),
     prisma.merchant.findMany({
       where: { isActive: true },
@@ -34,6 +34,8 @@ export default async function HomePage() {
       take: 6,
       orderBy: { createdAt: "desc" },
     }),
+    prisma.merchant.count({ where: { isActive: true } }),
+    prisma.sector.count({ where: { merchants: { some: { isActive: true } } } }),
   ]);
 
   const merchantsWithRating = merchants.map((m) => ({
@@ -196,7 +198,7 @@ export default async function HomePage() {
                   <Users className="h-6 w-6 text-[#0066FF]" />
                 </div>
                 <div className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-1">
-                  <CountUp end={50} suffix="+" />
+                  <CountUp end={activeMerchantCount} suffix="+" />
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                   Professionnels
@@ -210,7 +212,7 @@ export default async function HomePage() {
                   <Grid3X3 className="h-6 w-6 text-[#0066FF]" />
                 </div>
                 <div className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-1">
-                  <CountUp end={10} />
+                  <CountUp end={activeSectorCount} />
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                   Secteurs d'activité

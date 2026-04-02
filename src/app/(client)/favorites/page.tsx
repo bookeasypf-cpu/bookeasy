@@ -13,7 +13,7 @@ export const metadata = {
 
 export default async function FavoritesPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) redirect("/auth/signin");
+  if (!session?.user?.id) redirect("/login");
 
   const favorites = await prisma.favorite.findMany({
     where: { userId: session.user.id },

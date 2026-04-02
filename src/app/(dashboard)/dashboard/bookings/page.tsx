@@ -29,7 +29,7 @@ export default async function DashboardBookingsPage() {
       service: { select: { name: true } },
     },
     orderBy: [{ date: "desc" }, { startTime: "desc" }],
-    take: 50,
+    take: 200,
   });
 
   const pending = bookings.filter((b) => b.status === "PENDING");

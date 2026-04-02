@@ -67,10 +67,13 @@ export default async function DashboardAnalyticsPage() {
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5);
 
-  // 30 derniers jours
-  const last30Days = new Date();
+  // 30 derniers jours (basé sur le fuseau horaire Tahiti)
+  const tahitiNow = new Date(
+    new Date().toLocaleString('en-US', { timeZone: 'Pacific/Tahiti' })
+  );
+  const last30Days = new Date(tahitiNow);
   last30Days.setDate(last30Days.getDate() - 30);
-  const last30Str = last30Days.toISOString().split("T")[0];
+  const last30Str = last30Days.toLocaleDateString('en-CA', { timeZone: 'Pacific/Tahiti' });
   const recentBookings = nonCancelledBookings.filter((b) => b.date >= last30Str);
   const recentRevenue = recentBookings.reduce((s, b) => s + b.totalPrice, 0);
 
