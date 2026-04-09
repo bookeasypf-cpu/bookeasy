@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, formatDuration, formatDate, formatTime } from "@/lib/utils";
-import { Calendar, Clock, Briefcase, MapPin, Home, CalendarCheck, Star } from "lucide-react";
+import { Calendar, Clock, Briefcase, Home, CalendarCheck, Star } from "lucide-react";
 import Link from "next/link";
+import { ConfirmationContent } from "@/components/booking/ConfirmationContent";
 
 interface ConfirmationPageProps {
   params: Promise<{ bookingId: string }>;
@@ -30,7 +31,8 @@ export default async function BookingConfirmationPage({
   });
 
   return (
-    <div className="page-transition min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex flex-col items-center justify-center px-4 sm:px-6 py-12">
+    <ConfirmationContent>
+      <div className="page-transition min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex flex-col items-center justify-center px-4 sm:px-6 py-12">
       {/* Success animation area */}
       <div className="animate-scale-in mb-6">
         <div className="relative w-24 h-24 mx-auto">
@@ -182,5 +184,6 @@ export default async function BookingConfirmationPage({
         </Link>
       </div>
     </div>
+    </ConfirmationContent>
   );
 }

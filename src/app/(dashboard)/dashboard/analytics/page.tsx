@@ -7,12 +7,9 @@ import { isMedicalSectorName } from "@/lib/medical";
 import {
   Users,
   CalendarDays,
-  TrendingUp,
-  Activity,
   UserCheck,
   AlertCircle,
   CheckCircle,
-  Clock,
 } from "lucide-react";
 
 export default async function DashboardAnalyticsPage() {
