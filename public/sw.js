@@ -1,6 +1,21 @@
 // BookEasy Service Worker - PWA + Push Notifications
+// Cache version is based on deployment timestamp.
+// Each build generates a new sw-version.json, which triggers cache invalidation.
 
-const CACHE_NAME = "bookeasy-v1";
+let CACHE_NAME = "bookeasy-v1";
+
+// On activation, fetch the current version and update cache name
+async function getVersionedCacheName() {
+  try {
+    const res = await fetch("/sw-version.json?_=" + Date.now());
+    if (res.ok) {
+      const data = await res.json();
+      return "bookeasy-" + data.version;
+    }
+  } catch {}
+  return CACHE_NAME;
+}
+
 const PRECACHE_URLS = [
   "/",
   "/icon-192x192.png",
@@ -12,7 +27,10 @@ const PRECACHE_URLS = [
 // Install: pre-cache essential assets
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    getVersionedCacheName().then((name) => {
+      CACHE_NAME = name;
+      return caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS));
+    })
   );
   self.skipWaiting();
 });
@@ -20,13 +38,16 @@ self.addEventListener("install", (event) => {
 // Activate: clean old caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
-    )
+    getVersionedCacheName().then((currentName) => {
+      CACHE_NAME = currentName;
+      return caches.keys().then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key.startsWith("bookeasy-") && key !== CACHE_NAME)
+            .map((key) => caches.delete(key))
+        )
+      );
+    })
   );
   self.clients.claim();
 });

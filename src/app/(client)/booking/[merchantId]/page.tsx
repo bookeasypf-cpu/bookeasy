@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { createBooking } from "@/actions/booking";
@@ -59,7 +59,9 @@ const STEPS = [
 export default function BookingPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const merchantId = params.merchantId as string;
+  const preselectedServiceId = searchParams.get("service");
 
   const [step, setStep] = useState(1);
   const [merchant, setMerchant] = useState<Merchant | null>(null);
@@ -84,10 +86,18 @@ export default function BookingPage() {
       .then((r) => r.json())
       .then((data) => {
         setMerchant(data);
+        // Auto-select service if passed via URL query param
+        if (preselectedServiceId && data?.services) {
+          const service = data.services.find((s: Service) => s.id === preselectedServiceId);
+          if (service) {
+            setSelectedService(service);
+            setStep(2);
+          }
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [merchantId]);
+  }, [merchantId, preselectedServiceId]);
 
   // Fetch available slots when date changes
   useEffect(() => {

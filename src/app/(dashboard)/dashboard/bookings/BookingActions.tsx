@@ -30,6 +30,10 @@ export function BookingActions({
   }, []);
 
   async function handleAction(action: "confirm" | "cancel" | "complete") {
+    if (action === "cancel") {
+      const confirmed = window.confirm("Êtes-vous sûr de vouloir annuler ce rendez-vous ?");
+      if (!confirmed) return;
+    }
     setLoading(true);
     let result;
     if (action === "confirm") result = await confirmBooking(bookingId);

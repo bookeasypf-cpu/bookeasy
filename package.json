@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && node -e \"require('fs').writeFileSync('public/sw-version.json',JSON.stringify({version:Date.now().toString(36)}))\" && next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -27,6 +27,7 @@
     "jsqr": "^1.4.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.576.0",
+    "nanoid": "^5.1.7",
     "next": "16.1.6",
     "next-auth": "^4.24.13",
     "next-themes": "^0.4.6",

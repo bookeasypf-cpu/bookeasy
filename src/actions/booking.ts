@@ -232,6 +232,29 @@ export async function cancelBooking(bookingId: string, reason?: string) {
     },
   });
 
+  // Refund gift card balance if booking used a gift card
+  if (booking.notes) {
+    const giftCardMatch = booking.notes.match(/\[Carte cadeau: ([A-Z0-9-]+)\]/);
+    if (giftCardMatch) {
+      const giftCardCode = giftCardMatch[1];
+      const giftCard = await prisma.giftCard.findUnique({
+        where: { code: giftCardCode },
+      });
+      if (giftCard && booking.service) {
+        const refundEUR = booking.service.price / 119.33;
+        const newBalance = Math.min(giftCard.amount, giftCard.balance + refundEUR);
+        await prisma.giftCard.update({
+          where: { id: giftCard.id },
+          data: {
+            balance: newBalance,
+            status: "ACTIVE",
+            usedAt: null,
+          },
+        });
+      }
+    }
+  }
+
   // Revoke XP if any were earned for this booking
   const earnedXp = await prisma.xpTransaction.findFirst({
     where: {

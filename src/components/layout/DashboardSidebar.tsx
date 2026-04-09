@@ -12,6 +12,7 @@ import {
   Star,
   BarChart3,
   Gift,
+  CreditCard,
   Headphones,
   Stethoscope,
   Users,
@@ -31,6 +32,7 @@ const standardNavItems = [
   { href: "/dashboard/calendar", icon: Calendar, label: "Calendrier" },
   { href: "/dashboard/reviews", icon: Star, label: "Avis" },
   { href: "/dashboard/loyalty", icon: Gift, label: "Fidélité XP" },
+  { href: "/dashboard/gift-cards", icon: CreditCard, label: "Cartes cadeaux" },
   { href: "/dashboard/analytics", icon: BarChart3, label: "Statistiques" },
   { href: "/dashboard/support", icon: Headphones, label: "Support" },
 ];

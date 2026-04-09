@@ -9,6 +9,7 @@ import {
 } from "@/lib/constants";
 import { BookingActions } from "./BookingActions";
 import { isMedicalSectorName } from "@/lib/medical";
+import { Gift } from "lucide-react";
 
 export default async function DashboardBookingsPage() {
   const session = await getSession();
@@ -76,9 +77,15 @@ export default async function DashboardBookingsPage() {
                         {formatDate(b.date)} ·{" "}
                         {formatTime(b.startTime)} - {formatTime(b.endTime)}
                       </p>
-                      {b.notes && (
+                      {b.notes?.includes("[Carte cadeau:") && (
+                        <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                          <Gift className="h-3 w-3" />
+                          Carte cadeau
+                        </span>
+                      )}
+                      {b.notes && !b.notes.match(/^\s*\[Carte cadeau:/) && (
                         <p className="text-sm text-gray-500 mt-1 italic">
-                          « {b.notes} »
+                          « {b.notes.replace(/\n?\[Carte cadeau: [A-Z0-9-]+\]/, "").trim()} »
                         </p>
                       )}
                     </div>

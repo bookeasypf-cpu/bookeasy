@@ -2,12 +2,12 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { formatPrice, formatDate, formatTime, formatDuration } from "@/lib/utils";
+import { formatPrice, formatDate, formatTime } from "@/lib/utils";
 import { BOOKING_STATUS_LABELS, BOOKING_STATUS_COLORS } from "@/lib/constants";
-import { Calendar, Clock, MapPin } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import Link from "next/link";
 import { CancelBookingButton } from "./CancelButton";
+import { ReviewForm } from "./ReviewForm";
 
 export default async function MyBookingsPage() {
   const session = await getSession();
@@ -41,13 +41,13 @@ export default async function MyBookingsPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
         Mes rendez-vous
       </h1>
 
       {/* Upcoming */}
       <section className="mb-10">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           À venir ({upcoming.length})
         </h2>
         {upcoming.length > 0 ? (
@@ -58,7 +58,7 @@ export default async function MyBookingsPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-medium text-gray-900">
+                        <h3 className="font-medium text-gray-900 dark:text-white">
                           {booking.merchant.businessName}
                         </h3>
                         <span
@@ -67,10 +67,10 @@ export default async function MyBookingsPage() {
                           {BOOKING_STATUS_LABELS[booking.status] || booking.status}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
                         {booking.service.name}
                       </p>
-                      <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mt-1">
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mt-1">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3.5 w-3.5" />
                           {formatDate(booking.date)}
@@ -83,7 +83,7 @@ export default async function MyBookingsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-semibold text-gray-900 dark:text-white">
                         {formatPrice(booking.totalPrice)}
                       </span>
                       {(booking.status === "CONFIRMED" ||
@@ -97,9 +97,9 @@ export default async function MyBookingsPage() {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             Aucun rendez-vous à venir.{" "}
-            <Link href="/search" className="text-indigo-600">
+            <Link href="/search" className="text-[#0066FF]">
               Trouver un professionnel
             </Link>
           </p>
@@ -109,7 +109,7 @@ export default async function MyBookingsPage() {
       {/* Past */}
       {past.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Passés ({past.length})
           </h2>
           <div className="space-y-3">
@@ -119,7 +119,7 @@ export default async function MyBookingsPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-medium text-gray-900">
+                        <h3 className="font-medium text-gray-900 dark:text-white">
                           {booking.merchant.businessName}
                         </h3>
                         <span
@@ -128,7 +128,7 @@ export default async function MyBookingsPage() {
                           {BOOKING_STATUS_LABELS[booking.status] || booking.status}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
                         {booking.service.name}
                       </p>
                       <span className="text-sm text-gray-400">
@@ -137,16 +137,15 @@ export default async function MyBookingsPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-semibold text-gray-900 dark:text-white">
                         {formatPrice(booking.totalPrice)}
                       </span>
                       {booking.status === "COMPLETED" && !booking.review && (
-                        <Link
-                          href={`/merchants/${booking.merchantId}`}
-                          className="text-sm text-indigo-600 font-medium"
-                        >
-                          Laisser un avis
-                        </Link>
+                        <ReviewForm
+                          bookingId={booking.id}
+                          merchantName={booking.merchant.businessName}
+                          serviceName={booking.service.name}
+                        />
                       )}
                     </div>
                   </div>

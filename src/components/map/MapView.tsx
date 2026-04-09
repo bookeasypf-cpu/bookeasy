@@ -10,7 +10,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Search, MapPin, Star, List, Map as MapIcon, X, BadgeCheck } from "lucide-react";
+import { Search, MapPin, Star, List, Map as MapIcon, X, BadgeCheck, Navigation, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MerchantPopup } from "./MerchantPopup";
 import { formatPrice } from "@/lib/utils";
@@ -167,6 +167,39 @@ function createMarkerIcon(
 }
 
 // ---------------------------------------------------------------------------
+// User position marker icon
+// ---------------------------------------------------------------------------
+
+function createUserPositionIcon(): L.DivIcon {
+  return L.divIcon({
+    className: "user-position-marker",
+    html: `
+      <div style="position:relative; display:flex; align-items:center; justify-content:center;">
+        <div style="
+          position:absolute;
+          width: 40px; height: 40px;
+          border-radius: 50%;
+          background: rgba(0, 102, 255, 0.12);
+          animation: user-pulse 2s ease-in-out infinite;
+        "></div>
+        <div style="
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #0066FF;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0,102,255,0.4);
+          position: relative;
+          z-index: 2;
+        "></div>
+      </div>
+    `,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Map fly-to helper component
 // ---------------------------------------------------------------------------
 
@@ -228,6 +261,9 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileView, setMobileView] = useState<"map" | "list">("map");
   const [flyTarget, setFlyTarget] = useState<[number, number] | null>(null);
+  const [userPosition, setUserPosition] = useState<[number, number] | null>(null);
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
 
   const listRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -318,6 +354,70 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
   const clearSearch = useCallback(() => {
     setSearchQuery("");
   }, []);
+
+  // ---- Geolocation ----
+  const handleGeolocate = useCallback(() => {
+    if (!navigator.geolocation) {
+      setGeoError("Géolocalisation non supportée");
+      return;
+    }
+    setGeoLoading(true);
+    setGeoError(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+        setUserPosition(coords);
+        setFlyTarget(coords);
+        setGeoLoading(false);
+      },
+      (err) => {
+        setGeoLoading(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setGeoError("Accès à la position refusé");
+        } else {
+          setGeoError("Position introuvable");
+        }
+        setTimeout(() => setGeoError(null), 3000);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, []);
+
+  // ---- Distance calculation (haversine) ----
+  const getDistance = useCallback(
+    (lat: number, lng: number): number | null => {
+      if (!userPosition) return null;
+      const R = 6371;
+      const dLat = ((lat - userPosition[0]) * Math.PI) / 180;
+      const dLon = ((lng - userPosition[1]) * Math.PI) / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos((userPosition[0] * Math.PI) / 180) *
+          Math.cos((lat * Math.PI) / 180) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    },
+    [userPosition]
+  );
+
+  const formatDistance = (km: number): string => {
+    if (km < 1) return `${Math.round(km * 1000)} m`;
+    return `${km.toFixed(1)} km`;
+  };
+
+  // Sort merchants by distance when user position is available
+  const sortedFilteredMerchants = useMemo(() => {
+    if (!userPosition) return filteredMerchants;
+    return [...filteredMerchants].sort((a, b) => {
+      const distA = a.latitude != null && a.longitude != null ? getDistance(a.latitude, a.longitude) : null;
+      const distB = b.latitude != null && b.longitude != null ? getDistance(b.latitude, b.longitude) : null;
+      if (distA == null && distB == null) return 0;
+      if (distA == null) return 1;
+      if (distB == null) return -1;
+      return distA - distB;
+    });
+  }, [filteredMerchants, userPosition, getDistance]);
 
   // ---- Render helpers ----
 
@@ -458,6 +558,15 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
                   {merchant.city}
                 </span>
               )}
+              {userPosition && merchant.latitude != null && merchant.longitude != null && (() => {
+                const dist = getDistance(merchant.latitude, merchant.longitude);
+                return dist != null ? (
+                  <span className="flex items-center gap-0.5 text-[11px] text-[#0066FF] font-medium">
+                    <Navigation className="h-2.5 w-2.5" />
+                    {formatDistance(dist)}
+                  </span>
+                ) : null;
+              })()}
             </div>
 
             {firstService && (
@@ -478,8 +587,8 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
 
   const renderMerchantList = () => (
     <div ref={listRef} className="space-y-2 overflow-y-auto flex-1 pr-1">
-      {filteredMerchants.length > 0 ? (
-        filteredMerchants.map(renderMerchantCard)
+      {sortedFilteredMerchants.length > 0 ? (
+        sortedFilteredMerchants.map(renderMerchantCard)
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
@@ -509,6 +618,15 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
       />
 
       <FlyToLocation position={flyTarget} />
+
+      {/* User position marker */}
+      {userPosition && (
+        <Marker
+          position={userPosition}
+          icon={createUserPositionIcon()}
+          zIndexOffset={2000}
+        />
+      )}
 
       {filteredMerchants.map((merchant) => {
         if (merchant.latitude == null || merchant.longitude == null) return null;
@@ -557,8 +675,8 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
           {renderSearchBar()}
           {renderSectorChips()}
           <p className="text-xs text-gray-400">
-            {filteredMerchants.length} professionnel
-            {filteredMerchants.length !== 1 ? "s" : ""}
+            {sortedFilteredMerchants.length} professionnel
+            {sortedFilteredMerchants.length !== 1 ? "s" : ""}
           </p>
         </div>
 
@@ -569,7 +687,32 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
       </div>
 
       {/* Map area */}
-      <div className="flex-1 relative">{renderMap()}</div>
+      <div className="flex-1 relative">
+        {renderMap()}
+        {/* Autour de moi button */}
+        <button
+          onClick={handleGeolocate}
+          disabled={geoLoading}
+          className={cn(
+            "absolute top-4 right-4 z-[1000] flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-lg transition-all",
+            userPosition
+              ? "bg-[#0066FF] text-white shadow-blue-500/25 hover:bg-[#0055DD]"
+              : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+          )}
+        >
+          {geoLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Navigation className={cn("h-4 w-4", userPosition && "fill-white")} />
+          )}
+          Autour de moi
+        </button>
+        {geoError && (
+          <div className="absolute top-16 right-4 z-[1000] px-3 py-2 bg-red-500 text-white text-xs font-medium rounded-lg shadow-lg animate-in fade-in">
+            {geoError}
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -614,6 +757,34 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
           )}
         </AnimatePresence>
       </div>
+
+      {/* Autour de moi button - mobile */}
+      {mobileView === "map" && (
+        <>
+          <button
+            onClick={handleGeolocate}
+            disabled={geoLoading}
+            className={cn(
+              "absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold shadow-lg transition-all",
+              userPosition
+                ? "bg-[#0066FF] text-white shadow-blue-500/25"
+                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700"
+            )}
+          >
+            {geoLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Navigation className={cn("h-3.5 w-3.5", userPosition && "fill-white")} />
+            )}
+            Autour de moi
+          </button>
+          {geoError && (
+            <div className="absolute top-14 right-3 z-20 px-2.5 py-1.5 bg-red-500 text-white text-[11px] font-medium rounded-lg shadow-lg">
+              {geoError}
+            </div>
+          )}
+        </>
+      )}
 
       {/* Mobile toggle button */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
@@ -686,6 +857,15 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
         }
         .merchant-popup .leaflet-popup-tip {
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        /* User position marker */
+        .user-position-marker {
+          background: transparent !important;
+          border: none !important;
+        }
+        @keyframes user-pulse {
+          0%, 100% { transform: scale(1); opacity: 0.6; }
+          50% { transform: scale(1.5); opacity: 0.2; }
         }
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
