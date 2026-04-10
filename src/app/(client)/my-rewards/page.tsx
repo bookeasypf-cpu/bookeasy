@@ -5,6 +5,7 @@ import { Star, Gift, ChevronRight, Trophy, Sparkles, Clock, CheckCircle, XCircle
 import toast from "react-hot-toast";
 import QRCodeDisplay from "@/components/qr/QRCodeDisplay";
 import LucideIcon from "@/components/ui/LucideIcon";
+import { isMedicalSectorName } from "@/lib/medical";
 
 interface MerchantReward {
   id: string;
@@ -100,7 +101,12 @@ export default function MyRewardsPage() {
     setRedeeming(null);
   }
 
-  const totalXp = balances.reduce((sum, b) => sum + b.balance, 0);
+  // Filter out medical sectors (they don't offer XP rewards/promotions)
+  const nonMedicalBalances = balances.filter(
+    (b) => !isMedicalSectorName(b.merchant?.sector.name)
+  );
+
+  const totalXp = nonMedicalBalances.reduce((sum, b) => sum + b.balance, 0);
 
   if (loading) {
     return (
@@ -203,7 +209,7 @@ export default function MyRewardsPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
         {tab === "rewards" ? (
           /* REWARDS TAB */
-          balances.length === 0 ? (
+          nonMedicalBalances.length === 0 ? (
             <div className="text-center py-16">
               <Star className="h-16 w-16 text-gray-200 mx-auto mb-4" />
               <h2 className="text-xl font-semibold text-gray-400 mb-2">
@@ -215,7 +221,7 @@ export default function MyRewardsPage() {
             </div>
           ) : (
             <div className="space-y-6">
-              {balances.map((item) => (
+              {nonMedicalBalances.map((item) => (
                 <div
                   key={item.merchantId}
                   className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"

@@ -134,7 +134,6 @@ export function Header() {
             )}
 
             {/* Separator + Auth section */}
-            <ThemeToggle />
             <div className="h-6 w-px bg-[#0C1B2A]/10 dark:bg-gray-700 mx-1" />
 
             {session?.user ? (
@@ -182,6 +181,10 @@ export function Header() {
                         <User className="h-4 w-4" />
                         Mon profil
                       </Link>
+                      <div className="flex items-center justify-between px-3.5 py-2 border-t border-gray-100 dark:border-gray-700">
+                        <span className="text-sm text-[#0C1B2A]/60 dark:text-gray-400">Mode sombre</span>
+                        <ThemeToggle />
+                      </div>
                       <button
                         onClick={() => {
                           setProfileOpen(false);

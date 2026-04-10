@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/Card";
-import { User, Mail, Phone, Pencil, Check, X } from "lucide-react";
+import { User, Mail, Phone, Pencil, Check, X, Upload, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 import toast from "react-hot-toast";
 
 interface UserProfile {
@@ -13,16 +14,19 @@ interface UserProfile {
   email: string;
   phone: string | null;
   role: string;
+  image: string | null;
 }
 
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ name: "", phone: "" });
+  const [uploading, setUploading] = useState(false);
+  const [form, setForm] = useState({ name: "", phone: "", image: "" });
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -35,7 +39,7 @@ export default function ProfilePage() {
         .then((data) => {
           if (data.id) {
             setProfile(data);
-            setForm({ name: data.name || "", phone: data.phone || "" });
+            setForm({ name: data.name || "", phone: data.phone || "", image: data.image || "" });
           }
           setLoading(false);
         })
@@ -45,16 +49,46 @@ export default function ProfilePage() {
 
   function startEdit() {
     if (profile) {
-      setForm({ name: profile.name || "", phone: profile.phone || "" });
+      setForm({ name: profile.name || "", phone: profile.phone || "", image: profile.image || "" });
     }
     setEditing(true);
   }
 
   function cancelEdit() {
     if (profile) {
-      setForm({ name: profile.name || "", phone: profile.phone || "" });
+      setForm({ name: profile.name || "", phone: profile.phone || "", image: profile.image || "" });
     }
     setEditing(false);
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Veuillez sélectionner une image");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setForm({ ...form, image: data.url });
+        toast.success("Photo téléchargée !");
+      } else {
+        toast.error(data.error || "Erreur d'upload");
+      }
+    } catch {
+      toast.error("Erreur de connexion");
+    }
+    setUploading(false);
   }
 
   async function handleSave() {
@@ -67,7 +101,7 @@ export default function ProfilePage() {
       const res = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, phone: form.phone }),
+        body: JSON.stringify({ name: form.name, phone: form.phone, image: form.image }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -75,7 +109,7 @@ export default function ProfilePage() {
         setEditing(false);
         toast.success("Profil mis à jour !");
         // Update the session so Header shows new name
-        await update({ name: data.name });
+        await update({ name: data.name, image: data.image });
       } else {
         toast.error(data.error || "Erreur");
       }
@@ -114,8 +148,38 @@ export default function ProfilePage() {
         <CardContent className="p-6">
           {/* Avatar + Role */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-blue-500/20">
-              {(profile.name || "U").charAt(0).toUpperCase()}
+            <div className="relative">
+              {form.image || profile.image ? (
+                <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/20">
+                  <Image
+                    src={form.image || profile.image || ""}
+                    alt={profile.name || "Profile"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-blue-500/20">
+                  {(profile.name || "U").charAt(0).toUpperCase()}
+                </div>
+              )}
+              {editing && (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="absolute bottom-0 right-0 w-6 h-6 bg-[#0066FF] text-white rounded-full flex items-center justify-center hover:bg-[#0052CC] transition-colors shadow-md"
+                  title="Changer la photo"
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
             </div>
             <div>
               {editing ? (
