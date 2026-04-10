@@ -134,12 +134,7 @@ export function Header() {
             )}
 
             {/* Theme toggle */}
-            <button
-              className="p-2 text-[#0C1B2A]/50 dark:text-gray-400 hover:text-[#0066FF] transition-colors rounded-lg hover:bg-[#0066FF]/5"
-              title="Toggle dark mode"
-            >
-              <ThemeToggle />
-            </button>
+            <ThemeToggle />
 
             {/* Separator + Auth section */}
             <div className="h-6 w-px bg-[#0C1B2A]/10 dark:bg-gray-700 mx-1" />

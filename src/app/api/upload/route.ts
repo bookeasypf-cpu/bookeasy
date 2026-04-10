@@ -8,7 +8,11 @@ const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 export async function POST(request: Request) {
   try {
     const session = await getSession();
-    if (!session?.user || session.user.role !== "MERCHANT") {
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    // Allow both CLIENT and MERCHANT to upload
+    if (!["CLIENT", "MERCHANT"].includes(session.user.role || "")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
