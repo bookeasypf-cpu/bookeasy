@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import toast from "react-hot-toast";
+import { showUpdateNotification } from "@/components/UpdateNotification";
 
 export function useUpdateChecker() {
   const lastVersionRef = useRef<string | null>(null);
@@ -46,26 +46,7 @@ export function useUpdateChecker() {
           notifiedRef.current = true;
 
           // Show update notification
-          toast.custom(
-            (t) => (
-              <div className="bg-blue-600 text-white p-4 rounded-lg shadow-xl flex items-center justify-between gap-4 min-w-[320px] animate-slide-in">
-                <div>
-                  <p className="font-semibold">Nouvelle version disponible</p>
-                  <p className="text-xs text-blue-100">Cliquez pour mettre à jour</p>
-                </div>
-                <button
-                  onClick={() => {
-                    toast.dismiss(t.id);
-                    window.location.reload();
-                  }}
-                  className="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors whitespace-nowrap"
-                >
-                  Recharger
-                </button>
-              </div>
-            ),
-            { duration: Infinity }
-          );
+          showUpdateNotification();
         }
       });
     }, 30 * 1000);
