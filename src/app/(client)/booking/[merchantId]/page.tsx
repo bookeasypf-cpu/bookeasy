@@ -563,51 +563,53 @@ export default function BookingPage() {
             </div>
 
             {/* Gift Card */}
-            <div className="mb-6">
-              <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2">
-                <Gift className="h-4 w-4 text-[#0066FF]" />
-                Carte cadeau (optionnel)
-              </label>
-              {giftCardApplied ? (
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl px-4 py-3 flex items-center justify-between border border-green-200">
-                  <div>
-                    <p className="text-sm font-semibold text-green-800">
-                      Carte {giftCardApplied.code}
-                    </p>
-                    <p className="text-xs text-green-600">
-                      Solde : {giftCardApplied.balanceXPF.toLocaleString()} F CFP
-                    </p>
+            {(!merchant.sector ? false : !isMedicalSectorClient(merchant.sector.slug)) && (
+              <div className="mb-6">
+                <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2">
+                  <Gift className="h-4 w-4 text-[#0066FF]" />
+                  Carte cadeau (optionnel)
+                </label>
+                {giftCardApplied ? (
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl px-4 py-3 flex items-center justify-between border border-green-200">
+                    <div>
+                      <p className="text-sm font-semibold text-green-800">
+                        Carte {giftCardApplied.code}
+                      </p>
+                      <p className="text-xs text-green-600">
+                        Solde : {giftCardApplied.balanceXPF.toLocaleString()} F CFP
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setGiftCardApplied(null);
+                        setGiftCardCode("");
+                      }}
+                      className="p-1.5 rounded-lg hover:bg-green-100 text-green-600 transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      setGiftCardApplied(null);
-                      setGiftCardCode("");
-                    }}
-                    className="p-1.5 rounded-lg hover:bg-green-100 text-green-600 transition-colors"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Ex: BE-ABCD-1234-EFGH"
-                    value={giftCardCode}
-                    onChange={(e) => setGiftCardCode(e.target.value.toUpperCase())}
-                    className="flex-1 rounded-xl border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-mono tracking-wider text-[#0C1B2A] dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-500 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleApplyGiftCard}
-                    disabled={!giftCardCode.trim() || checkingGiftCard}
-                    className="px-4 py-2.5 rounded-xl bg-[#0066FF]/10 text-[#0066FF] font-semibold text-sm hover:bg-[#0066FF]/20 transition-colors disabled:opacity-50"
-                  >
-                    {checkingGiftCard ? "..." : "Appliquer"}
-                  </button>
-                </div>
-              )}
-            </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Ex: BE-ABCD-1234-EFGH"
+                      value={giftCardCode}
+                      onChange={(e) => setGiftCardCode(e.target.value.toUpperCase())}
+                      className="flex-1 rounded-xl border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-mono tracking-wider text-[#0C1B2A] dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-500 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyGiftCard}
+                      disabled={!giftCardCode.trim() || checkingGiftCard}
+                      className="px-4 py-2.5 rounded-xl bg-[#0066FF]/10 text-[#0066FF] font-semibold text-sm hover:bg-[#0066FF]/20 transition-colors disabled:opacity-50"
+                    >
+                      {checkingGiftCard ? "..." : "Appliquer"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Notes */}
             <div className="mb-6">
