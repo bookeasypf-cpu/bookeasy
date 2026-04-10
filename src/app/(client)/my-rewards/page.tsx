@@ -319,10 +319,18 @@ export default function MyRewardsPage() {
                       })}
                     </div>
                   ) : (
-                    <div className="p-4 text-center">
-                      <p className="text-sm text-gray-400">
-                        Ce commerçant n'a pas encore de récompenses
-                      </p>
+                    <div className="p-5 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+                      <div className="flex items-start gap-3">
+                        <Gift className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+                        <div className="text-left">
+                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                            Pas de récompenses créées
+                          </p>
+                          <p className="text-xs text-blue-700 dark:text-blue-200">
+                            Le commerçant peut créer des récompenses (réduction, service gratuit, etc.) dans son dashboard pour que vous puissiez les échanger contre vos points XP.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>

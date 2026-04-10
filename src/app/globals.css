@@ -602,3 +602,23 @@ body {
 .leaflet-popup-tip {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
 }
+
+/* Smooth scroll for tab anchors */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Tab active state animation */
+nav a[href^="#"]:target {
+  animation: tabActive 0.3s ease-out;
+}
+
+@keyframes tabActive {
+  0% { transform: scale(0.98); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Scroll margin for proper section positioning */
+section[id] {
+  scroll-margin-top: 80px;
+}
