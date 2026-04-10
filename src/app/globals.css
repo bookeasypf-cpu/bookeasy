@@ -420,17 +420,20 @@ body {
 /* Service card with neon glow animation */
 .service-card {
   animation: serviceCardFade 0.5s ease-out both;
+  position: relative;
 }
-.service-card:hover::after {
+.service-card::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(0, 102, 255, 0.5), rgba(0, 180, 216, 0.3));
-  pointer-events: none;
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.3), rgba(0, 180, 216, 0.2));
   opacity: 0;
-  animation: glowPulse 2s ease-in-out infinite;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.service-card:hover::before {
+  animation: glowPulseOpacity 2s ease-in-out infinite;
 }
 
 @keyframes serviceCardFade {
@@ -444,7 +447,7 @@ body {
   }
 }
 
-@keyframes glowPulse {
+@keyframes glowPulseOpacity {
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }
 }

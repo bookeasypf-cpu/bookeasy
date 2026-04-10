@@ -28,6 +28,7 @@ import {
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { isMedicalSectorClient } from "@/lib/medical-client";
 
 interface Service {
   id: string;
@@ -313,7 +314,7 @@ export default function BookingPage() {
                           <Clock className="h-3 w-3" />
                           {formatDuration(service.duration)}
                         </span>
-                        {!merchant.sector ? isMedicalSectorClient(merchant.sector.slug) : false && (service.xpAmount ?? merchant.xpPerBooking) > 0 && (
+                        {(!merchant.sector ? false : !isMedicalSectorClient(merchant.sector.slug)) && (service.xpAmount ?? merchant.xpPerBooking) > 0 && (
                           <span className="inline-flex items-center gap-1 text-xs font-medium text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full">
                             <Star className="h-3 w-3 text-yellow-500" />
                             +{service.xpAmount ?? merchant.xpPerBooking} XP
@@ -547,7 +548,7 @@ export default function BookingPage() {
                 </div>
 
                 {/* XP Bonus */}
-                {(selectedService.xpAmount ?? merchant.xpPerBooking) > 0 && (
+                {(!merchant.sector ? false : !isMedicalSectorClient(merchant.sector.slug)) && (selectedService.xpAmount ?? merchant.xpPerBooking) > 0 && (
                   <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl px-4 py-3 flex items-center justify-between border border-yellow-100">
                     <span className="flex items-center gap-2 text-sm font-medium text-yellow-800">
                       <Star className="h-4 w-4 text-yellow-500" />
