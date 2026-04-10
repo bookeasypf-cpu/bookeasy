@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { sendBookingConfirmation, sendBookingCancellation, sendReferralRewardEmail } from "@/lib/email";
 import { sendPushNotification } from "@/lib/push";
 import { REFERRAL_XP_FIRST_BOOKING, checkAndAwardMilestoneBonus } from "@/lib/referral";
+import { isMedicalSector } from "@/lib/medical";
 
 export async function createBooking(data: {
   merchantId: string;
@@ -97,7 +98,7 @@ export async function createBooking(data: {
     // Create notification for merchant + send confirmation email
     const merchant = await prisma.merchant.findUnique({
       where: { id: data.merchantId },
-      select: { userId: true, xpPerBooking: true, businessName: true, address: true, city: true },
+      select: { userId: true, xpPerBooking: true, businessName: true, address: true, city: true, sector: { select: { slug: true } } },
     });
 
     if (merchant) {
@@ -112,18 +113,22 @@ export async function createBooking(data: {
       });
 
       // Award XP to client (service-level XP takes priority over merchant default)
-      const xpToAward = service.xpAmount ?? merchant.xpPerBooking;
-      if (xpToAward > 0) {
-        await prisma.xpTransaction.create({
-          data: {
-            userId: user.id,
-            merchantId: data.merchantId,
-            bookingId: booking.id,
-            amount: xpToAward,
-            type: "EARNED",
-            reason: `Réservation : ${service.name}`,
-          },
-        });
+      // Only award XP for non-medical sectors
+      const isMedical = merchant.sector ? isMedicalSector(merchant.sector.slug) : false;
+      if (!isMedical) {
+        const xpToAward = service.xpAmount ?? merchant.xpPerBooking;
+        if (xpToAward > 0) {
+          await prisma.xpTransaction.create({
+            data: {
+              userId: user.id,
+              merchantId: data.merchantId,
+              bookingId: booking.id,
+              amount: xpToAward,
+              type: "EARNED",
+              reason: `Réservation : ${service.name}`,
+            },
+          });
+        }
       }
 
       // Check referral: if user was referred and this is their first booking

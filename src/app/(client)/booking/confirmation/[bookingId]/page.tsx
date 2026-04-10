@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, formatDuration, formatDate, formatTime } from "@/lib/utils";
+import { isMedicalSector } from "@/lib/medical";
 import { Calendar, Clock, Briefcase, Home, CalendarCheck, Star } from "lucide-react";
 import Link from "next/link";
 import { ConfirmationContent } from "@/components/booking/ConfirmationContent";
@@ -17,18 +18,21 @@ export default async function BookingConfirmationPage({
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     include: {
-      merchant: { select: { businessName: true, xpPerBooking: true } },
+      merchant: { select: { businessName: true, xpPerBooking: true, sector: { select: { slug: true } } } },
       service: true,
     },
   });
 
   if (!booking) notFound();
 
-  // Get XP earned for this booking
-  const xpEarned = await prisma.xpTransaction.findFirst({
+  // Check if merchant is in medical sector
+  const isMedical = booking.merchant.sector ? isMedicalSector(booking.merchant.sector.slug) : false;
+
+  // Get XP earned for this booking (only for non-medical)
+  const xpEarned = !isMedical ? await prisma.xpTransaction.findFirst({
     where: { bookingId, type: "EARNED" },
     select: { amount: true },
-  });
+  }) : null;
 
   return (
     <ConfirmationContent>

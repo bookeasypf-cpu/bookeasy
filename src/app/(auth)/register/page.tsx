@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Card, CardContent } from "@/components/ui/Card";
 import { registerUser } from "@/actions/auth";
 import { User, Store, Gift } from "lucide-react";
@@ -231,7 +232,7 @@ function RegisterForm() {
             id="name"
             name="name"
             label="Nom complet"
-            placeholder="Jean Dupont"
+            placeholder="Elon Musk"
             required
           />
           <Input
@@ -242,12 +243,19 @@ function RegisterForm() {
             placeholder="votre@email.com"
             required
           />
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             label="Mot de passe"
             placeholder="Minimum 6 caractères"
+            minLength={6}
+            required
+          />
+          <PasswordInput
+            id="confirmPassword"
+            name="confirmPassword"
+            label="Confirmer le mot de passe"
+            placeholder="Répétez votre mot de passe"
             minLength={6}
             required
           />

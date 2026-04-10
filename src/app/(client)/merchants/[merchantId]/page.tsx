@@ -298,7 +298,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             {merchant.services.map((service) => (
               <div
                 key={service.id}
-                className="card-hover group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5 flex items-center justify-between gap-4"
+                className="service-card card-hover group bg-white dark:bg-gray-900 rounded-2xl border border-[#0066FF]/20 dark:border-[#0066FF]/30 shadow-sm p-5 flex items-center justify-between gap-4 transition-all duration-300 hover:shadow-lg hover:shadow-[#0066FF]/20 dark:hover:shadow-[#0066FF]/10"
               >
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-[#0C1B2A] dark:text-white group-hover:text-[#0066FF] transition-colors">

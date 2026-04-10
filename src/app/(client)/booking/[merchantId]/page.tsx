@@ -43,6 +43,7 @@ interface Merchant {
   businessName: string;
   services: Service[];
   xpPerBooking: number;
+  sector?: { slug: string } | null;
 }
 
 interface TimeSlot {
@@ -312,7 +313,7 @@ export default function BookingPage() {
                           <Clock className="h-3 w-3" />
                           {formatDuration(service.duration)}
                         </span>
-                        {(service.xpAmount ?? merchant.xpPerBooking) > 0 && (
+                        {!merchant.sector ? isMedicalSectorClient(merchant.sector.slug) : false && (service.xpAmount ?? merchant.xpPerBooking) > 0 && (
                           <span className="inline-flex items-center gap-1 text-xs font-medium text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full">
                             <Star className="h-3 w-3 text-yellow-500" />
                             +{service.xpAmount ?? merchant.xpPerBooking} XP
