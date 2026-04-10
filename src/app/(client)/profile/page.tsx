@@ -80,8 +80,28 @@ export default function ProfilePage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setForm({ ...form, image: data.url });
-        toast.success("Photo téléchargée !");
+        const updatedForm = { ...form, image: data.url };
+
+        // Auto-save to profile immediately after upload
+        const saveRes = await fetch("/api/profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: updatedForm.name,
+            phone: updatedForm.phone,
+            image: updatedForm.image,
+          }),
+        });
+
+        const savedData = await saveRes.json();
+        if (saveRes.ok) {
+          setProfile(savedData);
+          setForm(updatedForm);
+          toast.success("Photo mise à jour !");
+          await update({ name: savedData.name, image: savedData.image });
+        } else {
+          toast.error("Erreur de sauvegarde");
+        }
       } else {
         toast.error(data.error || "Erreur d'upload");
       }
