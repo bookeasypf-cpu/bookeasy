@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
+import { useUpdateChecker } from "@/hooks/useUpdateChecker";
 
 export function ServiceWorkerProvider() {
+  // Check for app updates and notify user
+  useUpdateChecker();
+
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
