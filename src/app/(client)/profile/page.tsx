@@ -65,6 +65,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadStep, setUploadStep] = useState<string>("");
   const [form, setForm] = useState({ name: "", phone: "", image: "" });
   const [localImagePreview, setLocalImagePreview] = useState<string | null>(null);
 
@@ -129,6 +130,7 @@ export default function ProfilePage() {
 
     // Start upload
     setUploading(true);
+    setUploadStep("Compression de l'image...");
     try {
       // Compress image before uploading
       const compressedBlob = await compressImage(file);
@@ -136,6 +138,7 @@ export default function ProfilePage() {
         type: "image/jpeg",
       });
 
+      setUploadStep("Upload en cours...");
       const formData = new FormData();
       formData.append("file", compressedFile);
 
@@ -156,12 +159,14 @@ export default function ProfilePage() {
         toast.error(data.error || `Erreur d'upload (${res.status})`);
         setLocalImagePreview(null);
         setUploading(false);
+        setUploadStep("");
         return;
       }
 
       const imageUrl = data.url;
 
       // Auto-save to profile
+      setUploadStep("Sauvegarde en cours...");
       const saveRes = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -178,12 +183,14 @@ export default function ProfilePage() {
         toast.error("Erreur de sauvegarde");
         setLocalImagePreview(null);
         setUploading(false);
+        setUploadStep("");
         return;
       }
 
       setProfile(savedData);
       setForm({ ...form, image: savedData.image });
       setLocalImagePreview(null);
+      setUploadStep("Actualisation en cours...");
       toast.success("Photo mise à jour !");
 
       // Wait for DB to commit, then reload
@@ -193,6 +200,7 @@ export default function ProfilePage() {
       toast.error("Erreur de connexion");
       setLocalImagePreview(null);
       setUploading(false);
+      setUploadStep("");
     }
   }
 
@@ -265,8 +273,11 @@ export default function ProfilePage() {
                     className="w-full h-full object-cover"
                   />
                   {uploading && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center gap-2">
                       <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="text-white text-xs font-medium text-center px-1">
+                        {uploadStep}
+                      </div>
                     </div>
                   )}
                 </div>
