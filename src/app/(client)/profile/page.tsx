@@ -109,7 +109,7 @@ export default function ProfilePage() {
         if (saveRes.ok) {
           setProfile(savedData);
           setForm(updatedForm);
-          setLocalImagePreview(null);
+          // Keep preview visible - will be cleared when user exits edit mode
           toast.success("Photo mise à jour !");
           await update({ name: savedData.name, image: savedData.image });
         } else {
