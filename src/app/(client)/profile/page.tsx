@@ -109,14 +109,14 @@ export default function ProfilePage() {
         if (saveRes.ok) {
           setProfile(savedData);
           setForm(updatedForm);
-          // Keep preview visible - will be cleared when user exits edit mode
           toast.success("Photo mise à jour !");
-          // Update session
-          await update({ name: savedData.name, image: savedData.image });
-          // Reload after brief delay to sync session throughout the app
+
+          // Reload page after delay to sync session across the app
+          // The session callback will automatically fetch fresh image from database
           setTimeout(() => {
-            window.location.href = window.location.href;
-          }, 600);
+            // Use replace to skip adding to history
+            window.location.replace(window.location.href);
+          }, 800);
         } else {
           toast.error("Erreur de sauvegarde");
         }
