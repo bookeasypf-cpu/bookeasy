@@ -27,6 +27,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", image: "" });
+  const [localImagePreview, setLocalImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -50,6 +51,7 @@ export default function ProfilePage() {
   function startEdit() {
     if (profile) {
       setForm({ name: profile.name || "", phone: profile.phone || "", image: profile.image || "" });
+      setLocalImagePreview(null);
     }
     setEditing(true);
   }
@@ -57,6 +59,7 @@ export default function ProfilePage() {
   function cancelEdit() {
     if (profile) {
       setForm({ name: profile.name || "", phone: profile.phone || "", image: profile.image || "" });
+      setLocalImagePreview(null);
     }
     setEditing(false);
   }
@@ -70,6 +73,15 @@ export default function ProfilePage() {
       return;
     }
 
+    // Show local preview immediately
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const preview = event.target?.result as string;
+      setLocalImagePreview(preview);
+    };
+    reader.readAsDataURL(file);
+
+    // Start upload
     setUploading(true);
     try {
       const formData = new FormData();
@@ -97,6 +109,7 @@ export default function ProfilePage() {
         if (saveRes.ok) {
           setProfile(savedData);
           setForm(updatedForm);
+          setLocalImagePreview(null);
           toast.success("Photo mise à jour !");
           await update({ name: savedData.name, image: savedData.image });
         } else {
@@ -104,9 +117,11 @@ export default function ProfilePage() {
         }
       } else {
         toast.error(data.error || "Erreur d'upload");
+        setLocalImagePreview(null);
       }
     } catch {
       toast.error("Erreur de connexion");
+      setLocalImagePreview(null);
     }
     setUploading(false);
   }
@@ -127,6 +142,7 @@ export default function ProfilePage() {
       if (res.ok) {
         setProfile(data);
         setEditing(false);
+        setLocalImagePreview(null);
         toast.success("Profil mis à jour !");
         // Update the session so Header shows new name
         await update({ name: data.name, image: data.image });
@@ -149,6 +165,8 @@ export default function ProfilePage() {
 
   if (!profile) return null;
 
+  const displayImage = localImagePreview || form.image || profile.image;
+
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -169,14 +187,18 @@ export default function ProfilePage() {
           {/* Avatar + Role */}
           <div className="flex items-center gap-4 mb-6">
             <div className="relative">
-              {form.image || profile.image ? (
+              {displayImage ? (
                 <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/20">
-                  <Image
-                    src={form.image || profile.image || ""}
+                  <img
+                    src={displayImage}
                     alt={profile.name || "Profile"}
-                    fill
-                    className="object-cover"
+                    className="w-full h-full object-cover"
                   />
+                  {uploading && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-blue-500/20">
@@ -187,10 +209,14 @@ export default function ProfilePage() {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="absolute bottom-0 right-0 w-6 h-6 bg-[#0066FF] text-white rounded-full flex items-center justify-center hover:bg-[#0052CC] transition-colors shadow-md"
+                  className="absolute bottom-0 right-0 w-6 h-6 bg-[#0066FF] text-white rounded-full flex items-center justify-center hover:bg-[#0052CC] transition-colors shadow-md disabled:opacity-60"
                   title="Changer la photo"
                 >
-                  <Upload className="h-3.5 w-3.5" />
+                  {uploading ? (
+                    <div className="h-3.5 w-3.5 border border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Upload className="h-3.5 w-3.5" />
+                  )}
                 </button>
               )}
               <input

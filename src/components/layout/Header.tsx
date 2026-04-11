@@ -277,8 +277,8 @@ export function Header() {
             )}
 
             {/* Dark mode toggle - always visible */}
-            <div className="flex items-center justify-between px-3 py-3 rounded-lg bg-[#0066FF]/5 dark:bg-gray-800 mx-3 my-2 border border-[#0066FF]/10 dark:border-gray-700">
-              <span className="text-sm font-semibold text-[#0C1B2A] dark:text-white">Mode sombre</span>
+            <div className="flex items-center justify-between px-3 py-2.5 gap-2">
+              <span className="text-xs font-medium text-[#0C1B2A]/60 dark:text-gray-400">Mode</span>
               <ThemeToggle />
             </div>
 
