@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { put } from "@vercel/blob";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
 export async function POST(request: Request) {
   try {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     // Validate file size
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
-        { error: "Le fichier est trop volumineux (max 5 Mo)." },
+        { error: "Le fichier est trop volumineux (max 10 Mo)." },
         { status: 400 }
       );
     }

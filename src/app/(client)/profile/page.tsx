@@ -73,6 +73,13 @@ export default function ProfilePage() {
       return;
     }
 
+    // Check file size (max 10 MB)
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      toast.error(`L'image est trop grosse (${(file.size / 1024 / 1024).toFixed(1)} MB). Max: 10 MB`);
+      return;
+    }
+
     // Show local preview immediately
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -96,12 +103,18 @@ export default function ProfilePage() {
       console.log("3. Fetch completed, status:", res.status, res.ok);
 
       console.log("4. Parsing JSON response...");
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (e) {
+        console.error("Failed to parse JSON response:", e);
+        data = { error: `Erreur serveur (${res.status})` };
+      }
       console.log("5. JSON parsed:", data);
 
       if (!res.ok) {
         console.error("Upload failed:", res.status, data);
-        toast.error(data.error || "Erreur d'upload");
+        toast.error(data.error || `Erreur d'upload (${res.status})`);
         setLocalImagePreview(null);
         setUploading(false);
         return;
