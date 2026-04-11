@@ -86,58 +86,62 @@ export default function ProfilePage() {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      console.log("Uploading file...");
+
       const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
       const data = await res.json();
-      if (res.ok) {
-        const updatedForm = { ...form, image: data.url };
 
-        // Auto-save to profile immediately after upload
-        const saveRes = await fetch("/api/profile", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: updatedForm.name,
-            phone: updatedForm.phone,
-            image: updatedForm.image,
-          }),
-        });
-
-        const savedData = await saveRes.json();
-        console.log("Saved profile data:", {
-          ok: saveRes.ok,
-          image: savedData.image,
-          name: savedData.name,
-          id: savedData.id,
-        });
-
-        if (saveRes.ok) {
-          setProfile(savedData);
-          setForm(updatedForm);
-          toast.success("Photo mise à jour !");
-
-          // Wait a bit for database write to fully commit before reloading
-          await new Promise((resolve) => setTimeout(resolve, 500));
-
-          // Reload page to refresh session - the session callback will fetch fresh image from DB
-          window.location.href = window.location.pathname;
-        } else {
-          console.error("Save failed:", saveRes.status, savedData);
-          toast.error("Erreur de sauvegarde");
-        }
-      } else {
-        console.error("Upload failed:", data);
+      if (!res.ok) {
+        console.error("Upload failed:", res.status, data);
         toast.error(data.error || "Erreur d'upload");
         setLocalImagePreview(null);
+        setUploading(false);
+        return;
       }
+
+      console.log("Upload successful, URL:", data.url);
+      const imageUrl = data.url;
+
+      // Auto-save to profile immediately after upload
+      console.log("Saving to profile...");
+      const saveRes = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          image: imageUrl,
+        }),
+      });
+
+      const savedData = await saveRes.json();
+
+      if (!saveRes.ok) {
+        console.error("Profile save failed:", saveRes.status, savedData);
+        toast.error("Erreur de sauvegarde");
+        setLocalImagePreview(null);
+        setUploading(false);
+        return;
+      }
+
+      console.log("Profile saved successfully:", savedData);
+      setProfile(savedData);
+      setForm({ ...form, image: savedData.image });
+      setLocalImagePreview(null);
+      toast.success("Photo mise à jour !");
+
+      // Wait for DB to commit, then reload
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      window.location.href = window.location.pathname;
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error("Upload/save error:", error);
       toast.error("Erreur de connexion");
       setLocalImagePreview(null);
+      setUploading(false);
     }
-    setUploading(false);
   }
 
   async function handleSave() {
