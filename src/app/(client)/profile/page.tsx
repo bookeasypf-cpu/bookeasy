@@ -86,13 +86,18 @@ export default function ProfilePage() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      console.log("Uploading file...");
+      console.log("1. Uploading file...", file.name, file.size, file.type);
 
+      console.log("2. Starting fetch to /api/upload");
       const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
+      console.log("3. Fetch completed, status:", res.status, res.ok);
+
+      console.log("4. Parsing JSON response...");
       const data = await res.json();
+      console.log("5. JSON parsed:", data);
 
       if (!res.ok) {
         console.error("Upload failed:", res.status, data);
@@ -102,7 +107,7 @@ export default function ProfilePage() {
         return;
       }
 
-      console.log("Upload successful, URL:", data.url);
+      console.log("6. Upload successful, URL:", data.url);
       const imageUrl = data.url;
 
       // Auto-save to profile immediately after upload
