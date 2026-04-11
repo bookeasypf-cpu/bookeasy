@@ -106,44 +106,34 @@ export default function ProfilePage() {
         });
 
         const savedData = await saveRes.json();
+        console.log("Saved profile data:", {
+          ok: saveRes.ok,
+          image: savedData.image,
+          name: savedData.name,
+          id: savedData.id,
+        });
+
         if (saveRes.ok) {
           setProfile(savedData);
           setForm(updatedForm);
           toast.success("Photo mise à jour !");
 
-          // Wait a bit for database write to fully commit before updating session
-          await new Promise((resolve) => setTimeout(resolve, 300));
+          // Wait a bit for database write to fully commit before reloading
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
-          // Update NextAuth session with fresh data
-          try {
-            const updateResult = await update({
-              name: savedData.name,
-              image: savedData.image,
-              email: savedData.email,
-              role: savedData.role,
-            });
-            console.log("Session updated:", updateResult);
-          } catch (err) {
-            console.error("Session update error:", err);
-          }
-
-          // Reload page with full cache invalidation to ensure service worker fetches fresh
-          setTimeout(() => {
-            if ("serviceWorker" in navigator) {
-              navigator.serviceWorker.getRegistrations().then((registrations) => {
-                registrations.forEach((reg) => reg.unregister());
-              });
-            }
-            window.location.reload();
-          }, 800);
+          // Reload page to refresh session - the session callback will fetch fresh image from DB
+          window.location.href = window.location.pathname;
         } else {
+          console.error("Save failed:", saveRes.status, savedData);
           toast.error("Erreur de sauvegarde");
         }
       } else {
+        console.error("Upload failed:", data);
         toast.error(data.error || "Erreur d'upload");
         setLocalImagePreview(null);
       }
-    } catch {
+    } catch (error) {
+      console.error("Upload error:", error);
       toast.error("Erreur de connexion");
       setLocalImagePreview(null);
     }
