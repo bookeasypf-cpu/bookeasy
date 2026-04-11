@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer, useTransition, useOptimistic } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -52,6 +52,69 @@ interface TimeSlot {
   endTime: string;
 }
 
+interface BookingState {
+  step: number;
+  merchant: Merchant | null;
+  selectedService: Service | null;
+  selectedDate: string;
+  selectedSlot: TimeSlot | null;
+  slots: TimeSlot[];
+  loadingSlots: boolean;
+  notes: string;
+  loading: boolean;
+  giftCardCode: string;
+  giftCardApplied: { code: string; balanceXPF: number } | null;
+  checkingGiftCard: boolean;
+}
+
+type BookingAction =
+  | { type: "SET_STEP"; step: number }
+  | { type: "SET_MERCHANT"; merchant: Merchant }
+  | { type: "SELECT_SERVICE"; service: Service | null }
+  | { type: "SELECT_DATE"; date: string }
+  | { type: "SELECT_SLOT"; slot: TimeSlot | null }
+  | { type: "SET_SLOTS"; slots: TimeSlot[] }
+  | { type: "SET_LOADING_SLOTS"; loading: boolean }
+  | { type: "SET_NOTES"; notes: string }
+  | { type: "SET_LOADING"; loading: boolean }
+  | { type: "SET_GIFT_CARD_CODE"; code: string }
+  | { type: "APPLY_GIFT_CARD"; data: { code: string; balanceXPF: number } }
+  | { type: "REMOVE_GIFT_CARD" }
+  | { type: "SET_CHECKING_GIFT_CARD"; checking: boolean };
+
+const bookingReducer = (state: BookingState, action: BookingAction): BookingState => {
+  switch (action.type) {
+    case "SET_STEP":
+      return { ...state, step: action.step };
+    case "SET_MERCHANT":
+      return { ...state, merchant: action.merchant, loading: false };
+    case "SELECT_SERVICE":
+      return { ...state, selectedService: action.service };
+    case "SELECT_DATE":
+      return { ...state, selectedDate: action.date, selectedSlot: null };
+    case "SELECT_SLOT":
+      return { ...state, selectedSlot: action.slot };
+    case "SET_SLOTS":
+      return { ...state, slots: action.slots, loadingSlots: false };
+    case "SET_LOADING_SLOTS":
+      return { ...state, loadingSlots: action.loading };
+    case "SET_NOTES":
+      return { ...state, notes: action.notes };
+    case "SET_LOADING":
+      return { ...state, loading: action.loading };
+    case "SET_GIFT_CARD_CODE":
+      return { ...state, giftCardCode: action.code };
+    case "APPLY_GIFT_CARD":
+      return { ...state, giftCardApplied: action.data, giftCardCode: "" };
+    case "REMOVE_GIFT_CARD":
+      return { ...state, giftCardApplied: null, giftCardCode: "" };
+    case "SET_CHECKING_GIFT_CARD":
+      return { ...state, checkingGiftCard: action.checking };
+    default:
+      return state;
+  }
+};
+
 const STEPS = [
   { label: "Service", icon: Briefcase },
   { label: "Date & Heure", icon: Calendar },
@@ -65,57 +128,58 @@ export default function BookingPage() {
   const merchantId = params.merchantId as string;
   const preselectedServiceId = searchParams.get("service");
 
-  const [step, setStep] = useState(1);
-  const [merchant, setMerchant] = useState<Merchant | null>(null);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
-  const [slots, setSlots] = useState<TimeSlot[]>([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [notes, setNotes] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [giftCardCode, setGiftCardCode] = useState("");
-  const [giftCardApplied, setGiftCardApplied] = useState<{
-    code: string;
-    balanceXPF: number;
-  } | null>(null);
-  const [checkingGiftCard, setCheckingGiftCard] = useState(false);
+  const [state, dispatch] = useReducer(bookingReducer, {
+    step: 1,
+    merchant: null,
+    selectedService: null,
+    selectedDate: "",
+    selectedSlot: null,
+    slots: [],
+    loadingSlots: false,
+    notes: "",
+    loading: true,
+    giftCardCode: "",
+    giftCardApplied: null,
+    checkingGiftCard: false,
+  });
+
+  const [isPending, startTransition] = useTransition();
+  const [optimisticSlot, setOptimisticSlot] = useOptimistic(state.selectedSlot);
 
   // Fetch merchant info
   useEffect(() => {
     fetch(`/api/merchants/${merchantId}`)
       .then((r) => r.json())
       .then((data) => {
-        setMerchant(data);
+        dispatch({ type: "SET_MERCHANT", merchant: data });
         // Auto-select service if passed via URL query param
         if (preselectedServiceId && data?.services) {
           const service = data.services.find((s: Service) => s.id === preselectedServiceId);
           if (service) {
-            setSelectedService(service);
-            setStep(2);
+            dispatch({ type: "SELECT_SERVICE", service });
+            dispatch({ type: "SET_STEP", step: 2 });
           }
         }
-        setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => dispatch({ type: "SET_LOADING", loading: false }));
   }, [merchantId, preselectedServiceId]);
 
   // Fetch available slots when date changes
   useEffect(() => {
-    if (!selectedDate || !selectedService) return;
-    setLoadingSlots(true);
-    setSelectedSlot(null);
+    if (!state.selectedDate || !state.selectedService) return;
+    dispatch({ type: "SET_LOADING_SLOTS", loading: true });
+    dispatch({ type: "SELECT_SLOT", slot: null });
     fetch(
-      `/api/merchants/${merchantId}/availability?date=${selectedDate}&serviceId=${selectedService.id}`
+      `/api/merchants/${merchantId}/availability?date=${state.selectedDate}&serviceId=${state.selectedService.id}`
     )
       .then((r) => r.json())
       .then((data) => {
-        setSlots(data.slots || []);
-        setLoadingSlots(false);
+        dispatch({ type: "SET_SLOTS", slots: data.slots || [] });
       })
-      .catch(() => setLoadingSlots(false));
-  }, [selectedDate, selectedService, merchantId]);
+      .catch(() => {
+        dispatch({ type: "SET_SLOTS", slots: [] });
+      });
+  }, [state.selectedDate, state.selectedService, merchantId]);
 
   // Generate next 30 days
   const dates = Array.from({ length: 30 }, (_, i) => {
@@ -124,48 +188,49 @@ export default function BookingPage() {
     return d.toISOString().split("T")[0];
   });
 
-  async function handleApplyGiftCard() {
-    if (!giftCardCode.trim()) return;
-    setCheckingGiftCard(true);
-    try {
-      const res = await fetch(`/api/gift-cards?code=${encodeURIComponent(giftCardCode)}&merchantId=${merchantId}`);
-      const data = await res.json();
-      if (res.ok && data.balanceXPF > 0) {
-        setGiftCardApplied({ code: data.code, balanceXPF: data.balanceXPF });
-        toast.success(`Carte cadeau appliquée : ${data.balanceXPF.toLocaleString()} F CFP`);
-      } else {
-        toast.error(data.error || "Carte cadeau invalide");
+  function handleApplyGiftCard() {
+    if (!state.giftCardCode.trim()) return;
+    startTransition(async () => {
+      dispatch({ type: "SET_CHECKING_GIFT_CARD", checking: true });
+      try {
+        const res = await fetch(`/api/gift-cards?code=${encodeURIComponent(state.giftCardCode)}&merchantId=${merchantId}`);
+        const data = await res.json();
+        if (res.ok && data.balanceXPF > 0) {
+          dispatch({ type: "APPLY_GIFT_CARD", data: { code: data.code, balanceXPF: data.balanceXPF } });
+          toast.success(`Carte cadeau appliquée : ${data.balanceXPF.toLocaleString()} F CFP`);
+        } else {
+          toast.error(data.error || "Carte cadeau invalide");
+        }
+      } catch {
+        toast.error("Erreur de vérification");
       }
-    } catch {
-      toast.error("Erreur de vérification");
-    }
-    setCheckingGiftCard(false);
-  }
-
-  async function handleConfirm() {
-    if (!selectedService || !selectedSlot || !selectedDate) return;
-    setSubmitting(true);
-
-    const result = await createBooking({
-      merchantId,
-      serviceId: selectedService.id,
-      date: selectedDate,
-      startTime: selectedSlot.startTime,
-      endTime: selectedSlot.endTime,
-      notes: notes || undefined,
-      giftCardCode: giftCardApplied?.code || undefined,
+      dispatch({ type: "SET_CHECKING_GIFT_CARD", checking: false });
     });
-
-    if (result.error) {
-      toast.error(result.error);
-      setSubmitting(false);
-    } else if (result.bookingId) {
-      toast.success("Rendez-vous confirmé !");
-      router.push(`/booking/confirmation/${result.bookingId}`);
-    }
   }
 
-  if (loading) {
+  function handleConfirm() {
+    if (!state.selectedService || !state.selectedSlot || !state.selectedDate) return;
+    startTransition(async () => {
+      const result = await createBooking({
+        merchantId,
+        serviceId: state.selectedService!.id,
+        date: state.selectedDate,
+        startTime: state.selectedSlot!.startTime,
+        endTime: state.selectedSlot!.endTime,
+        notes: state.notes || undefined,
+        giftCardCode: state.giftCardApplied?.code || undefined,
+      });
+
+      if (result.error) {
+        toast.error(result.error);
+      } else if (result.bookingId) {
+        toast.success("Rendez-vous confirmé !");
+        router.push(`/booking/confirmation/${result.bookingId}`);
+      }
+    });
+  }
+
+  if (state.loading) {
     return (
       <div className="page-transition flex flex-col items-center justify-center py-24 gap-3">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 flex items-center justify-center">
@@ -176,7 +241,7 @@ export default function BookingPage() {
     );
   }
 
-  if (!merchant) {
+  if (!state.merchant) {
     return (
       <div className="page-transition flex flex-col items-center justify-center py-24 gap-3">
         <div className="w-16 h-16 rounded-2xl bg-[#FF6B6B]/10 flex items-center justify-center">
@@ -206,7 +271,7 @@ export default function BookingPage() {
           </button>
           <div className="flex-1 min-w-0">
             <h1 className="text-sm font-bold text-[#0C1B2A] dark:text-white truncate">
-              Réserver chez {merchant.businessName}
+              Réserver chez {state.merchant?.businessName}
             </h1>
           </div>
         </div>
@@ -217,8 +282,8 @@ export default function BookingPage() {
         <div className="flex items-center mb-8">
           {STEPS.map((s, i) => {
             const StepIcon = s.icon;
-            const isCompleted = i + 1 < step;
-            const isCurrent = i + 1 === step;
+            const isCompleted = i + 1 < state.step;
+            const isCurrent = i + 1 === state.step;
             return (
               <div key={s.label} className="flex items-center flex-1 last:flex-initial">
                 <div className="flex items-center gap-2.5">
@@ -272,7 +337,7 @@ export default function BookingPage() {
         </div>
 
         {/* Step 1: Select service */}
-        {step === 1 && (
+        {state.step === 1 && (
           <div className="animate-fade-in-up">
             <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white mb-1">
               Choisissez un service
@@ -281,13 +346,13 @@ export default function BookingPage() {
               Sélectionnez le service qui vous convient
             </p>
             <div className="space-y-3">
-              {merchant.services.map((service) => (
+              {state.merchant?.services.map((service) => (
                 <button
                   key={service.id}
-                  onClick={() => setSelectedService(service)}
+                  onClick={() => dispatch({ type: "SELECT_SERVICE", service })}
                   className={cn(
                     "card-hover w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 bg-white dark:bg-gray-900",
-                    selectedService?.id === service.id
+                    state.selectedService?.id === service.id
                       ? "border-[#0066FF] bg-[#0066FF]/[0.03] shadow-lg shadow-blue-500/10"
                       : "border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-md"
                   )}
@@ -298,7 +363,7 @@ export default function BookingPage() {
                         <h3 className="font-semibold text-[#0C1B2A] dark:text-white">
                           {service.name}
                         </h3>
-                        {selectedService?.id === service.id && (
+                        {state.selectedService?.id === service.id && (
                           <div className="w-5 h-5 rounded-full bg-[#0066FF] flex items-center justify-center">
                             <Check className="h-3 w-3 text-white" />
                           </div>
@@ -314,10 +379,10 @@ export default function BookingPage() {
                           <Clock className="h-3 w-3" />
                           {formatDuration(service.duration)}
                         </span>
-                        {(!merchant.sector ? false : !isMedicalSectorClient(merchant.sector.slug)) && (service.xpAmount ?? merchant.xpPerBooking) > 0 && (
+                        {state.merchant && (!state.merchant.sector ? false : !isMedicalSectorClient(state.merchant.sector.slug)) && (service.xpAmount ?? state.merchant.xpPerBooking) > 0 && (
                           <span className="inline-flex items-center gap-1 text-xs font-medium text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full">
                             <Star className="h-3 w-3 text-yellow-500" />
-                            +{service.xpAmount ?? merchant.xpPerBooking} XP
+                            +{service.xpAmount ?? state.merchant.xpPerBooking} XP
                           </span>
                         )}
                       </div>
@@ -325,7 +390,7 @@ export default function BookingPage() {
                     <div className="shrink-0">
                       <span className={cn(
                         "text-lg font-bold",
-                        selectedService?.id === service.id ? "text-[#0066FF]" : "text-[#0C1B2A] dark:text-white"
+                        state.selectedService?.id === service.id ? "text-[#0066FF]" : "text-[#0C1B2A] dark:text-white"
                       )}>
                         {formatPrice(service.price)}
                       </span>
@@ -337,8 +402,8 @@ export default function BookingPage() {
             <div className="mt-8 flex justify-end">
               <Button
                 variant="gradient"
-                onClick={() => setStep(2)}
-                disabled={!selectedService}
+                onClick={() => dispatch({ type: "SET_STEP", step: 2 })}
+                disabled={!state.selectedService}
                 size="lg"
               >
                 Continuer
@@ -349,16 +414,16 @@ export default function BookingPage() {
         )}
 
         {/* Step 2: Date & Time */}
-        {step === 2 && (
+        {state.step === 2 && (
           <div className="animate-fade-in-up">
             <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white mb-1">
               Choisissez une date et un créneau
             </h2>
             <p className="text-sm text-gray-400 mb-5">
-              {selectedService && (
+              {state.selectedService && (
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#0066FF]" />
-                  {selectedService.name} - {formatDuration(selectedService.duration)}
+                  {state.selectedService.name} - {formatDuration(state.selectedService.duration)}
                 </span>
               )}
             </p>
@@ -379,12 +444,12 @@ export default function BookingPage() {
                   const monthName = d.toLocaleDateString("fr-FR", {
                     month: "short",
                   });
-                  const isSelected = selectedDate === date;
+                  const isSelected = state.selectedDate === date;
                   const isToday = false; // Tomorrow at minimum
                   return (
                     <button
                       key={date}
-                      onClick={() => setSelectedDate(date)}
+                      onClick={() => dispatch({ type: "SELECT_DATE", date })}
                       className={cn(
                         "flex flex-col items-center min-w-[72px] px-3 py-3 rounded-2xl border-2 text-sm transition-all duration-200 shrink-0",
                         isSelected
@@ -417,26 +482,31 @@ export default function BookingPage() {
             </div>
 
             {/* Time slots */}
-            {selectedDate && (
+            {state.selectedDate && (
               <div className="animate-fade-in">
                 <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] dark:text-white mb-3">
                   <Clock className="h-4 w-4 text-[#00B4D8]" />
                   Creneau horaire
                 </label>
-                {loadingSlots ? (
+                {state.loadingSlots ? (
                   <div className="flex flex-col items-center justify-center py-10 gap-2">
                     <Spinner className="h-6 w-6" />
                     <p className="text-xs text-gray-400">Recherche des créneaux...</p>
                   </div>
-                ) : slots.length > 0 ? (
+                ) : state.slots.length > 0 ? (
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                    {slots.map((slot) => (
+                    {state.slots.map((slot) => (
                       <button
                         key={slot.startTime}
-                        onClick={() => setSelectedSlot(slot)}
+                        onClick={() => {
+                          startTransition(() => {
+                            setOptimisticSlot(slot);
+                            dispatch({ type: "SELECT_SLOT", slot });
+                          });
+                        }}
                         className={cn(
                           "py-3 px-3 rounded-xl border-2 text-sm font-semibold transition-all duration-200",
-                          selectedSlot?.startTime === slot.startTime
+                          optimisticSlot?.startTime === slot.startTime
                             ? "border-[#0066FF] bg-gradient-to-b from-[#0066FF] to-[#0052CC] text-white shadow-lg shadow-blue-500/25"
                             : "border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 text-[#0C1B2A] dark:text-white hover:border-[#0066FF]/30 hover:shadow-md"
                         )}
@@ -457,13 +527,13 @@ export default function BookingPage() {
             )}
 
             <div className="mt-8 flex justify-between">
-              <Button variant="outline" onClick={() => setStep(1)}>
+              <Button variant="outline" onClick={() => dispatch({ type: "SET_STEP", step: 1 })}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Retour
               </Button>
               <Button
                 variant="gradient"
-                onClick={() => setStep(3)}
-                disabled={!selectedSlot}
+                onClick={() => dispatch({ type: "SET_STEP", step: 3 })}
+                disabled={!optimisticSlot}
                 size="lg"
               >
                 Continuer
@@ -474,7 +544,7 @@ export default function BookingPage() {
         )}
 
         {/* Step 3: Confirmation */}
-        {step === 3 && selectedService && selectedSlot && (
+        {state.step === 3 && state.selectedService && optimisticSlot && (
           <div className="animate-fade-in-up">
             <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white mb-1">
               Confirmez votre rendez-vous
@@ -489,11 +559,11 @@ export default function BookingPage() {
               <div className="bg-gradient-to-r from-[#0066FF]/5 to-[#00B4D8]/5 dark:from-[#0066FF]/10 dark:to-[#00B4D8]/10 px-5 py-4 border-b border-gray-50 dark:border-gray-800">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white font-bold text-sm">
-                    {merchant.businessName[0]}
+                    {state.merchant?.businessName?.[0]}
                   </div>
                   <div>
                     <h3 className="font-bold text-[#0C1B2A] dark:text-white text-sm">
-                      {merchant.businessName}
+                      {state.merchant?.businessName}
                     </h3>
                     <p className="text-xs text-gray-400">Récapitulatif</p>
                   </div>
@@ -508,7 +578,7 @@ export default function BookingPage() {
                     Service
                   </span>
                   <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
-                    {selectedService.name}
+                    {state.selectedService.name}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -517,7 +587,7 @@ export default function BookingPage() {
                     Date
                   </span>
                   <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
-                    {formatDate(selectedDate)}
+                    {formatDate(state.selectedDate)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -526,7 +596,7 @@ export default function BookingPage() {
                     Heure
                   </span>
                   <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
-                    {formatTime(selectedSlot.startTime)} - {formatTime(selectedSlot.endTime)}
+                    {formatTime(optimisticSlot.startTime)} - {formatTime(optimisticSlot.endTime)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -535,7 +605,7 @@ export default function BookingPage() {
                     Durée
                   </span>
                   <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
-                    {formatDuration(selectedService.duration)}
+                    {formatDuration(state.selectedService.duration)}
                   </span>
                 </div>
 
@@ -543,19 +613,19 @@ export default function BookingPage() {
                 <div className="border-t border-dashed border-gray-200 dark:border-gray-700 pt-4 flex items-center justify-between">
                   <span className="font-bold text-[#0C1B2A] dark:text-white">Total</span>
                   <span className="text-2xl font-black bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent">
-                    {formatPrice(selectedService.price)}
+                    {formatPrice(state.selectedService.price)}
                   </span>
                 </div>
 
                 {/* XP Bonus */}
-                {(!merchant.sector ? false : !isMedicalSectorClient(merchant.sector.slug)) && (selectedService.xpAmount ?? merchant.xpPerBooking) > 0 && (
+                {(!state.merchant?.sector ? false : !isMedicalSectorClient(state.merchant.sector.slug)) && (state.selectedService.xpAmount ?? state.merchant?.xpPerBooking) > 0 && (
                   <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl px-4 py-3 flex items-center justify-between border border-yellow-100">
                     <span className="flex items-center gap-2 text-sm font-medium text-yellow-800">
                       <Star className="h-4 w-4 text-yellow-500" />
                       Points fidélité
                     </span>
                     <span className="font-bold text-yellow-700">
-                      +{selectedService.xpAmount ?? merchant.xpPerBooking} XP
+                      +{state.selectedService.xpAmount ?? state.merchant?.xpPerBooking} XP
                     </span>
                   </div>
                 )}
@@ -563,27 +633,24 @@ export default function BookingPage() {
             </div>
 
             {/* Gift Card */}
-            {(!merchant.sector ? false : !isMedicalSectorClient(merchant.sector.slug)) && (
+            {(!state.merchant?.sector ? false : !isMedicalSectorClient(state.merchant.sector.slug)) && (
               <div className="mb-6">
                 <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2">
                   <Gift className="h-4 w-4 text-[#0066FF]" />
                   Carte cadeau (optionnel)
                 </label>
-                {giftCardApplied ? (
+                {state.giftCardApplied ? (
                   <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl px-4 py-3 flex items-center justify-between border border-green-200">
                     <div>
                       <p className="text-sm font-semibold text-green-800">
-                        Carte {giftCardApplied.code}
+                        Carte {state.giftCardApplied.code}
                       </p>
                       <p className="text-xs text-green-600">
-                        Solde : {giftCardApplied.balanceXPF.toLocaleString()} F CFP
+                        Solde : {state.giftCardApplied.balanceXPF.toLocaleString()} F CFP
                       </p>
                     </div>
                     <button
-                      onClick={() => {
-                        setGiftCardApplied(null);
-                        setGiftCardCode("");
-                      }}
+                      onClick={() => dispatch({ type: "REMOVE_GIFT_CARD" })}
                       className="p-1.5 rounded-lg hover:bg-green-100 text-green-600 transition-colors"
                     >
                       <X className="h-4 w-4" />
@@ -594,17 +661,17 @@ export default function BookingPage() {
                     <input
                       type="text"
                       placeholder="Ex: BE-ABCD-1234-EFGH"
-                      value={giftCardCode}
-                      onChange={(e) => setGiftCardCode(e.target.value.toUpperCase())}
+                      value={state.giftCardCode}
+                      onChange={(e) => dispatch({ type: "SET_GIFT_CARD_CODE", code: e.target.value.toUpperCase() })}
                       className="flex-1 rounded-xl border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-mono tracking-wider text-[#0C1B2A] dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-500 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 transition-all"
                     />
                     <button
                       type="button"
                       onClick={handleApplyGiftCard}
-                      disabled={!giftCardCode.trim() || checkingGiftCard}
+                      disabled={!state.giftCardCode.trim() || state.checkingGiftCard}
                       className="px-4 py-2.5 rounded-xl bg-[#0066FF]/10 text-[#0066FF] font-semibold text-sm hover:bg-[#0066FF]/20 transition-colors disabled:opacity-50"
                     >
-                      {checkingGiftCard ? "..." : "Appliquer"}
+                      {state.checkingGiftCard ? "..." : "Appliquer"}
                     </button>
                   </div>
                 )}
@@ -622,8 +689,8 @@ export default function BookingPage() {
               </label>
               <textarea
                 id="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
+                value={state.notes}
+                onChange={(e) => dispatch({ type: "SET_NOTES", notes: e.target.value })}
                 placeholder="Des précisions pour votre rendez-vous..."
                 className="w-full rounded-2xl border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-[#0C1B2A] dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-500 focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 resize-none transition-all"
                 rows={3}
@@ -631,13 +698,13 @@ export default function BookingPage() {
             </div>
 
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setStep(2)}>
+              <Button variant="outline" onClick={() => dispatch({ type: "SET_STEP", step: 2 })}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Retour
               </Button>
               <Button
                 variant="gradient"
                 onClick={handleConfirm}
-                loading={submitting}
+                loading={isPending}
                 size="lg"
               >
                 <Check className="h-4 w-4 mr-1.5" />
