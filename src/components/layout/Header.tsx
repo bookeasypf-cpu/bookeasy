@@ -145,11 +145,17 @@ export function Header() {
                   onClick={() => setProfileOpen(!profileOpen)}
                   className="flex items-center gap-2 text-sm font-medium text-[#0C1B2A]/70 dark:text-gray-300 hover:text-[#0066FF] transition-colors rounded-full py-1 pl-1 pr-2"
                 >
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-xs font-semibold shrink-0">
-                    {session.user.name
-                      ? session.user.name.charAt(0).toUpperCase()
-                      : "U"}
-                  </div>
+                  {session.user.image ? (
+                    <div className="h-8 w-8 rounded-full overflow-hidden shadow-md flex-shrink-0">
+                      <img src={session.user.image} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-xs font-semibold shrink-0">
+                      {session.user.name
+                        ? session.user.name.charAt(0).toUpperCase()
+                        : "U"}
+                    </div>
+                  )}
                   <span className="max-w-[100px] truncate hidden lg:inline">
                     {session.user.name || "Profil"}
                   </span>
@@ -169,9 +175,16 @@ export function Header() {
                     />
                     <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1.5 z-50 animate-scale-in origin-top-right">
                       <div className="px-3.5 py-2.5 border-b border-gray-100 dark:border-gray-700">
-                        <p className="text-sm font-semibold text-[#0C1B2A] dark:text-white truncate">
-                          {session.user.name || "Utilisateur"}
-                        </p>
+                        <div className="flex items-center gap-2 w-full">
+                          {session.user.image && (
+                            <div className="h-6 w-6 rounded-full overflow-hidden flex-shrink-0">
+                              <img src={session.user.image} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
+                            </div>
+                          )}
+                          <p className="text-sm font-semibold text-[#0C1B2A] dark:text-white truncate">
+                            {session.user.name || "Utilisateur"}
+                          </p>
+                        </div>
                         <p className="text-xs text-[#0C1B2A]/50 dark:text-gray-400 truncate">
                           {session.user.email}
                         </p>
