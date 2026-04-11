@@ -134,7 +134,7 @@ export default function ProfilePage() {
                 registrations.forEach((reg) => reg.unregister());
               });
             }
-            window.location.reload(true);
+            window.location.reload();
           }, 800);
         } else {
           toast.error("Erreur de sauvegarde");
