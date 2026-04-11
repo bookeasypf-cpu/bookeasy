@@ -111,13 +111,22 @@ export default function ProfilePage() {
           setForm(updatedForm);
           toast.success("Photo mise à jour !");
 
-          // Reload page after delay to sync session across the app
-          // Add timestamp to force cache bust both in browser and NextAuth
+          // Update NextAuth session with fresh data, then reload
+          try {
+            await update({
+              name: savedData.name,
+              image: savedData.image,
+              email: savedData.email,
+              role: savedData.role,
+            });
+          } catch (err) {
+            console.error("Session update error:", err);
+          }
+
+          // Reload page after delay to ensure session is updated across all components
           setTimeout(() => {
-            const url = new URL(window.location.href);
-            url.searchParams.set("_refresh", Date.now().toString());
-            window.location.href = url.toString();
-          }, 800);
+            window.location.reload();
+          }, 500);
         } else {
           toast.error("Erreur de sauvegarde");
         }
