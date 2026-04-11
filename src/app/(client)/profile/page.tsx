@@ -8,6 +8,45 @@ import { User, Mail, Phone, Pencil, Check, X, Upload, Image as ImageIcon } from 
 import Image from "next/image";
 import toast from "react-hot-toast";
 
+// Compress image before upload
+async function compressImage(file: File): Promise<Blob> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = document.createElement("img") as HTMLImageElement;
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        // Resize if too large (max 2000px)
+        if (width > 2000 || height > 2000) {
+          const ratio = Math.min(2000 / width, 2000 / height);
+          width = Math.floor(width * ratio);
+          height = Math.floor(height * ratio);
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Compress to JPEG with 0.7 quality
+        canvas.toBlob(
+          (blob) => {
+            resolve(blob || file);
+          },
+          "image/jpeg",
+          0.7
+        );
+      };
+    };
+  });
+}
+
 interface UserProfile {
   id: string;
   name: string | null;
@@ -73,10 +112,10 @@ export default function ProfilePage() {
       return;
     }
 
-    // Check file size (max 10 MB)
-    const MAX_SIZE = 10 * 1024 * 1024;
-    if (file.size > MAX_SIZE) {
-      toast.error(`L'image est trop grosse (${(file.size / 1024 / 1024).toFixed(1)} MB). Max: 10 MB`);
+    // Check original file size (will be compressed)
+    const MAX_ORIGINAL_SIZE = 20 * 1024 * 1024; // 20 MB original, will be compressed
+    if (file.size > MAX_ORIGINAL_SIZE) {
+      toast.error(`L'image est trop grosse (${(file.size / 1024 / 1024).toFixed(1)} MB). Max: 20 MB`);
       return;
     }
 
@@ -91,9 +130,20 @@ export default function ProfilePage() {
     // Start upload
     setUploading(true);
     try {
+      console.log("1. Original file size:", (file.size / 1024 / 1024).toFixed(2), "MB");
+
+      // Compress image
+      console.log("1b. Compressing image...");
+      const compressedBlob = await compressImage(file);
+      console.log("1c. Compressed file size:", (compressedBlob.size / 1024 / 1024).toFixed(2), "MB");
+
+      const compressedFile = new File([compressedBlob], file.name, {
+        type: "image/jpeg",
+      });
+
       const formData = new FormData();
-      formData.append("file", file);
-      console.log("1. Uploading file...", file.name, file.size, file.type);
+      formData.append("file", compressedFile);
+      console.log("1d. Ready to upload:", compressedFile.name, compressedFile.size);
 
       console.log("2. Starting fetch to /api/upload");
       const res = await fetch("/api/upload", {
