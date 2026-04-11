@@ -111,22 +111,31 @@ export default function ProfilePage() {
           setForm(updatedForm);
           toast.success("Photo mise à jour !");
 
-          // Update NextAuth session with fresh data, then reload
+          // Wait a bit for database write to fully commit before updating session
+          await new Promise((resolve) => setTimeout(resolve, 300));
+
+          // Update NextAuth session with fresh data
           try {
-            await update({
+            const updateResult = await update({
               name: savedData.name,
               image: savedData.image,
               email: savedData.email,
               role: savedData.role,
             });
+            console.log("Session updated:", updateResult);
           } catch (err) {
             console.error("Session update error:", err);
           }
 
-          // Reload page after delay to ensure session is updated across all components
+          // Reload page with full cache invalidation to ensure service worker fetches fresh
           setTimeout(() => {
-            window.location.reload();
-          }, 500);
+            if ("serviceWorker" in navigator) {
+              navigator.serviceWorker.getRegistrations().then((registrations) => {
+                registrations.forEach((reg) => reg.unregister());
+              });
+            }
+            window.location.reload(true);
+          }, 800);
         } else {
           toast.error("Erreur de sauvegarde");
         }
