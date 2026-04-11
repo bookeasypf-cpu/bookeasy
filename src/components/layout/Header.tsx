@@ -372,11 +372,17 @@ export function Header() {
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#0C1B2A]/70 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
-                  <div className="h-7 w-7 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-[10px] font-semibold">
-                    {session.user.name
-                      ? session.user.name.charAt(0).toUpperCase()
-                      : "U"}
-                  </div>
+                  {session.user.image ? (
+                    <div className="h-7 w-7 rounded-full overflow-hidden shadow-md flex-shrink-0">
+                      <img src={session.user.image} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="h-7 w-7 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-[10px] font-semibold">
+                      {session.user.name
+                        ? session.user.name.charAt(0).toUpperCase()
+                        : "U"}
+                    </div>
+                  )}
                   {session.user.name || "Mon profil"}
                 </Link>
 
