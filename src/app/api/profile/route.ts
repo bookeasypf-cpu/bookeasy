@@ -11,7 +11,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, name: true, email: true, phone: true, role: true },
+      select: { id: true, name: true, email: true, phone: true, role: true, image: true },
     });
 
     if (!user) {
@@ -32,7 +32,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { name, phone } = body;
+    const { name, phone, image } = body;
 
     if (!name || name.trim().length < 2) {
       return NextResponse.json(
@@ -46,8 +46,9 @@ export async function PUT(request: Request) {
       data: {
         name: name.trim(),
         phone: phone?.trim() || null,
+        image: image || null,
       },
-      select: { id: true, name: true, email: true, phone: true, role: true },
+      select: { id: true, name: true, email: true, phone: true, role: true, image: true },
     });
 
     return NextResponse.json(updatedUser);
