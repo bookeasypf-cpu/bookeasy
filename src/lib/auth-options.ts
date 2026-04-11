@@ -119,6 +119,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.image = user.image;
         token.role = (user as { role: string }).role || "CLIENT";
       }
       return token;
@@ -127,6 +128,22 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
+        
+        // Always fetch latest image from database in case it was updated
+        if (token.id) {
+          try {
+            const dbUser = await prisma.user.findUnique({
+              where: { id: token.id as string },
+              select: { image: true, name: true },
+            });
+            if (dbUser) {
+              session.user.image = dbUser.image || undefined;
+              session.user.name = dbUser.name || session.user.name;
+            }
+          } catch (error) {
+            console.error("Error fetching user image:", error);
+          }
+        }
       }
       return session;
     },

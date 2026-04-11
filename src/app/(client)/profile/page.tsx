@@ -112,6 +112,10 @@ export default function ProfilePage() {
           // Keep preview visible - will be cleared when user exits edit mode
           toast.success("Photo mise à jour !");
           await update({ name: savedData.name, image: savedData.image });
+          // Refresh session to update header and other components
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
         } else {
           toast.error("Erreur de sauvegarde");
         }
