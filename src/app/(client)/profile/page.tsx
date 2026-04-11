@@ -111,10 +111,12 @@ export default function ProfilePage() {
           setForm(updatedForm);
           // Keep preview visible - will be cleared when user exits edit mode
           toast.success("Photo mise à jour !");
-          // Update session and refresh to show changes everywhere
+          // Update session
           await update({ name: savedData.name, image: savedData.image });
-          // Soft refresh to update Header with new image from session
-          router.refresh();
+          // Reload after brief delay to sync session throughout the app
+          setTimeout(() => {
+            window.location.href = window.location.href;
+          }, 600);
         } else {
           toast.error("Erreur de sauvegarde");
         }
