@@ -139,9 +139,6 @@ export const authOptions: NextAuthOptions = {
             if (dbUser) {
               session.user.image = dbUser.image || undefined;
               session.user.name = dbUser.name || session.user.name;
-              if (dbUser.image) {
-                console.log("Session callback: Found image for user", token.id, dbUser.image.substring(0, 50));
-              }
             }
           } catch (error) {
             console.error("Session callback error fetching user:", error);

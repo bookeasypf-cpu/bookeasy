@@ -51,16 +51,8 @@ export async function PUT(request: Request) {
       select: { id: true, name: true, email: true, phone: true, role: true, image: true },
     });
 
-    // Debug logging
-    console.log("Profile updated:", {
-      userId: session.user.id,
-      image: updatedUser.image,
-      timestamp: new Date().toISOString(),
-    });
-
     return NextResponse.json(updatedUser);
-  } catch (error) {
-    console.error("Profile PUT error:", error);
+  } catch {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

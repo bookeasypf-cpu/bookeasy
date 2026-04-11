@@ -130,51 +130,38 @@ export default function ProfilePage() {
     // Start upload
     setUploading(true);
     try {
-      console.log("1. Original file size:", (file.size / 1024 / 1024).toFixed(2), "MB");
-
-      // Compress image
-      console.log("1b. Compressing image...");
+      // Compress image before uploading
       const compressedBlob = await compressImage(file);
-      console.log("1c. Compressed file size:", (compressedBlob.size / 1024 / 1024).toFixed(2), "MB");
-
       const compressedFile = new File([compressedBlob], file.name, {
         type: "image/jpeg",
       });
 
       const formData = new FormData();
       formData.append("file", compressedFile);
-      console.log("1d. Ready to upload:", compressedFile.name, compressedFile.size);
 
-      console.log("2. Starting fetch to /api/upload");
+      // Upload to Vercel Blob
       const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
-      console.log("3. Fetch completed, status:", res.status, res.ok);
 
-      console.log("4. Parsing JSON response...");
       let data;
       try {
         data = await res.json();
       } catch (e) {
-        console.error("Failed to parse JSON response:", e);
         data = { error: `Erreur serveur (${res.status})` };
       }
-      console.log("5. JSON parsed:", data);
 
       if (!res.ok) {
-        console.error("Upload failed:", res.status, data);
         toast.error(data.error || `Erreur d'upload (${res.status})`);
         setLocalImagePreview(null);
         setUploading(false);
         return;
       }
 
-      console.log("6. Upload successful, URL:", data.url);
       const imageUrl = data.url;
 
-      // Auto-save to profile immediately after upload
-      console.log("Saving to profile...");
+      // Auto-save to profile
       const saveRes = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -188,14 +175,12 @@ export default function ProfilePage() {
       const savedData = await saveRes.json();
 
       if (!saveRes.ok) {
-        console.error("Profile save failed:", saveRes.status, savedData);
         toast.error("Erreur de sauvegarde");
         setLocalImagePreview(null);
         setUploading(false);
         return;
       }
 
-      console.log("Profile saved successfully:", savedData);
       setProfile(savedData);
       setForm({ ...form, image: savedData.image });
       setLocalImagePreview(null);
@@ -205,7 +190,6 @@ export default function ProfilePage() {
       await new Promise((resolve) => setTimeout(resolve, 500));
       window.location.href = window.location.pathname;
     } catch (error) {
-      console.error("Upload/save error:", error);
       toast.error("Erreur de connexion");
       setLocalImagePreview(null);
       setUploading(false);
