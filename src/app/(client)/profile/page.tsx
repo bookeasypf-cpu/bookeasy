@@ -112,10 +112,11 @@ export default function ProfilePage() {
           toast.success("Photo mise à jour !");
 
           // Reload page after delay to sync session across the app
-          // The session callback will automatically fetch fresh image from database
+          // Add timestamp to force cache bust both in browser and NextAuth
           setTimeout(() => {
-            // Use replace to skip adding to history
-            window.location.replace(window.location.href);
+            const url = new URL(window.location.href);
+            url.searchParams.set("_refresh", Date.now().toString());
+            window.location.href = url.toString();
           }, 800);
         } else {
           toast.error("Erreur de sauvegarde");
