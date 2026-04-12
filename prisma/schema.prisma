@@ -30,6 +30,7 @@ model User {
   notifications Notification[]
   referralCode      String?        @unique
   xpTransactions XpTransaction[]
+  xpRedemptions XpRedemption[]
   pushSubscriptions PushSubscription[]
   favorites         Favorite[]
   referralsSent     Referral[]     @relation("ReferralsSent")
@@ -335,6 +336,7 @@ model XpRedemption {
   createdAt DateTime @default(now())
 
   reward XpReward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([code])

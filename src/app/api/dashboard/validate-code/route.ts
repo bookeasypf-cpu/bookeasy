@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendPushNotification } from "@/lib/push";
 
 async function getMerchant(userId: string) {
   return prisma.merchant.findUnique({ where: { userId } });
@@ -74,6 +75,26 @@ export async function POST(request: Request) {
       },
     });
 
+    // Notify client: their reward has been validated
+    await prisma.notification.create({
+      data: {
+        userId: redemption.userId,
+        type: "XP_VALIDATED",
+        title: "Récompense validée !",
+        message: `Votre récompense "${redemption.reward.name}" a été utilisée avec succès.`,
+        metadata: JSON.stringify({
+          code: redemption.code,
+          rewardId: redemption.rewardId,
+        }),
+      },
+    }).catch(() => {});
+
+    sendPushNotification(redemption.userId, {
+      title: "Récompense validée !",
+      body: `Votre ${redemption.reward.name} a été appliqué.`,
+      url: "/my-rewards",
+    }).catch(() => {});
+
     return NextResponse.json({
       success: true,
       reward: redemption.reward.name,
@@ -111,7 +132,22 @@ export async function GET(request: NextRequest) {
       take: 50,
     });
 
-    return NextResponse.json(redemptions);
+    // Fetch client names to avoid N+1 query
+    const clientIds = [...new Set(redemptions.map((r) => r.userId))];
+    const users = await prisma.user.findMany({
+      where: { id: { in: clientIds } },
+      select: { id: true, name: true },
+    });
+
+    const userMap = new Map(users.map((u) => [u.id, u.name]));
+
+    // Enrich redemptions with client names
+    const enrichedRedemptions = redemptions.map((r) => ({
+      ...r,
+      clientName: userMap.get(r.userId) || "Client inconnu",
+    }));
+
+    return NextResponse.json(enrichedRedemptions);
   } catch {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }

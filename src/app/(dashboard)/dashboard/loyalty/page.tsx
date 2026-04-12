@@ -74,18 +74,21 @@ export default function DashboardLoyaltyPage() {
   }, []);
 
   async function fetchData() {
-    const [rewardsRes, settingsRes] = await Promise.all([
+    const [rewardsRes, settingsRes, pendingRes] = await Promise.all([
       fetch("/api/dashboard/xp-rewards"),
       fetch("/api/dashboard/xp-settings"),
+      fetch("/api/dashboard/validate-code?status=ACTIVE"),
     ]);
     const rewardsData = await rewardsRes.json();
     const settingsData = await settingsRes.json();
+    const pendingData = await pendingRes.json();
 
     if (Array.isArray(rewardsData)) setRewards(rewardsData);
     if (settingsData.xpPerBooking !== undefined) {
       setSettings(settingsData);
       setXpPerBooking(String(settingsData.xpPerBooking));
     }
+    if (Array.isArray(pendingData)) setPendingRedemptions(pendingData);
     setLoading(false);
   }
 
@@ -201,6 +204,7 @@ export default function DashboardLoyaltyPage() {
     reward?: string;
     error?: string;
   } | null>(null);
+  const [pendingRedemptions, setPendingRedemptions] = useState<any[]>([]);
 
   async function handleValidateCode(e: React.FormEvent) {
     e.preventDefault();
@@ -219,6 +223,10 @@ export default function DashboardLoyaltyPage() {
       setValidationResult({ success: true, reward: data.reward });
       toast.success("Code validé avec succès !");
       setCodeInput("");
+      // Remove the validated code from pending list
+      setPendingRedemptions((prev) =>
+        prev.filter((r) => r.code !== codeInput.trim().toUpperCase())
+      );
       fetchData();
     } else {
       setValidationResult({ success: false, error: data.error });
@@ -245,6 +253,8 @@ export default function DashboardLoyaltyPage() {
       setValidationResult({ success: true, reward: data.reward });
       toast.success("Code QR validé avec succès !");
       setCodeInput("");
+      // Remove the validated code from pending list
+      setPendingRedemptions((prev) => prev.filter((r) => r.code !== code));
       fetchData();
     } else {
       setValidationResult({ success: false, error: data.error });
@@ -391,6 +401,75 @@ export default function DashboardLoyaltyPage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Pending Redemptions */}
+      {pendingRedemptions.length > 0 && (
+        <Card className="rounded-2xl border-0 shadow-sm mb-6 animate-fade-in-up bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-800 border-l-4 border-emerald-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Gift className="h-5 w-5 text-emerald-500" />
+                <h3 className="font-semibold text-[#0C1B2A] dark:text-white">
+                  Récompenses en attente ({pendingRedemptions.length})
+                </h3>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {pendingRedemptions.map((redemption) => (
+                <div
+                  key={redemption.id}
+                  className="flex items-center justify-between p-3 bg-white dark:bg-gray-700/50 rounded-lg border border-emerald-200 dark:border-emerald-500/20"
+                >
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-[#0C1B2A] dark:text-white">
+                      {redemption.clientName}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {redemption.reward.name}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <code className="text-xs font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/20 px-2 py-1 rounded">
+                      {redemption.code}
+                    </code>
+                    <button
+                      onClick={async () => {
+                        setValidating(true);
+                        const res = await fetch("/api/dashboard/validate-code", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            code: redemption.code,
+                          }),
+                        });
+                        const data = await res.json();
+
+                        if (res.ok) {
+                          setValidationResult({
+                            success: true,
+                            reward: data.reward,
+                          });
+                          toast.success("Code validé avec succès !");
+                          setPendingRedemptions((prev) =>
+                            prev.filter((r) => r.code !== redemption.code)
+                          );
+                        } else {
+                          toast.error(data.error || "Erreur de validation");
+                        }
+                        setValidating(false);
+                      }}
+                      disabled={validating}
+                      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                    >
+                      Valider
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* QR Scanner Modal */}
       {showScanner && (

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendPushNotification } from "@/lib/push";
 import { randomBytes } from "crypto";
 
 // POST: Échanger des XP contre une récompense
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
     // Récupérer la récompense
     const reward = await prisma.xpReward.findUnique({
       where: { id: rewardId },
-      include: { merchant: { select: { id: true, businessName: true } } },
+      include: { merchant: { select: { id: true, userId: true, businessName: true } } },
     });
 
     if (!reward || !reward.isActive) {
@@ -85,6 +86,31 @@ export async function POST(request: Request) {
         data: { usedCount: { increment: 1 } },
       }),
     ]);
+
+    // Notify merchant: client wants to use reward
+    const clientName = session.user.name || "Un client";
+    const notificationMessage = `${clientName} veut utiliser ${reward.name} – Code: ${redemption.code}`;
+
+    await prisma.notification.create({
+      data: {
+        userId: reward.merchant.userId,
+        type: "XP_REDEEMED",
+        title: "Récompense demandée",
+        message: notificationMessage,
+        metadata: JSON.stringify({
+          code: redemption.code,
+          rewardId: reward.id,
+          clientId: session.user.id,
+          clientName,
+        }),
+      },
+    }).catch(() => {});
+
+    sendPushNotification(reward.merchant.userId, {
+      title: "Récompense demandée",
+      body: `${clientName} veut utiliser ${reward.name}`,
+      url: "/dashboard/loyalty",
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,
