@@ -27,6 +27,18 @@ export async function POST(req: NextRequest) {
     const ipnData = parseIPNData(body);
     console.log("📥 PayZen IPN reçu:", ipnData);
 
+    // Idempotency: skip if already processed
+    const eventId = `payzen-${ipnData.orderId}-${ipnData.transId}-${ipnData.transactionStatus}`;
+    const existing = await prisma.webhookEvent.findUnique({
+      where: { id: eventId },
+    });
+    if (existing) {
+      return new NextResponse("OK", { status: 200 });
+    }
+    await prisma.webhookEvent.create({
+      data: { id: eventId, source: "payzen" },
+    });
+
     // Traiter selon le type de transaction
     if (ipnData.type === "PRO_SUBSCRIPTION") {
       switch (ipnData.transactionStatus) {

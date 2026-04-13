@@ -24,7 +24,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  // Idempotency: skip if already processed
+  const existing = await prisma.webhookEvent.findUnique({
+    where: { id: event.id },
+  });
+  if (existing) {
+    return NextResponse.json({ received: true, duplicate: true });
+  }
+
   try {
+    await prisma.webhookEvent.create({
+      data: { id: event.id, source: "stripe" },
+    });
+
     switch (event.type) {
       // Abonnement créé ou paiement réussi → activer Pro
       case "checkout.session.completed": {

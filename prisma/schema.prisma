@@ -427,6 +427,19 @@ model PatientNote {
 }
 
 // ─────────────────────────────────────────────
+// WEBHOOK IDEMPOTENCY
+// ─────────────────────────────────────────────
+
+model WebhookEvent {
+  id        String   @id
+  source    String   // "stripe" or "payzen"
+  createdAt DateTime @default(now())
+
+  @@index([source])
+  @@map("webhook_events")
+}
+
+// ─────────────────────────────────────────────
 // REFERRALS / PARRAINAGE
 // ─────────────────────────────────────────────
 

@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { sendWelcomeEmail } from "./email";
 import { generateReferralCode } from "./referral";
+import { loginLimiter } from "./ratelimit";
 
 export const authOptions: NextAuthOptions = {
   // No PrismaAdapter — we handle OAuth user creation manually in signIn callback
@@ -20,6 +21,14 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           return null;
+        }
+
+        // Rate limit: 5 login attempts per 15 minutes per email
+        const { success } = await loginLimiter.limit(
+          `login-${credentials.email.toLowerCase()}`
+        );
+        if (!success) {
+          throw new Error("Trop de tentatives de connexion. Réessayez dans quelques minutes.");
         }
 
         const user = await prisma.user.findUnique({

@@ -1,3 +1,8 @@
+Loaded Prisma config from prisma.config.ts.
+
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
@@ -10,6 +15,7 @@ CREATE TABLE "users" (
     "role" TEXT NOT NULL DEFAULT 'CLIENT',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "referralCode" TEXT,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -72,10 +78,15 @@ CREATE TABLE "merchants" (
     "latitude" DOUBLE PRECISION,
     "longitude" DOUBLE PRECISION,
     "coverImage" TEXT,
+    "plan" TEXT NOT NULL DEFAULT 'FREE',
+    "stripeCustomerId" TEXT,
+    "stripeSubscriptionId" TEXT,
+    "planExpiresAt" TIMESTAMP(3),
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "sectorId" TEXT NOT NULL,
+    "xpPerBooking" INTEGER NOT NULL DEFAULT 10,
 
     CONSTRAINT "merchants_pkey" PRIMARY KEY ("id")
 );
@@ -101,6 +112,7 @@ CREATE TABLE "services" (
     "duration" INTEGER NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "currency" TEXT NOT NULL DEFAULT 'EUR',
+    "xpAmount" INTEGER,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -182,8 +194,133 @@ CREATE TABLE "notifications" (
     CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "xp_transactions" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "merchantId" TEXT,
+    "bookingId" TEXT,
+    "amount" INTEGER NOT NULL,
+    "type" TEXT NOT NULL,
+    "reason" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "xp_transactions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "xp_rewards" (
+    "id" TEXT NOT NULL,
+    "merchantId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "xpCost" INTEGER NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'DISCOUNT',
+    "value" DOUBLE PRECISION,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "maxUses" INTEGER,
+    "usedCount" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "xp_rewards_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "xp_redemptions" (
+    "id" TEXT NOT NULL,
+    "rewardId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "usedAt" TIMESTAMP(3),
+    "expiresAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "xp_redemptions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "gift_cards" (
+    "id" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "amount" DOUBLE PRECISION NOT NULL,
+    "balance" DOUBLE PRECISION NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'XPF',
+    "senderName" TEXT NOT NULL,
+    "senderEmail" TEXT NOT NULL,
+    "recipientName" TEXT NOT NULL,
+    "recipientEmail" TEXT NOT NULL,
+    "message" TEXT,
+    "merchantId" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "usedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "gift_cards_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "favorites" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "merchantId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "favorites_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "push_subscriptions" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "endpoint" TEXT NOT NULL,
+    "p256dh" TEXT NOT NULL,
+    "auth" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "push_subscriptions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "patient_notes" (
+    "id" TEXT NOT NULL,
+    "merchantId" TEXT NOT NULL,
+    "clientId" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "patient_notes_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "webhook_events" (
+    "id" TEXT NOT NULL,
+    "source" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "webhook_events_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "referrals" (
+    "id" TEXT NOT NULL,
+    "referrerId" TEXT NOT NULL,
+    "refereeId" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'REGISTERED',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "referrals_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_referralCode_key" ON "users"("referralCode");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "accounts_provider_providerAccountId_key" ON "accounts"("provider", "providerAccountId");
@@ -205,6 +342,9 @@ CREATE UNIQUE INDEX "sectors_slug_key" ON "sectors"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "merchants_userId_key" ON "merchants"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "merchants_stripeCustomerId_key" ON "merchants"("stripeCustomerId");
 
 -- CreateIndex
 CREATE INDEX "merchants_city_idx" ON "merchants"("city");
@@ -241,6 +381,57 @@ CREATE INDEX "reviews_merchantId_idx" ON "reviews"("merchantId");
 
 -- CreateIndex
 CREATE INDEX "notifications_userId_isRead_idx" ON "notifications"("userId", "isRead");
+
+-- CreateIndex
+CREATE INDEX "xp_transactions_userId_merchantId_idx" ON "xp_transactions"("userId", "merchantId");
+
+-- CreateIndex
+CREATE INDEX "xp_transactions_bookingId_idx" ON "xp_transactions"("bookingId");
+
+-- CreateIndex
+CREATE INDEX "xp_rewards_merchantId_isActive_idx" ON "xp_rewards"("merchantId", "isActive");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "xp_redemptions_code_key" ON "xp_redemptions"("code");
+
+-- CreateIndex
+CREATE INDEX "xp_redemptions_userId_idx" ON "xp_redemptions"("userId");
+
+-- CreateIndex
+CREATE INDEX "xp_redemptions_code_idx" ON "xp_redemptions"("code");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "gift_cards_code_key" ON "gift_cards"("code");
+
+-- CreateIndex
+CREATE INDEX "gift_cards_code_idx" ON "gift_cards"("code");
+
+-- CreateIndex
+CREATE INDEX "gift_cards_recipientEmail_idx" ON "gift_cards"("recipientEmail");
+
+-- CreateIndex
+CREATE INDEX "favorites_userId_idx" ON "favorites"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "favorites_userId_merchantId_key" ON "favorites"("userId", "merchantId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "push_subscriptions_endpoint_key" ON "push_subscriptions"("endpoint");
+
+-- CreateIndex
+CREATE INDEX "push_subscriptions_userId_idx" ON "push_subscriptions"("userId");
+
+-- CreateIndex
+CREATE INDEX "patient_notes_merchantId_clientId_idx" ON "patient_notes"("merchantId", "clientId");
+
+-- CreateIndex
+CREATE INDEX "webhook_events_source_idx" ON "webhook_events"("source");
+
+-- CreateIndex
+CREATE INDEX "referrals_referrerId_idx" ON "referrals"("referrerId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "referrals_refereeId_key" ON "referrals"("refereeId");
 
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -286,3 +477,46 @@ ALTER TABLE "reviews" ADD CONSTRAINT "reviews_merchantId_fkey" FOREIGN KEY ("mer
 
 -- AddForeignKey
 ALTER TABLE "notifications" ADD CONSTRAINT "notifications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "xp_transactions" ADD CONSTRAINT "xp_transactions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "xp_transactions" ADD CONSTRAINT "xp_transactions_merchantId_fkey" FOREIGN KEY ("merchantId") REFERENCES "merchants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "xp_transactions" ADD CONSTRAINT "xp_transactions_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "bookings"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "xp_rewards" ADD CONSTRAINT "xp_rewards_merchantId_fkey" FOREIGN KEY ("merchantId") REFERENCES "merchants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "xp_redemptions" ADD CONSTRAINT "xp_redemptions_rewardId_fkey" FOREIGN KEY ("rewardId") REFERENCES "xp_rewards"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "xp_redemptions" ADD CONSTRAINT "xp_redemptions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "gift_cards" ADD CONSTRAINT "gift_cards_merchantId_fkey" FOREIGN KEY ("merchantId") REFERENCES "merchants"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "favorites" ADD CONSTRAINT "favorites_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "favorites" ADD CONSTRAINT "favorites_merchantId_fkey" FOREIGN KEY ("merchantId") REFERENCES "merchants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "push_subscriptions" ADD CONSTRAINT "push_subscriptions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "patient_notes" ADD CONSTRAINT "patient_notes_merchantId_fkey" FOREIGN KEY ("merchantId") REFERENCES "merchants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "patient_notes" ADD CONSTRAINT "patient_notes_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "referrals" ADD CONSTRAINT "referrals_referrerId_fkey" FOREIGN KEY ("referrerId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "referrals" ADD CONSTRAINT "referrals_refereeId_fkey" FOREIGN KEY ("refereeId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

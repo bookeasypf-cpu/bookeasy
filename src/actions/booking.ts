@@ -238,6 +238,22 @@ export async function cancelBooking(bookingId: string, reason?: string) {
     return { error: "Non autorisé" };
   }
 
+  if (booking.status === "CANCELLED_BY_CLIENT" || booking.status === "CANCELLED_BY_MERCHANT") {
+    return { error: "Cette réservation est déjà annulée" };
+  }
+
+  if (booking.status === "COMPLETED") {
+    return { error: "Impossible d'annuler une réservation terminée" };
+  }
+
+  // Clients cannot cancel past bookings
+  if (isClient) {
+    const bookingDateTime = new Date(`${booking.date}T${booking.startTime}`);
+    if (bookingDateTime < new Date()) {
+      return { error: "Impossible d'annuler un rendez-vous passé" };
+    }
+  }
+
   await prisma.booking.update({
     where: { id: bookingId },
     data: {
