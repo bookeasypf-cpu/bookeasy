@@ -77,11 +77,11 @@ export const giftCardLimiter = new Ratelimit({
 /**
  * Login rate limit
  * Prevents brute force password attacks
- * Limit: 5 attempts per 15 minutes per email
+ * Limit: 3 attempts per hour per email
  */
 export const loginLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(5, "15 m"),
+  limiter: Ratelimit.slidingWindow(3, "1 h"),
   analytics: true,
 });
 
