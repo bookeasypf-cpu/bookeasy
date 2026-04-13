@@ -8,6 +8,7 @@ import { sendBookingConfirmation, sendBookingCancellation, sendReferralRewardEma
 import { sendPushNotification } from "@/lib/push";
 import { REFERRAL_XP_FIRST_BOOKING, checkAndAwardMilestoneBonus } from "@/lib/referral";
 import { isMedicalSector } from "@/lib/medical";
+import { bookingLimiter, formatRateLimitError } from "@/lib/ratelimit";
 
 export async function createBooking(data: {
   merchantId: string;
@@ -19,6 +20,15 @@ export async function createBooking(data: {
   giftCardCode?: string;
 }) {
   const user = await requireAuth();
+
+  // Rate limiting: 10 bookings per hour per user
+  const { success, reset } = await bookingLimiter.limit(`booking-${user.id}`);
+  if (!success) {
+    const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
+    return {
+      error: formatRateLimitError(resetIn, "réservations"),
+    };
+  }
 
   const result = bookingSchema.safeParse(data);
   if (!result.success) {

@@ -2,9 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
+import { signupLimiter, formatRateLimitError } from "@/lib/ratelimit";
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limiting: 3 signup attempts per hour per IP
+    const ipAddress = req.headers.get("x-forwarded-for") ||
+                      req.headers.get("x-real-ip") ||
+                      "unknown";
+    const { success, reset } = await signupLimiter.limit(`signup-${ipAddress}`);
+    if (!success) {
+      const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
+      return NextResponse.json(
+        {
+          error: formatRateLimitError(resetIn, "tentatives d'inscription"),
+        },
+        { status: 429 }
+      );
+    }
+
     const { name, email, phone, plan } = await req.json();
 
     if (!name || !email) {

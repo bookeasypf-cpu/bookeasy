@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
+import { giftCardLimiter, formatRateLimitError } from "@/lib/ratelimit";
 
 // Générer un code carte cadeau lisible
 function generateGiftCardCode(): string {
@@ -66,6 +67,23 @@ export async function GET(req: NextRequest) {
 // POST - Créer une carte cadeau
 export async function POST(req: NextRequest) {
   try {
+    // Rate limiting: 5 gift cards per hour per IP
+    const ipAddress = req.headers.get("x-forwarded-for") ||
+                      req.headers.get("x-real-ip") ||
+                      "unknown";
+    const { success, reset } = await giftCardLimiter.limit(
+      `giftcard-${ipAddress}`
+    );
+    if (!success) {
+      const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
+      return NextResponse.json(
+        {
+          error: formatRateLimitError(resetIn, "créations de cartes cadeaux"),
+        },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
 
     const { amountXPF, senderName, senderEmail, recipientName, recipientEmail, message, merchantId } = body;

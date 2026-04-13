@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendPushNotification } from "@/lib/push";
+import { xpRedeemLimiter, formatRateLimitError } from "@/lib/ratelimit";
 import { randomBytes } from "crypto";
 
 // POST: Échanger des XP contre une récompense
@@ -10,6 +11,20 @@ export async function POST(request: Request) {
     const session = await getSession();
     if (!session?.user)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // Rate limiting: 10 redemptions per hour per user
+    const { success, reset } = await xpRedeemLimiter.limit(
+      `redeem-${session.user.id}`
+    );
+    if (!success) {
+      const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
+      return NextResponse.json(
+        {
+          error: formatRateLimitError(resetIn, "échanges XP"),
+        },
+        { status: 429 }
+      );
+    }
 
     const body = await request.json();
     const { rewardId } = body;

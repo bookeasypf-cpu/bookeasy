@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { put } from "@vercel/blob";
+import { uploadLimiter, formatRateLimitError } from "@/lib/ratelimit";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
@@ -14,6 +15,16 @@ export async function POST(request: Request) {
     // Allow both CLIENT and MERCHANT to upload
     if (!["CLIENT", "MERCHANT"].includes(session.user.role || "")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Rate limiting: 5 uploads per minute per user
+    const { success, reset } = await uploadLimiter.limit(`upload-${session.user.id}`);
+    if (!success) {
+      const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
+      return NextResponse.json(
+        { error: formatRateLimitError(resetIn, "uploads") },
+        { status: 429 }
+      );
     }
 
     const formData = await request.formData();
