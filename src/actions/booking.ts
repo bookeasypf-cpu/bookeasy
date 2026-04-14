@@ -22,12 +22,16 @@ export async function createBooking(data: {
   const user = await requireAuth();
 
   // Rate limiting: 10 bookings per hour per user
-  const { success, reset } = await bookingLimiter.limit(`booking-${user.id}`);
-  if (!success) {
-    const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
-    return {
-      error: formatRateLimitError(resetIn, "réservations"),
-    };
+  try {
+    const { success, reset } = await bookingLimiter.limit(`booking-${user.id}`);
+    if (!success) {
+      const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
+      return {
+        error: formatRateLimitError(resetIn, "réservations"),
+      };
+    }
+  } catch {
+    // Fail open if Redis is unavailable
   }
 
   const result = bookingSchema.safeParse(data);

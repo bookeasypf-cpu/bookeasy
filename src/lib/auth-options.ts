@@ -23,12 +23,17 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Rate limit: 5 login attempts per 15 minutes per email
-        const { success } = await loginLimiter.limit(
-          `login-${credentials.email.toLowerCase()}`
-        );
-        if (!success) {
-          throw new Error("Trop de tentatives de connexion. Réessayez dans quelques minutes.");
+        // Rate limit: 3 login attempts per hour per email
+        try {
+          const { success } = await loginLimiter.limit(
+            `login-${credentials.email.toLowerCase()}`
+          );
+          if (!success) {
+            throw new Error("Trop de tentatives de connexion. Réessayez dans quelques minutes.");
+          }
+        } catch (e) {
+          if (e instanceof Error && e.message.includes("Trop de tentatives")) throw e;
+          // Fail open if Redis is unavailable
         }
 
         const user = await prisma.user.findUnique({
