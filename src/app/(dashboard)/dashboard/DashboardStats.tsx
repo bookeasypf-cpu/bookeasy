@@ -12,6 +12,9 @@ import {
   X,
   User,
   Briefcase,
+  TrendingUp,
+  TrendingDown,
+  Minus,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { formatPrice, formatTime } from "@/lib/utils";
@@ -29,6 +32,17 @@ export interface BookingLite {
   serviceName: string;
 }
 
+export interface RevenueDetails {
+  monthLabel: string;
+  total: number;
+  prevTotal: number;
+  bookingCount: number;
+  avgTicket: number;
+  byService: { name: string; count: number; revenue: number }[];
+  byStatus: { status: string; count: number; revenue: number }[];
+  daily: { date: string; revenue: number }[];
+}
+
 interface Props {
   isMedical: boolean;
   todayCount: number;
@@ -38,9 +52,10 @@ interface Props {
   patientsCount: number;
   todayBookings: BookingLite[];
   weekBookings: BookingLite[];
+  revenueDetails: RevenueDetails;
 }
 
-type ModalKind = "today" | "week" | null;
+type ModalKind = "today" | "week" | "revenue" | null;
 
 const DAYS_FR = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 const MONTHS_FR = [
@@ -62,6 +77,7 @@ export function DashboardStats({
   patientsCount,
   todayBookings,
   weekBookings,
+  revenueDetails,
 }: Props) {
   const [modal, setModal] = useState<ModalKind>(null);
 
@@ -130,7 +146,7 @@ export function DashboardStats({
           icon: DollarSign,
           gradient: "from-violet-500/10 to-purple-500/10",
           iconColor: "text-violet-600",
-          clickable: false,
+          clickable: true,
         },
         {
           key: "rating" as const,
@@ -157,9 +173,12 @@ export function DashboardStats({
       ? isMedical
         ? "Consultations d'aujourd'hui"
         : "Rendez-vous d'aujourd'hui"
-      : "Cette semaine";
+      : modal === "week"
+        ? "Cette semaine"
+        : `Revenu · ${revenueDetails.monthLabel}`;
 
-  const modalBookings = modal === "today" ? todayBookings : weekBookings;
+  const modalBookings =
+    modal === "today" ? todayBookings : modal === "week" ? weekBookings : [];
   const modalTotal = modalBookings.reduce((s, b) => s + b.totalPrice, 0);
 
   return (
@@ -201,9 +220,7 @@ export function DashboardStats({
             <button
               key={stat.key}
               type="button"
-              onClick={() =>
-                setModal(stat.key === "today" ? "today" : "week")
-              }
+              onClick={() => setModal(stat.key as ModalKind)}
               className="text-left focus:outline-none focus:ring-2 focus:ring-[#0066FF]/30 rounded-2xl"
             >
               {content}
@@ -237,13 +254,20 @@ export function DashboardStats({
                   <h3 className="font-bold text-lg text-[#0C1B2A] dark:text-white">
                     {modalTitle}
                   </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {modalBookings.length}{" "}
-                    {modalBookings.length > 1 ? "rendez-vous" : "rendez-vous"}
-                    {!isMedical && modalBookings.length > 0 && (
-                      <> · {formatPrice(modalTotal)}</>
-                    )}
-                  </p>
+                  {modal !== "revenue" && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {modalBookings.length} rendez-vous
+                      {!isMedical && modalBookings.length > 0 && (
+                        <> · {formatPrice(modalTotal)}</>
+                      )}
+                    </p>
+                  )}
+                  {modal === "revenue" && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {revenueDetails.bookingCount} réservations ·{" "}
+                      {formatPrice(revenueDetails.avgTicket)} / RDV
+                    </p>
+                  )}
                 </div>
                 <button
                   onClick={() => setModal(null)}
@@ -261,21 +285,26 @@ export function DashboardStats({
                 {modal === "week" && (
                   <WeekList grouped={weekGrouped} isMedical={isMedical} />
                 )}
+                {modal === "revenue" && (
+                  <RevenueBreakdown details={revenueDetails} />
+                )}
               </div>
 
-              <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
-                <Link
-                  href={modal === "week" ? "/dashboard/calendar" : "/dashboard/bookings"}
-                  onClick={() => setModal(null)}
-                  className={`block w-full text-center py-2.5 rounded-xl text-sm font-medium transition-all ${
-                    isMedical
-                      ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:shadow-lg hover:shadow-emerald-500/25"
-                      : "bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25"
-                  }`}
-                >
-                  {modal === "week" ? "Voir le calendrier complet" : "Voir tous les rendez-vous"}
-                </Link>
-              </div>
+              {modal !== "revenue" && (
+                <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+                  <Link
+                    href={modal === "week" ? "/dashboard/calendar" : "/dashboard/bookings"}
+                    onClick={() => setModal(null)}
+                    className={`block w-full text-center py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      isMedical
+                        ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:shadow-lg hover:shadow-emerald-500/25"
+                        : "bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25"
+                    }`}
+                  >
+                    {modal === "week" ? "Voir le calendrier complet" : "Voir tous les rendez-vous"}
+                  </Link>
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -381,6 +410,191 @@ function WeekList({
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function RevenueBreakdown({ details }: { details: RevenueDetails }) {
+  const { total, prevTotal, bookingCount, byService, byStatus, daily } = details;
+
+  const deltaPct =
+    prevTotal > 0
+      ? ((total - prevTotal) / prevTotal) * 100
+      : total > 0
+        ? 100
+        : 0;
+  const deltaIsZero = prevTotal === 0 && total === 0;
+  const deltaUp = deltaPct > 0;
+
+  const maxService = Math.max(1, ...byService.map((s) => s.revenue));
+  const maxDaily = Math.max(1, ...daily.map((d) => d.revenue));
+
+  const statusColorMap: Record<string, string> = {
+    CONFIRMED: "bg-green-500",
+    PENDING: "bg-yellow-500",
+    COMPLETED: "bg-blue-500",
+    NO_SHOW: "bg-gray-400",
+    CANCELLED_BY_CLIENT: "bg-red-400",
+    CANCELLED_BY_MERCHANT: "bg-red-400",
+  };
+
+  if (bookingCount === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          <DollarSign className="h-6 w-6 text-gray-400" />
+        </div>
+        <p className="text-sm text-gray-500">Aucun revenu ce mois-ci</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-2xl p-5 bg-gradient-to-br from-violet-500 to-purple-600 text-white">
+        <p className="text-xs uppercase tracking-wider text-white/70 font-medium">
+          Total du mois
+        </p>
+        <p className="text-3xl font-bold mt-1">{formatPrice(total)}</p>
+        <div className="flex items-center gap-2 mt-3 text-xs">
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-medium ${
+              deltaIsZero
+                ? "bg-white/20 text-white/80"
+                : deltaUp
+                  ? "bg-emerald-400/25 text-emerald-50"
+                  : "bg-red-400/25 text-red-50"
+            }`}
+          >
+            {deltaIsZero ? (
+              <Minus className="h-3 w-3" />
+            ) : deltaUp ? (
+              <TrendingUp className="h-3 w-3" />
+            ) : (
+              <TrendingDown className="h-3 w-3" />
+            )}
+            {deltaIsZero
+              ? "—"
+              : `${deltaUp ? "+" : ""}${deltaPct.toFixed(1)}%`}
+          </span>
+          <span className="text-white/70">
+            vs mois dernier ({formatPrice(prevTotal)})
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <h4 className="text-sm font-semibold text-[#0C1B2A] dark:text-white mb-3 flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-violet-600" />
+          Évolution quotidienne
+        </h4>
+        <div className="flex items-end gap-1 h-24 px-1 rounded-xl bg-gray-50 dark:bg-gray-800/50 p-3">
+          {daily.map((d) => {
+            const h = d.revenue > 0 ? (d.revenue / maxDaily) * 100 : 0;
+            const day = new Date(`${d.date}T00:00:00`).getDate();
+            return (
+              <div
+                key={d.date}
+                className="flex-1 flex flex-col items-center gap-1 group relative"
+                title={`${day} · ${formatPrice(d.revenue)}`}
+              >
+                <div className="w-full flex items-end justify-center h-full">
+                  <div
+                    className={`w-full rounded-t-sm transition-all ${
+                      d.revenue > 0
+                        ? "bg-gradient-to-t from-violet-500 to-purple-400 group-hover:from-violet-600 group-hover:to-purple-500"
+                        : "bg-gray-200 dark:bg-gray-700"
+                    }`}
+                    style={{ height: `${Math.max(h, d.revenue > 0 ? 4 : 2)}%` }}
+                  />
+                </div>
+                {d.revenue > 0 && (
+                  <span className="absolute -top-6 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-semibold bg-[#0C1B2A] text-white px-1.5 py-0.5 rounded whitespace-nowrap z-10">
+                    {formatPrice(d.revenue)}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex justify-between text-[10px] text-gray-400 mt-1 px-1">
+          <span>1</span>
+          <span>{daily.length}</span>
+        </div>
+      </div>
+
+      <div>
+        <h4 className="text-sm font-semibold text-[#0C1B2A] dark:text-white mb-3 flex items-center gap-2">
+          <Briefcase className="h-4 w-4 text-violet-600" />
+          Top prestations
+        </h4>
+        <div className="space-y-2">
+          {byService.slice(0, 5).map((s, idx) => {
+            const pct = (s.revenue / maxService) * 100;
+            return (
+              <div key={s.name} className="rounded-xl bg-gray-50 dark:bg-gray-800/50 p-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 text-[10px] font-bold shrink-0">
+                      {idx + 1}
+                    </span>
+                    <p className="text-sm font-medium text-[#0C1B2A] dark:text-white truncate">
+                      {s.name}
+                    </p>
+                  </div>
+                  <p className="text-sm font-semibold text-[#0C1B2A] dark:text-white ml-2 shrink-0">
+                    {formatPrice(s.revenue)}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="text-[11px] text-gray-500 dark:text-gray-400 shrink-0">
+                    {s.count} RDV
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <h4 className="text-sm font-semibold text-[#0C1B2A] dark:text-white mb-3 flex items-center gap-2">
+          <CalendarDays className="h-4 w-4 text-violet-600" />
+          Répartition par statut
+        </h4>
+        <div className="space-y-2">
+          {byStatus.map((s) => {
+            const pct = bookingCount > 0 ? (s.count / bookingCount) * 100 : 0;
+            return (
+              <div
+                key={s.status}
+                className="flex items-center gap-3 rounded-lg p-2.5 bg-gray-50 dark:bg-gray-800/50"
+              >
+                <span
+                  className={`w-2 h-2 rounded-full shrink-0 ${
+                    statusColorMap[s.status] || "bg-gray-400"
+                  }`}
+                />
+                <span className="text-sm text-[#0C1B2A] dark:text-white flex-1">
+                  {BOOKING_STATUS_LABELS[s.status] || s.status}
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {s.count} · {pct.toFixed(0)}%
+                </span>
+                <span className="text-sm font-medium text-[#0C1B2A] dark:text-white min-w-[80px] text-right">
+                  {formatPrice(s.revenue)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

@@ -11,7 +11,7 @@ import { Clock, Activity, Users, Heart } from "lucide-react";
 import Link from "next/link";
 import { isMedicalSectorName } from "@/lib/medical";
 import { AutoRefresh } from "@/components/AutoRefresh";
-import { DashboardStats, type BookingLite } from "./DashboardStats";
+import { DashboardStats, type BookingLite, type RevenueDetails } from "./DashboardStats";
 
 /** Return the current date in Tahiti (UTC-10) as YYYY-MM-DD */
 function getTahitiDate(): string {
@@ -61,12 +61,25 @@ export default async function DashboardPage() {
   monthStart.setDate(1);
   const monthStartStr = monthStart.toLocaleDateString('en-CA', { timeZone: 'Pacific/Tahiti' });
 
+  // Previous month range
+  const prevMonthStart = new Date(monthStart);
+  prevMonthStart.setMonth(prevMonthStart.getMonth() - 1);
+  const prevMonthStartStr = prevMonthStart.toLocaleDateString('en-CA', { timeZone: 'Pacific/Tahiti' });
+  const prevMonthEndStr = monthStartStr; // exclusive
+
+  const MONTHS_FR = [
+    "janvier", "février", "mars", "avril", "mai", "juin",
+    "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+  ];
+  const monthLabel = `${MONTHS_FR[monthStart.getMonth()]} ${monthStart.getFullYear()}`;
+  const daysInMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0).getDate();
+
   const bookingInclude = {
     client: { select: { name: true } },
     service: { select: { name: true } },
   } as const;
 
-  const [todayBookingsRaw, weekBookingsRaw, monthBookings, reviews, uniquePatients] =
+  const [todayBookingsRaw, weekBookingsRaw, monthBookingsFull, prevMonthBookings, reviews, uniquePatients] =
     await Promise.all([
       prisma.booking.findMany({
         where: {
@@ -92,6 +105,19 @@ export default async function DashboardPage() {
           date: { gte: monthStartStr },
           status: { notIn: ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT"] },
         },
+        select: {
+          date: true,
+          totalPrice: true,
+          status: true,
+          service: { select: { name: true } },
+        },
+      }),
+      prisma.booking.findMany({
+        where: {
+          merchantId: merchant.id,
+          date: { gte: prevMonthStartStr, lt: prevMonthEndStr },
+          status: { notIn: ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT"] },
+        },
         select: { totalPrice: true },
       }),
       prisma.review.findMany({
@@ -107,7 +133,57 @@ export default async function DashboardPage() {
         : Promise.resolve([]),
     ]);
 
-  const monthRevenue = monthBookings.reduce((s, b) => s + b.totalPrice, 0);
+  const monthRevenue = monthBookingsFull.reduce((s, b) => s + b.totalPrice, 0);
+  const prevMonthRevenue = prevMonthBookings.reduce((s, b) => s + b.totalPrice, 0);
+
+  // Service breakdown
+  const serviceMap = new Map<string, { count: number; revenue: number }>();
+  for (const b of monthBookingsFull) {
+    const name = b.service.name;
+    const cur = serviceMap.get(name) || { count: 0, revenue: 0 };
+    cur.count += 1;
+    cur.revenue += b.totalPrice;
+    serviceMap.set(name, cur);
+  }
+  const byService = Array.from(serviceMap.entries())
+    .map(([name, v]) => ({ name, ...v }))
+    .sort((a, b) => b.revenue - a.revenue);
+
+  // Status breakdown
+  const statusMap = new Map<string, { count: number; revenue: number }>();
+  for (const b of monthBookingsFull) {
+    const cur = statusMap.get(b.status) || { count: 0, revenue: 0 };
+    cur.count += 1;
+    cur.revenue += b.totalPrice;
+    statusMap.set(b.status, cur);
+  }
+  const byStatus = Array.from(statusMap.entries())
+    .map(([status, v]) => ({ status, ...v }))
+    .sort((a, b) => b.revenue - a.revenue);
+
+  // Daily breakdown (all days of the month)
+  const dailyMap = new Map<string, number>();
+  for (const b of monthBookingsFull) {
+    dailyMap.set(b.date, (dailyMap.get(b.date) || 0) + b.totalPrice);
+  }
+  const monthY = monthStart.getFullYear();
+  const monthM = monthStart.getMonth();
+  const daily = Array.from({ length: daysInMonth }, (_, i) => {
+    const dayNum = i + 1;
+    const dateStr = `${monthY}-${String(monthM + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
+    return { date: dateStr, revenue: dailyMap.get(dateStr) || 0 };
+  });
+
+  const revenueDetails = {
+    monthLabel,
+    total: monthRevenue,
+    prevTotal: prevMonthRevenue,
+    bookingCount: monthBookingsFull.length,
+    avgTicket: monthBookingsFull.length > 0 ? monthRevenue / monthBookingsFull.length : 0,
+    byService,
+    byStatus,
+    daily,
+  };
   const avgRating =
     reviews.length > 0
       ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
@@ -154,6 +230,7 @@ export default async function DashboardPage() {
         patientsCount={uniquePatients.length}
         todayBookings={todayBookings}
         weekBookings={weekBookings}
+        revenueDetails={revenueDetails}
       />
 
       {/* Today's bookings */}
