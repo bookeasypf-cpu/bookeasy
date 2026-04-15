@@ -126,9 +126,7 @@ export default async function DashboardPage() {
 
   const todayBookings: BookingLite[] = todayBookingsRaw.map(toLite);
   const weekBookings: BookingLite[] = weekBookingsRaw.map(toLite);
-  const upcomingBookings = todayBookingsRaw.filter((b) =>
-    ["CONFIRMED", "PENDING"].includes(b.status)
-  ).slice(0, 10);
+  const upcomingBookings = todayBookingsRaw.slice(0, 10);
 
   const greeting = isMedical ? "Docteur" : "Pro";
 
