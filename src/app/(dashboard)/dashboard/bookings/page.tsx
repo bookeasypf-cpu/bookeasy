@@ -10,6 +10,7 @@ import {
 import { BookingActions } from "./BookingActions";
 import { isMedicalSectorName } from "@/lib/medical";
 import { Gift } from "lucide-react";
+import { AutoRefresh } from "@/components/AutoRefresh";
 
 export default async function DashboardBookingsPage() {
   const session = await getSession();
@@ -112,6 +113,7 @@ export default async function DashboardBookingsPage() {
 
   return (
     <div className="page-transition">
+      <AutoRefresh intervalMs={15000} />
       <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white mb-6 animate-fade-in-up">
         {isMedical ? "Agenda des consultations" : "Rendez-vous"}
       </h1>

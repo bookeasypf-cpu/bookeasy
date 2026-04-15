@@ -108,8 +108,8 @@ export default function DashboardCalendarPage() {
   }, []);
 
   // ── Fetch bookings ──────────────────────────────────
-  const fetchBookings = useCallback(async () => {
-    setLoading(true);
+  const fetchBookings = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const res = await fetch(
         `/api/dashboard/calendar?month=${toMonthParam(currentYear, currentMonth)}`
@@ -118,15 +118,29 @@ export default function DashboardCalendarPage() {
       const data = await res.json();
       setBookings(data.bookings || []);
     } catch {
-      toast.error("Impossible de charger le calendrier");
-      setBookings([]);
+      if (!silent) toast.error("Impossible de charger le calendrier");
+      if (!silent) setBookings([]);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [currentYear, currentMonth]);
 
   useEffect(() => {
     fetchBookings();
+  }, [fetchBookings]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") fetchBookings(true);
+    }, 15000);
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") fetchBookings(true);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [fetchBookings]);
 
   // ── Calendar grid computation ────────────────────────

@@ -1,223 +1,219 @@
-# Claude Code Config - BookEasy
+# Claude Code Config — BookEasy (AUTO-GÉNÉRÉ)
+> Généré automatiquement depuis l'état réel du projet. Ne pas éditer manuellement.
+> Extends parent `/CLAUDE.md`
 
-Extends parent `/CLAUDE.md` with BookEasy-specific specializations.
+**Généré le**: 2026-04-14 13:55
 
----
-
-## 🎯 Project Context
-
-**BookEasy** = Booking/Reservation Platform
-
-### Core Domains
-- User accounts & profiles
-- Availability slots & calendar
-- Booking/reservation lifecycle
-- Payments (Stripe)
-- Notifications (email + push)
-- Location-based services (Leaflet)
-- QR code generation & verification
-
----
-
-## 📦 BookEasy-Specific Specialties
-
-### 1️⃣ Reservation Logic
-**Patterns to know:**
-- Slot availability (booked vs available)
-- Concurrency: two users booking same slot simultaneously
-  - Use DB-level constraints (UNIQUE, CHECK)
-  - Prisma transactions for atomic operations
-- Booking states: pending → confirmed → completed → cancelled
-- Cancellation windows (grace period logic)
-- Double-booking prevention
-
-**Common patterns:**
-```typescript
-// Atomic booking with transaction
-await prisma.$transaction(async (tx) => {
-  const slot = await tx.slot.findUnique({ ... });
-  if (!slot || slot.booked) throw Error("Unavailable");
-  await tx.booking.create({ ... });
-  await tx.slot.update({ booked: true });
-});
+## Stack (depuis package.json)
+```
+next: 16.1.6
+react: 19.2.3
+typescript: ^5
+@prisma/client: ^7.4.2
+prisma: ^7.4.2
+next-auth: ^4.24.13
+resend: ^6.9.3
+web-push: ^3.6.7
+stripe: ^20.4.1
+zod: ^4.3.6
+tailwindcss: ^4
+framer-motion: ^12.35.0
 ```
 
-### 2️⃣ Payment Integration (Stripe)
-**Key concepts:**
-- Idempotent webhook handlers (same webhook ≠ duplicate charge)
-- Payment status tracking: pending → succeeded → failed → refunded
-- Refund workflows (partial + full)
-- Dispute handling
-- PCI compliance (never handle raw card data)
-
-**Webhook pattern:**
-```typescript
-// idempotencyKey prevents duplicate processing
-if (await db.webhook.exists(event.id)) return;
-await processPayment(event);
-await db.webhook.create(event.id);
+## Structure réelle (src/)
+```
+actions/auth.ts
+actions/booking.ts
+actions/review.ts
+app/(auth)/layout.tsx
+app/(auth)/login/page.tsx
+app/(auth)/register/layout.tsx
+app/(auth)/register/page.tsx
+app/(client)/booking/[merchantId]/page.tsx
+app/(client)/booking/confirmation/[bookingId]/page.tsx
+app/(client)/favorites/page.tsx
+app/(client)/gift-cards/page.tsx
+app/(client)/layout.tsx
+app/(client)/legal/cgu/page.tsx
+app/(client)/legal/confidentialite/page.tsx
+app/(client)/legal/layout.tsx
+app/(client)/legal/mentions-legales/page.tsx
+app/(client)/map/page.tsx
+app/(client)/merchants/[merchantId]/loading.tsx
+app/(client)/merchants/[merchantId]/page.tsx
+app/(client)/my-bookings/CancelButton.tsx
+app/(client)/my-bookings/ReviewForm.tsx
+app/(client)/my-bookings/page.tsx
+app/(client)/my-rewards/page.tsx
+app/(client)/pricing/page.tsx
+app/(client)/profile/page.tsx
+app/(client)/referrals/ReferralPageClient.tsx
+app/(client)/referrals/page.tsx
+app/(client)/search/loading.tsx
+app/(client)/search/page.tsx
+app/(client)/sectors/page.tsx
+app/(dashboard)/dashboard/analytics/page.tsx
+app/(dashboard)/dashboard/availability/page.tsx
+app/(dashboard)/dashboard/bookings/BookingActions.tsx
+app/(dashboard)/dashboard/bookings/page.tsx
+app/(dashboard)/dashboard/calendar/page.tsx
+app/(dashboard)/dashboard/gift-cards/GiftCardVerifier.tsx
+app/(dashboard)/dashboard/gift-cards/page.tsx
+app/(dashboard)/dashboard/loyalty/page.tsx
+app/(dashboard)/dashboard/page.tsx
+app/(dashboard)/dashboard/patients/page.tsx
+app/(dashboard)/dashboard/profile/page.tsx
+app/(dashboard)/dashboard/reviews/page.tsx
+app/(dashboard)/dashboard/services/page.tsx
+app/(dashboard)/dashboard/support/page.tsx
+app/(dashboard)/layout.tsx
+app/api/admin/geocode-all/route.ts
+app/api/auth/[...nextauth]/route.ts
+app/api/cron/expire-subscriptions/route.ts
+app/api/cron/reminders/route.ts
+app/api/dashboard/availability/route.ts
+app/api/dashboard/calendar/route.ts
+app/api/dashboard/patients/notes/route.ts
+app/api/dashboard/photos/route.ts
+app/api/dashboard/profile/route.ts
+app/api/dashboard/services/route.ts
+app/api/dashboard/support/route.ts
+app/api/dashboard/validate-code/route.ts
+app/api/dashboard/xp-rewards/route.ts
+app/api/dashboard/xp-settings/route.ts
+app/api/favorites/route.ts
+app/api/gift-cards/route.ts
+app/api/merchants/[merchantId]/availability/route.ts
+app/api/merchants/[merchantId]/route.ts
+app/api/merchants/list/route.ts
+app/api/payzen/checkout/route.ts
+app/api/payzen/ipn/route.ts
+app/api/profile/route.ts
+app/api/push/subscribe/route.ts
+app/api/quick-register/route.ts
+app/api/referrals/route.ts
+app/api/referrals/validate/route.ts
+app/api/sectors/route.ts
+app/api/stripe/checkout/route.ts
+app/api/stripe/portal/route.ts
+app/api/stripe/webhook/route.ts
+app/api/upload/route.ts
+app/api/xp/balance/route.ts
+app/api/xp/history/route.ts
+app/api/xp/redeem/route.ts
+app/error.tsx
 ```
 
-### 3️⃣ Notifications
-**Email (Resend):**
-- Booking confirmation
-- Reminder 24h before
-- Cancellation notices
-- Payment receipt
+## API Routes (src/app/api/)
+- /api/admin/geocode-all
+- /api/auth/[...nextauth]
+- /api/cron/expire-subscriptions
+- /api/cron/reminders
+- /api/dashboard/availability
+- /api/dashboard/calendar
+- /api/dashboard/patients/notes
+- /api/dashboard/photos
+- /api/dashboard/profile
+- /api/dashboard/services
+- /api/dashboard/support
+- /api/dashboard/validate-code
+- /api/dashboard/xp-rewards
+- /api/dashboard/xp-settings
+- /api/favorites
+- /api/gift-cards
+- /api/merchants/[merchantId]/availability
+- /api/merchants/[merchantId]
+- /api/merchants/list
+- /api/payzen/checkout
+- /api/payzen/ipn
+- /api/profile
+- /api/push/subscribe
+- /api/quick-register
+- /api/referrals
+- /api/referrals/validate
+- /api/sectors
+- /api/stripe/checkout
+- /api/stripe/portal
+- /api/stripe/webhook
+- /api/upload
+- /api/xp/balance
+- /api/xp/history
+- /api/xp/redeem
 
-**Push notifications:**
-- Real-time booking updates
-- Reminders
-- Status changes
+## Modèles Prisma (schema réel)
+- User
+- Account
+- Session
+- VerificationToken
+- Sector
+- Merchant
+- MerchantPhoto
+- Service
+- WeeklySchedule
+- BlockedSlot
+- Booking
+- Review
+- Notification
+- XpTransaction
+- XpReward
+- XpRedemption
+- GiftCard
+- Favorite
+- PushSubscription
+- PatientNote
+- WebhookEvent
+- Referral
 
-**Pattern:**
-- Template-based (not string concatenation)
-- Retry on failure
-- Track delivery status
+## État migrations
+1 migration found in prisma/migrations
 
-### 4️⃣ Database Schema (Prisma)
-**Key models:**
-- `User` (profile, auth)
-- `Service` (what can be booked: haircut, consultation, etc.)
-- `Slot` (availability window)
-- `Booking` (reservation instance)
-- `Payment` (transaction record)
-- `Notification` (delivery log)
-
-**Relationships to watch:**
-- One user → many bookings
-- One service → many slots
-- One booking → one payment
-- Cascade deletes (careful!)
-
-### 5️⃣ Geolocation & Maps (Leaflet)
-**Patterns:**
-- Calculate distance between user & service location
-- Service zones (available in radius)
-- Map clustering for multiple slots
-- Geocoding addresses
-
-### 6️⃣ QR Codes
-**Flow:**
-- Generate on booking confirmation (booking ID encoded)
-- Scan to verify attendance (stateless: decode → validate → mark complete)
-- Never trust client-side QR decode (verify on server)
-
-### 7️⃣ Form Validation (Zod)
-**All forms must validate:**
-- Client-side (UX)
-- Server-side (security) ← always, assume client is compromised
-- Consistent error messages
-
-### 8️⃣ Security & Permissions
-**Critical:**
-- Row-level: user can only see their bookings
-- Rate limiting: prevent spam booking attempts
-- CSRF tokens (NextAuth handles)
-- Never expose internal IDs in URLs (slug + check ownership)
-- Input sanitization (especially text fields)
-
-**Pattern:**
-```typescript
-// Check ownership before returning data
-const booking = await db.booking.findUnique({ where: { id } });
-if (booking.userId !== session.user.id) throw Forbidden();
+## Variables d'env requises
+```
+DATABASE_URL
+NEXTAUTH_URL
+NEXTAUTH_SECRET
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+FACEBOOK_CLIENT_ID
+FACEBOOK_CLIENT_SECRET
+RESEND_API_KEY
+EMAIL_FROM
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
 ```
 
----
+## Règles métier critiques (invariantes)
 
-## 🔄 Common Workflows
+### Paiements
+- **PayZen** (OSB) = paiements clients (réservations) — devise XPF
+- **Stripe** = abonnements Pro marchands uniquement
+- IPN PayZen → toujours retourner 200 même si erreur interne
+- Signature HMAC-SHA256 vérifiée AVANT tout traitement
 
-### User Books a Slot
-1. User selects service + date/time
-2. Check slot available (not booked)
-3. Create booking (pending)
-4. Initiate Stripe payment
-5. On payment success: mark booking confirmed
-6. Send confirmation email + push
-7. Generate QR code
+### Auth
+- NextAuth v4 (rester sur v4, v5 = beta)
+- Strategy JWT (pas database)
+- Middleware: allow list uniquement, jamais deny list
+- Jamais importer Prisma dans middleware.ts (Edge Runtime)
 
-### Slot Management
-- Admin creates slots for service
-- Calculate availability (working hours, buffer between bookings)
-- Block slots (maintenance, time off)
+### DB
+- Prisma 7 — `$use` SUPPRIMÉ, utiliser `$extends`
+- `prisma generate` n'est plus automatique → postinstall script
+- Transactions + SELECT FOR UPDATE pour double-booking
+- Soft delete pour données importantes
 
-### Cancellation
-- User cancels: refund + notification
-- Admin cancels: refund + notification
-- Grace period: cancel free up to X hours before
+### Sécurité
+- Ownership check avant chaque retour de données
+- Rate limiting sur endpoints publics (Upstash)
+- Jamais exposer passwordHash, refresh_token, tokens
+- Validation Zod côté serveur TOUJOURS (même si client valide)
 
----
+### Logging (RGPD)
+- Logger: bookingId, orderId, transactionId, status, duration
+- JAMAIS logger: email, nom, téléphone, cardNumber, hash PayZen, tokens
 
-## 📊 Database Constraints
-
-```prisma
-// Slot uniqueness: service + date + time
-@@unique([serviceId, startTime])
-
-// Booking constraints
-- One booking per user per slot
-- Status must be: pending|confirmed|completed|cancelled
-- Payment must exist if booking confirmed
-
-// Payment idempotency
-- Unique stripePaymentId (prevents duplicate Stripe charges)
-```
-
----
-
-## 🚨 Edge Cases to Handle
-
-- User clicks "Book" twice → prevent duplicate booking
-- Payment webhook arrives before booking created → queue & retry
-- Slot deleted while user booking → show error gracefully
-- Admin changes service availability → notify affected users
-- Refund issued but user books again → handle state correctly
-- QR code expires (booking completed) → show "already verified"
-
----
-
-## 🎨 UI/UX Patterns
-
-- Availability calendar (Framer Motion transitions)
-- Loading states during booking (optimistic updates)
-- Toast notifications (react-hot-toast)
-- Form validation feedback (real-time Zod)
-- Error boundaries (don't crash on payment failure)
-- Dark mode (next-themes)
-
----
-
-## 🧪 Testing Focus
-
-Integration tests > unit tests for:
-- Full booking flow (slot → payment → confirmation)
-- Concurrent bookings (race conditions)
-- Webhook idempotence
-- Permission checks (user X can't access user Y's bookings)
-
----
-
-## 📍 File Structure (BookEasy-specific)
-
-```
-app/
-  (auth)/              # login, signup, forgot-password
-  (dashboard)/         # user dashboard
-    bookings/          # my bookings list
-    [bookingId]/       # booking detail + QR code
-  api/
-    bookings/          # POST (create), GET (list)
-    [bookingId]/       # GET, PATCH (cancel)
-    payments/          # Stripe webhooks
-    slots/             # service availability
-lib/
-  services/
-    booking.ts         # booking logic
-    payment.ts         # Stripe integration
-    notification.ts    # email + push
-    geolocation.ts     # maps + distance
-prisma/
-  schema.prisma        # models + constraints
-```
-
+### MCP disponibles dans cette session
+- `postgres` → requêtes SQL directes sur Neon DB
+- `prisma` → migrate-status, migrate-dev, Prisma Studio
+- `github` → PRs, issues, commits (repo: bookeasypf-cpu/bookeasy)
+- `vercel` → deployments, logs (projet: bookeasy)

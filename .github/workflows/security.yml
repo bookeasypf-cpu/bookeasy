@@ -1,0 +1,64 @@
+name: Security Review — BookEasy
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/app/api/**'
+      - 'src/middleware.ts'
+      - 'src/lib/auth*.ts'
+      - 'src/lib/payzen.ts'
+      - 'src/actions/**'
+      - 'prisma/schema.prisma'
+
+jobs:
+  security-check:
+    name: Security patterns check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for dangerous patterns
+        run: |
+          echo "=== Checking security patterns ==="
+          ERRORS=0
+
+          # 1. Jamais de prisma dans middleware
+          if grep -r "from '@prisma/client'\|require('prisma')\|from '.*prisma'" src/middleware.ts 2>/dev/null; then
+            echo "❌ CRITICAL: Prisma imported in middleware.ts (Edge Runtime crash)"
+            ERRORS=$((ERRORS+1))
+          fi
+
+          # 2. $queryRawUnsafe avec input utilisateur
+          if grep -rn "queryRawUnsafe" src/ 2>/dev/null; then
+            echo "⚠️  WARNING: queryRawUnsafe found — verify no user input interpolated"
+          fi
+
+          # 3. console.log dans les API routes (pas de logging structuré)
+          CONSOLE_COUNT=$(grep -rn "console\.log" src/app/api/ 2>/dev/null | wc -l | tr -d ' ')
+          if [ "$CONSOLE_COUNT" -gt "0" ]; then
+            echo "⚠️  WARNING: $CONSOLE_COUNT console.log found in API routes — use structured logger"
+          fi
+
+          # 4. API routes sans vérification auth
+          echo ""
+          echo "=== API routes sans getServerSession visible ==="
+          for file in $(find src/app/api -name "route.ts" | grep -v "auth\|webhook\|ipn\|sectors\|merchants/list\|quick-register\|push"); do
+            if ! grep -q "getServerSession\|getToken\|requireRole" "$file" 2>/dev/null; then
+              echo "⚠️  Possible unprotected route: $file"
+            fi
+          done
+
+          # 5. NEXTAUTH_SECRET hardcodé
+          if grep -rn "NEXTAUTH_SECRET.*=.*['\"][a-zA-Z]" src/ 2>/dev/null | grep -v "process.env"; then
+            echo "❌ CRITICAL: Hardcoded NEXTAUTH_SECRET detected"
+            ERRORS=$((ERRORS+1))
+          fi
+
+          echo ""
+          if [ "$ERRORS" -gt "0" ]; then
+            echo "❌ $ERRORS critical security issue(s) found — merge blocked"
+            exit 1
+          else
+            echo "✅ No critical security issues found"
+          fi

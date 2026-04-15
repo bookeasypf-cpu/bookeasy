@@ -2,25 +2,16 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { formatPrice, formatTime } from "@/lib/utils";
+import { formatTime } from "@/lib/utils";
 import {
   BOOKING_STATUS_LABELS,
   BOOKING_STATUS_COLORS,
 } from "@/lib/constants";
-import {
-  CalendarDays,
-  DollarSign,
-  Star,
-  Users,
-  Clock,
-  Activity,
-  UserCheck,
-  Stethoscope,
-  Heart,
-} from "lucide-react";
+import { Clock, Activity, Users, Heart } from "lucide-react";
 import Link from "next/link";
 import { isMedicalSectorName } from "@/lib/medical";
+import { AutoRefresh } from "@/components/AutoRefresh";
+import { DashboardStats, type BookingLite } from "./DashboardStats";
 
 /** Return the current date in Tahiti (UTC-10) as YYYY-MM-DD */
 function getTahitiDate(): string {
@@ -70,21 +61,30 @@ export default async function DashboardPage() {
   monthStart.setDate(1);
   const monthStartStr = monthStart.toLocaleDateString('en-CA', { timeZone: 'Pacific/Tahiti' });
 
-  const [todayBookings, weekBookings, monthBookings, reviews, upcomingBookings, uniquePatients] =
+  const bookingInclude = {
+    client: { select: { name: true } },
+    service: { select: { name: true } },
+  } as const;
+
+  const [todayBookingsRaw, weekBookingsRaw, monthBookings, reviews, uniquePatients] =
     await Promise.all([
-      prisma.booking.count({
+      prisma.booking.findMany({
         where: {
           merchantId: merchant.id,
           date: today,
           status: { notIn: ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT"] },
         },
+        include: bookingInclude,
+        orderBy: { startTime: "asc" },
       }),
-      prisma.booking.count({
+      prisma.booking.findMany({
         where: {
           merchantId: merchant.id,
           date: { gte: weekStartStr },
           status: { notIn: ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT"] },
         },
+        include: bookingInclude,
+        orderBy: [{ date: "asc" }, { startTime: "asc" }],
       }),
       prisma.booking.findMany({
         where: {
@@ -98,20 +98,6 @@ export default async function DashboardPage() {
         where: { merchantId: merchant.id },
         select: { rating: true },
       }),
-      prisma.booking.findMany({
-        where: {
-          merchantId: merchant.id,
-          date: today,
-          status: { in: ["CONFIRMED", "PENDING"] },
-        },
-        include: {
-          client: { select: { name: true } },
-          service: { select: { name: true } },
-        },
-        orderBy: { startTime: "asc" },
-        take: 10,
-      }),
-      // Nombre de patients uniques (seulement pour médical)
       isMedical
         ? prisma.booking.findMany({
             where: { merchantId: merchant.id },
@@ -127,73 +113,28 @@ export default async function DashboardPage() {
       ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
       : 0;
 
-  // Stats différentes selon le type
-  const stats = isMedical
-    ? [
-        {
-          label: "Consultations du jour",
-          value: todayBookings,
-          icon: Stethoscope,
-          gradient: "from-emerald-500/10 to-teal-500/10",
-          iconColor: "text-emerald-600",
-        },
-        {
-          label: "Cette semaine",
-          value: weekBookings,
-          icon: CalendarDays,
-          gradient: "from-blue-500/10 to-cyan-500/10",
-          iconColor: "text-blue-600",
-        },
-        {
-          label: "Total patients",
-          value: uniquePatients.length,
-          icon: Users,
-          gradient: "from-violet-500/10 to-purple-500/10",
-          iconColor: "text-violet-600",
-        },
-        {
-          label: "Note moyenne",
-          value: avgRating > 0 ? `${avgRating.toFixed(1)} / 5` : "\u2014",
-          icon: Star,
-          gradient: "from-amber-400/10 to-orange-400/10",
-          iconColor: "text-amber-500",
-        },
-      ]
-    : [
-        {
-          label: "RDV aujourd'hui",
-          value: todayBookings,
-          icon: CalendarDays,
-          gradient: "from-[#0066FF]/10 to-[#00B4D8]/10",
-          iconColor: "text-[#0066FF]",
-        },
-        {
-          label: "Cette semaine",
-          value: weekBookings,
-          icon: Users,
-          gradient: "from-emerald-500/10 to-teal-500/10",
-          iconColor: "text-emerald-600",
-        },
-        {
-          label: "Revenu du mois",
-          value: formatPrice(monthRevenue),
-          icon: DollarSign,
-          gradient: "from-violet-500/10 to-purple-500/10",
-          iconColor: "text-violet-600",
-        },
-        {
-          label: "Note moyenne",
-          value: avgRating > 0 ? `${avgRating.toFixed(1)} / 5` : "\u2014",
-          icon: Star,
-          gradient: "from-amber-400/10 to-orange-400/10",
-          iconColor: "text-amber-500",
-        },
-      ];
+  const toLite = (b: (typeof todayBookingsRaw)[number]): BookingLite => ({
+    id: b.id,
+    date: b.date,
+    startTime: b.startTime,
+    endTime: b.endTime,
+    status: b.status,
+    totalPrice: b.totalPrice,
+    clientName: b.client.name,
+    serviceName: b.service.name,
+  });
+
+  const todayBookings: BookingLite[] = todayBookingsRaw.map(toLite);
+  const weekBookings: BookingLite[] = weekBookingsRaw.map(toLite);
+  const upcomingBookings = todayBookingsRaw.filter((b) =>
+    ["CONFIRMED", "PENDING"].includes(b.status)
+  ).slice(0, 10);
 
   const greeting = isMedical ? "Docteur" : "Pro";
 
   return (
     <div className="page-transition">
+      <AutoRefresh intervalMs={20000} />
       <div className="flex items-center gap-3 mb-6 animate-fade-in-up">
         <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
           Bonjour, {session.user.name || greeting} !
@@ -206,26 +147,16 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
-        {stats.map((stat) => (
-          <Card key={stat.label} className="rounded-2xl card-hover border-0 shadow-sm">
-            <CardContent className="py-5 px-4">
-              <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${stat.gradient}`}>
-                  <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
-                    {stat.value}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{stat.label}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <DashboardStats
+        isMedical={isMedical}
+        todayCount={todayBookings.length}
+        weekCount={weekBookings.length}
+        monthRevenue={monthRevenue}
+        avgRating={avgRating}
+        patientsCount={uniquePatients.length}
+        todayBookings={todayBookings}
+        weekBookings={weekBookings}
+      />
 
       {/* Today's bookings */}
       <Card className="rounded-2xl border-0 shadow-sm animate-fade-in-up">
