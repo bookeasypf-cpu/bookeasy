@@ -47,7 +47,19 @@ export async function createBooking(data: {
     return { error: "Service introuvable" };
   }
 
-  // Atomic booking creation with conflict check
+  // Fetch merchant info for XP + notifications
+  const merchant = await prisma.merchant.findUnique({
+    where: { id: data.merchantId },
+    select: { userId: true, xpPerBooking: true, businessName: true, address: true, city: true, sector: { select: { slug: true } } },
+  });
+
+  if (!merchant) {
+    return { error: "Professionnel introuvable" };
+  }
+
+  const isMedical = merchant.sector ? isMedicalSector(merchant.sector.slug) : false;
+
+  // Atomic booking creation: conflict check + gift card + XP all in one transaction
   try {
     const booking = await prisma.$transaction(async (tx) => {
       // Check for conflicts
@@ -69,30 +81,29 @@ export async function createBooking(data: {
         throw new Error("TIME_SLOT_UNAVAILABLE");
       }
 
-      // Handle gift card deduction if provided
-      let giftCardId: string | null = null;
+      // Handle gift card deduction with balance guard
       if (data.giftCardCode) {
         const card = await tx.giftCard.findUnique({
           where: { code: data.giftCardCode },
         });
-        if (card && card.status === "ACTIVE" && card.balance > 0 && card.expiresAt > new Date() &&
+        if (card && card.status === "ACTIVE" && card.expiresAt > new Date() &&
             (!card.merchantId || card.merchantId === data.merchantId)) {
-          // Deduct service price from gift card (convert XPF price to EUR)
           const priceEUR = service.price / 119.33;
-          const newBalance = Math.max(0, card.balance - priceEUR);
-          await tx.giftCard.update({
-            where: { id: card.id },
-            data: {
-              balance: newBalance,
-              status: newBalance <= 0 ? "USED" : "ACTIVE",
-              usedAt: newBalance <= 0 ? new Date() : null,
-            },
-          });
-          giftCardId = card.id;
+          if (card.balance >= priceEUR) {
+            const newBalance = card.balance - priceEUR;
+            await tx.giftCard.update({
+              where: { id: card.id },
+              data: {
+                balance: newBalance,
+                status: newBalance <= 0 ? "USED" : "ACTIVE",
+                usedAt: newBalance <= 0 ? new Date() : null,
+              },
+            });
+          }
         }
       }
 
-      return tx.booking.create({
+      const newBooking = await tx.booking.create({
         data: {
           clientId: user.id,
           merchantId: data.merchantId,
@@ -107,36 +118,16 @@ export async function createBooking(data: {
           status: "CONFIRMED",
         },
       });
-    });
 
-    // Create notification for merchant + send confirmation email
-    const merchant = await prisma.merchant.findUnique({
-      where: { id: data.merchantId },
-      select: { userId: true, xpPerBooking: true, businessName: true, address: true, city: true, sector: { select: { slug: true } } },
-    });
-
-    if (merchant) {
-      await prisma.notification.create({
-        data: {
-          userId: merchant.userId,
-          type: "NEW_BOOKING",
-          title: "Nouveau rendez-vous",
-          message: `${user.name || "Un client"} a réservé ${service.name} le ${data.date} à ${data.startTime}`,
-          metadata: JSON.stringify({ bookingId: booking.id }),
-        },
-      });
-
-      // Award XP to client (service-level XP takes priority over merchant default)
-      // Only award XP for non-medical sectors
-      const isMedical = merchant.sector ? isMedicalSector(merchant.sector.slug) : false;
+      // Award XP inside the transaction (atomic with booking)
       if (!isMedical) {
         const xpToAward = service.xpAmount ?? merchant.xpPerBooking;
         if (xpToAward > 0) {
-          await prisma.xpTransaction.create({
+          await tx.xpTransaction.create({
             data: {
               userId: user.id,
               merchantId: data.merchantId,
-              bookingId: booking.id,
+              bookingId: newBooking.id,
               amount: xpToAward,
               type: "EARNED",
               reason: `Réservation : ${service.name}`,
@@ -145,67 +136,75 @@ export async function createBooking(data: {
         }
       }
 
-      // Check referral: if user was referred and this is their first booking
-      try {
-        const referral = await prisma.referral.findUnique({
-          where: { refereeId: user.id },
-          include: { referrer: { select: { id: true, name: true, email: true } } },
+      return newBooking;
+    });
+
+    // Non-transactional side effects (notifications, emails, referrals)
+    await prisma.notification.create({
+      data: {
+        userId: merchant.userId,
+        type: "NEW_BOOKING",
+        title: "Nouveau rendez-vous",
+        message: `${user.name || "Un client"} a réservé ${service.name} le ${data.date} à ${data.startTime}`,
+        metadata: JSON.stringify({ bookingId: booking.id }),
+      },
+    });
+
+    // Check referral: if user was referred and this is their first booking
+    try {
+      const referral = await prisma.referral.findUnique({
+        where: { refereeId: user.id },
+        include: { referrer: { select: { id: true, name: true, email: true } } },
+      });
+
+      if (referral && referral.status === "REGISTERED") {
+        await prisma.referral.update({
+          where: { id: referral.id },
+          data: { status: "FIRST_BOOKING" },
         });
 
-        if (referral && referral.status === "REGISTERED") {
-          await prisma.referral.update({
-            where: { id: referral.id },
-            data: { status: "FIRST_BOOKING" },
-          });
+        await prisma.xpTransaction.create({
+          data: {
+            userId: referral.referrerId,
+            amount: REFERRAL_XP_FIRST_BOOKING,
+            type: "EARNED",
+            reason: `Parrainage : ${user.name || "Filleul"} a fait sa 1ère réservation`,
+          },
+        });
 
-          // Award XP to referrer for first booking
-          await prisma.xpTransaction.create({
-            data: {
-              userId: referral.referrerId,
-              amount: REFERRAL_XP_FIRST_BOOKING,
-              type: "EARNED",
-              reason: `Parrainage : ${user.name || "Filleul"} a fait sa 1ère réservation`,
-            },
-          });
+        await checkAndAwardMilestoneBonus(referral.referrerId);
 
-          // Check milestones
-          await checkAndAwardMilestoneBonus(referral.referrerId);
-
-          // Notify referrer by email
-          if (referral.referrer.email) {
-            sendReferralRewardEmail(
-              referral.referrer.email,
-              referral.referrer.name || "Parrain",
-              REFERRAL_XP_FIRST_BOOKING,
-              `${user.name || "Votre filleul"} a fait sa première réservation`
-            ).catch(() => {});
-          }
+        if (referral.referrer.email) {
+          sendReferralRewardEmail(
+            referral.referrer.email,
+            referral.referrer.name || "Parrain",
+            REFERRAL_XP_FIRST_BOOKING,
+            `${user.name || "Votre filleul"} a fait sa première réservation`
+          ).catch(() => {});
         }
-      } catch {
-        // Don't fail booking if referral processing fails
       }
-
-      // Push notification to merchant (async, non-blocking)
-      sendPushNotification(merchant.userId, {
-        title: "Nouveau rendez-vous",
-        body: `${user.name || "Un client"} a réservé ${service.name} le ${data.date} à ${data.startTime}`,
-        url: "/dashboard/bookings",
-      }).catch(() => {});
-
-      // Send confirmation email to client (async, non-blocking)
-      sendBookingConfirmation({
-        clientName: user.name || "Client",
-        clientEmail: user.email!,
-        serviceName: service.name,
-        merchantName: merchant.businessName,
-        date: data.date,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        price: service.price,
-        address: merchant.address,
-        city: merchant.city,
-      }).catch(() => {}); // Don't fail booking if email fails
+    } catch {
+      // Don't fail booking if referral processing fails
     }
+
+    sendPushNotification(merchant.userId, {
+      title: "Nouveau rendez-vous",
+      body: `${user.name || "Un client"} a réservé ${service.name} le ${data.date} à ${data.startTime}`,
+      url: "/dashboard/bookings",
+    }).catch(() => {});
+
+    sendBookingConfirmation({
+      clientName: user.name || "Client",
+      clientEmail: user.email!,
+      serviceName: service.name,
+      merchantName: merchant.businessName,
+      date: data.date,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      price: service.price,
+      address: merchant.address,
+      city: merchant.city,
+    }).catch(() => {});
 
     revalidatePath("/my-bookings");
     revalidatePath("/dashboard/bookings");
@@ -250,7 +249,6 @@ export async function cancelBooking(bookingId: string, reason?: string) {
     return { error: "Impossible d'annuler une réservation terminée" };
   }
 
-  // Clients cannot cancel past bookings
   if (isClient) {
     const bookingDateTime = new Date(`${booking.date}T${booking.startTime}`);
     if (bookingDateTime < new Date()) {
@@ -258,14 +256,23 @@ export async function cancelBooking(bookingId: string, reason?: string) {
     }
   }
 
-  await prisma.booking.update({
-    where: { id: bookingId },
+  // Atomic cancellation: only succeeds if status is still CONFIRMED/PENDING
+  const newStatus = isMerchant ? "CANCELLED_BY_MERCHANT" : "CANCELLED_BY_CLIENT";
+  const updated = await prisma.booking.updateMany({
+    where: {
+      id: bookingId,
+      status: { notIn: ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT", "COMPLETED"] },
+    },
     data: {
-      status: isMerchant ? "CANCELLED_BY_MERCHANT" : "CANCELLED_BY_CLIENT",
+      status: newStatus,
       cancelledAt: new Date(),
       cancelReason: reason || null,
     },
   });
+
+  if (updated.count === 0) {
+    return { error: "Cette réservation ne peut plus être annulée" };
+  }
 
   // Refund gift card balance if booking used a gift card
   if (booking.notes) {
@@ -290,23 +297,20 @@ export async function cancelBooking(bookingId: string, reason?: string) {
     }
   }
 
-  // Revoke XP if any were earned for this booking
-  const earnedXp = await prisma.xpTransaction.findFirst({
-    where: {
-      bookingId,
-      type: "EARNED",
-    },
+  // Revoke ALL XP earned for this booking
+  const earnedXpList = await prisma.xpTransaction.findMany({
+    where: { bookingId, type: "EARNED" },
   });
 
-  if (earnedXp) {
+  for (const xp of earnedXpList) {
     await prisma.xpTransaction.create({
       data: {
-        userId: booking.clientId,
-        merchantId: booking.merchantId,
+        userId: xp.userId,
+        merchantId: xp.merchantId,
         bookingId,
-        amount: -earnedXp.amount,
+        amount: -xp.amount,
         type: "REVOKED",
-        reason: `Annulation : ${booking.service.name}`,
+        reason: `Annulation : ${booking.service?.name || "Service"}`,
       },
     });
   }

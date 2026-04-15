@@ -54,6 +54,17 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
 
+    // Verify merchant has seen this client (at least one booking)
+    const hasBooking = await prisma.booking.findFirst({
+      where: { merchantId: merchant.id, clientId },
+      select: { id: true },
+    });
+    if (!hasBooking)
+      return NextResponse.json(
+        { error: "Ce client n'a aucune réservation chez vous" },
+        { status: 403 }
+      );
+
     const note = await prisma.patientNote.create({
       data: {
         merchantId: merchant.id,

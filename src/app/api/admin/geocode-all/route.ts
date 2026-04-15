@@ -3,14 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { geocodeAddress } from "@/lib/geocode";
 
 // One-time endpoint to geocode all merchants missing coordinates
-// GET /api/admin/geocode-all?key=bookeasy-geocode-2024
+// GET /api/admin/geocode-all (requires Bearer CRON_SECRET)
 export async function GET(request: Request) {
   try {
-    const url = new URL(request.url);
-    const key = url.searchParams.get("key");
-
-    // Simple protection
-    if (key !== "bookeasy-geocode-2024") {
+    const authHeader = request.headers.get("authorization");
+    const cronSecret = process.env.CRON_SECRET;
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

@@ -19,6 +19,18 @@ function generateGiftCardCode(): string {
 
 // GET - Vérifier le solde d'une carte cadeau
 export async function GET(req: NextRequest) {
+  // Rate limit gift card lookups to prevent code enumeration
+  try {
+    const ipAddress = req.headers.get("x-forwarded-for") ||
+                      req.headers.get("x-real-ip") || "unknown";
+    const { success } = await giftCardLimiter.limit(`giftcard-check-${ipAddress}`);
+    if (!success) {
+      return NextResponse.json({ error: "Trop de vérifications. Réessayez plus tard." }, { status: 429 });
+    }
+  } catch {
+    // Fail open
+  }
+
   const code = req.nextUrl.searchParams.get("code");
   const merchantId = req.nextUrl.searchParams.get("merchantId");
 
