@@ -217,31 +217,37 @@ export function DashboardStats({
           );
 
           return stat.clickable ? (
-            <button
+            <div
               key={stat.key}
-              type="button"
+              role="button"
+              tabIndex={0}
               onClick={() => setModal(stat.key as ModalKind)}
-              className="text-left focus:outline-none focus:ring-2 focus:ring-[#0066FF]/30 rounded-2xl"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") setModal(stat.key as ModalKind);
+              }}
+              className="focus:outline-none focus:ring-2 focus:ring-[#0066FF]/30 rounded-2xl"
             >
               {content}
-            </button>
+            </div>
           ) : (
             <div key={stat.key}>{content}</div>
           );
         })}
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {modal && (
           <motion.div
+            key={`backdrop-${modal}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => setModal(null)}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
+            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
           >
             <motion.div
+              key={`modal-${modal}`}
               initial={{ y: 40, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 40, opacity: 0, scale: 0.98 }}
