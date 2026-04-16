@@ -116,7 +116,7 @@ export default async function DashboardPage() {
         where: {
           merchantId: merchant.id,
           date: { gte: prevMonthStartStr, lt: prevMonthEndStr },
-          status: { notIn: ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT"] },
+          status: "COMPLETED",
         },
         select: { totalPrice: true },
       }),
@@ -133,7 +133,11 @@ export default async function DashboardPage() {
         : Promise.resolve([]),
     ]);
 
-  const monthRevenue = monthBookingsFull.reduce((s, b) => s + b.totalPrice, 0);
+  const completedBookings = monthBookingsFull.filter((b) => b.status === "COMPLETED");
+  const monthRevenue = completedBookings.reduce((s, b) => s + b.totalPrice, 0);
+  const monthPending = monthBookingsFull
+    .filter((b) => ["CONFIRMED", "PENDING"].includes(b.status))
+    .reduce((s, b) => s + b.totalPrice, 0);
   const prevMonthRevenue = prevMonthBookings.reduce((s, b) => s + b.totalPrice, 0);
 
   // Service breakdown
@@ -177,9 +181,10 @@ export default async function DashboardPage() {
   const revenueDetails = {
     monthLabel,
     total: monthRevenue,
+    pendingRevenue: monthPending,
     prevTotal: prevMonthRevenue,
-    bookingCount: monthBookingsFull.length,
-    avgTicket: monthBookingsFull.length > 0 ? monthRevenue / monthBookingsFull.length : 0,
+    bookingCount: completedBookings.length,
+    avgTicket: completedBookings.length > 0 ? monthRevenue / completedBookings.length : 0,
     byService,
     byStatus,
     daily,

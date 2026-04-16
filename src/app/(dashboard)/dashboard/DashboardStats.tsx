@@ -35,6 +35,7 @@ export interface BookingLite {
 export interface RevenueDetails {
   monthLabel: string;
   total: number;
+  pendingRevenue: number;
   prevTotal: number;
   bookingCount: number;
   avgTicket: number;
@@ -421,7 +422,7 @@ function WeekList({
 }
 
 function RevenueBreakdown({ details }: { details: RevenueDetails }) {
-  const { total, prevTotal, bookingCount, byService, byStatus, daily } = details;
+  const { total, pendingRevenue, prevTotal, bookingCount, byService, byStatus, daily } = details;
 
   const deltaPct =
     prevTotal > 0
@@ -462,6 +463,11 @@ function RevenueBreakdown({ details }: { details: RevenueDetails }) {
           Total du mois
         </p>
         <p className="text-3xl font-bold mt-1">{formatPrice(total)}</p>
+        {pendingRevenue > 0 && (
+          <p className="text-sm text-white/80 mt-1">
+            + {formatPrice(pendingRevenue)} en attente de paiement
+          </p>
+        )}
         <div className="flex items-center gap-2 mt-3 text-xs">
           <span
             className={`inline-flex items-center gap-1 px-2 py-1 rounded-full font-medium ${
