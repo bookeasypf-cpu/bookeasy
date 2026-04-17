@@ -78,6 +78,13 @@ interface PaymentFormParams {
   isSubscription?: boolean;
 }
 
+interface BookingPaymentParams {
+  bookingId: string;
+  clientEmail: string;
+  amount: number; // en XPF
+  orderId: string;
+}
+
 /**
  * Génère les champs du formulaire de paiement PayZen.
  * Le frontend affiche un formulaire HTML avec ces champs cachés
@@ -134,6 +141,45 @@ export function createPaymentForm(params: PaymentFormParams): {
 }
 
 /**
+ * Génère les champs du formulaire de paiement pour une réservation.
+ */
+export function createBookingPaymentForm(params: BookingPaymentParams): {
+  actionUrl: string;
+  fields: Record<string, string>;
+} {
+  const now = new Date();
+  const transmissionDate = now.toISOString().replace(/[-:T]/g, "").slice(0, 14);
+  const baseUrl = process.env.NEXTAUTH_URL || "https://bookeasy-eta.vercel.app";
+
+  const fields: Record<string, string> = {
+    vads_action_mode: "INTERACTIVE",
+    vads_amount: String(params.amount),
+    vads_ctx_mode: MODE,
+    vads_currency: "953",
+    vads_cust_email: params.clientEmail,
+    vads_order_id: params.orderId,
+    vads_page_action: "PAYMENT",
+    vads_payment_config: "SINGLE",
+    vads_return_mode: "POST",
+    vads_site_id: SHOP_ID,
+    vads_trans_date: transmissionDate,
+    vads_trans_id: generateTransId(),
+    vads_url_cancel: `${baseUrl}/booking/confirmation/${params.bookingId}?payment=cancelled`,
+    vads_url_error: `${baseUrl}/booking/confirmation/${params.bookingId}?payment=failed`,
+    vads_url_refused: `${baseUrl}/booking/confirmation/${params.bookingId}?payment=failed`,
+    vads_url_return: `${baseUrl}/booking/confirmation/${params.bookingId}?payment=pending`,
+    vads_url_success: `${baseUrl}/booking/confirmation/${params.bookingId}?payment=success`,
+    vads_version: "V2",
+    vads_ext_info_bookingId: params.bookingId,
+    vads_ext_info_type: "BOOKING_PAYMENT",
+  };
+
+  fields.signature = computeSignature(fields);
+
+  return { actionUrl: PAYZEN_URL, fields };
+}
+
+/**
  * Analyse les données IPN de PayZen et retourne les infos utiles
  */
 export function parseIPNData(body: Record<string, string>) {
@@ -141,6 +187,7 @@ export function parseIPNData(body: Record<string, string>) {
     transactionStatus: body.vads_trans_status,
     orderId: body.vads_order_id,
     merchantId: body.vads_ext_info_merchantId,
+    bookingId: body.vads_ext_info_bookingId,
     type: body.vads_ext_info_type,
     amount: parseInt(body.vads_amount || "0"),
     transId: body.vads_trans_id,

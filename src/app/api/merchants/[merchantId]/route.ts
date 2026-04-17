@@ -24,6 +24,7 @@ export async function GET(
         coverImage: true,
         isActive: true,
         xpPerBooking: true,
+        paymentPolicy: true,
         createdAt: true,
         updatedAt: true,
         sector: true,

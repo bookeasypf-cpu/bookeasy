@@ -21,11 +21,13 @@ import {
   ArrowLeft,
   Briefcase,
   User,
-  MapPin,
   FileText,
   Star,
   Gift,
   X,
+  CreditCard,
+  Banknote,
+  Loader2,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { isMedicalSectorClient } from "@/lib/medical-client";
@@ -45,6 +47,7 @@ interface Merchant {
   services: Service[];
   xpPerBooking: number;
   sector?: { slug: string } | null;
+  paymentPolicy?: string;
 }
 
 interface TimeSlot {
@@ -65,6 +68,8 @@ interface BookingState {
   giftCardCode: string;
   giftCardApplied: { code: string; balanceXPF: number } | null;
   checkingGiftCard: boolean;
+  paymentMethod: "online" | "on_site";
+  processingPayment: boolean;
 }
 
 type BookingAction =
@@ -80,7 +85,9 @@ type BookingAction =
   | { type: "SET_GIFT_CARD_CODE"; code: string }
   | { type: "APPLY_GIFT_CARD"; data: { code: string; balanceXPF: number } }
   | { type: "REMOVE_GIFT_CARD" }
-  | { type: "SET_CHECKING_GIFT_CARD"; checking: boolean };
+  | { type: "SET_CHECKING_GIFT_CARD"; checking: boolean }
+  | { type: "SET_PAYMENT_METHOD"; method: "online" | "on_site" }
+  | { type: "SET_PROCESSING_PAYMENT"; processing: boolean };
 
 const bookingReducer = (state: BookingState, action: BookingAction): BookingState => {
   switch (action.type) {
@@ -110,6 +117,10 @@ const bookingReducer = (state: BookingState, action: BookingAction): BookingStat
       return { ...state, giftCardApplied: null, giftCardCode: "" };
     case "SET_CHECKING_GIFT_CARD":
       return { ...state, checkingGiftCard: action.checking };
+    case "SET_PAYMENT_METHOD":
+      return { ...state, paymentMethod: action.method };
+    case "SET_PROCESSING_PAYMENT":
+      return { ...state, processingPayment: action.processing };
     default:
       return state;
   }
@@ -141,6 +152,8 @@ export default function BookingPage() {
     giftCardCode: "",
     giftCardApplied: null,
     checkingGiftCard: false,
+    paymentMethod: "on_site",
+    processingPayment: false,
   });
 
   const [isPending, startTransition] = useTransition();
@@ -211,6 +224,12 @@ export default function BookingPage() {
   function handleConfirm() {
     if (!state.selectedService || !state.selectedSlot || !state.selectedDate) return;
     startTransition(async () => {
+      const paymentMethod = state.merchant?.paymentPolicy === "ONLINE_ONLY"
+        ? "online" as const
+        : state.merchant?.paymentPolicy === "FLEXIBLE"
+          ? state.paymentMethod
+          : undefined;
+
       const result = await createBooking({
         merchantId,
         serviceId: state.selectedService!.id,
@@ -219,11 +238,49 @@ export default function BookingPage() {
         endTime: state.selectedSlot!.endTime,
         notes: state.notes || undefined,
         giftCardCode: state.giftCardApplied?.code || undefined,
+        paymentMethod,
       });
 
       if (result.error) {
         toast.error(result.error);
-      } else if (result.bookingId) {
+        return;
+      }
+
+      if (result.requiresPayment && result.bookingId) {
+        dispatch({ type: "SET_PROCESSING_PAYMENT", processing: true });
+        try {
+          const res = await fetch("/api/payzen/booking-checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bookingId: result.bookingId }),
+          });
+          const data = await res.json();
+
+          if (data.actionUrl && data.fields) {
+            // Create and submit hidden form to PayZen
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = data.actionUrl;
+            for (const [key, value] of Object.entries(data.fields)) {
+              const input = document.createElement("input");
+              input.type = "hidden";
+              input.name = key;
+              input.value = value as string;
+              form.appendChild(input);
+            }
+            document.body.appendChild(form);
+            form.submit();
+            return;
+          }
+          toast.error(data.error || "Erreur lors de l'initialisation du paiement");
+        } catch {
+          toast.error("Erreur de connexion au service de paiement");
+        }
+        dispatch({ type: "SET_PROCESSING_PAYMENT", processing: false });
+        return;
+      }
+
+      if (result.bookingId) {
         toast.success("Rendez-vous confirmé !");
         router.push(`/booking/confirmation/${result.bookingId}`);
       }
@@ -678,6 +735,76 @@ export default function BookingPage() {
               </div>
             )}
 
+            {/* Payment method selector */}
+            {state.merchant?.paymentPolicy && state.merchant.paymentPolicy !== "NONE" && (
+              <div className="mb-6">
+                <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] dark:text-white mb-3">
+                  <CreditCard className="h-4 w-4 text-[#0066FF]" />
+                  Mode de paiement
+                </label>
+                {state.merchant.paymentPolicy === "ONLINE_ONLY" ? (
+                  <div className="bg-blue-50 dark:bg-blue-950/30 border-2 border-[#0066FF]/20 rounded-2xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#0066FF]/10 flex items-center justify-center shrink-0">
+                      <CreditCard className="h-5 w-5 text-[#0066FF]" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm text-[#0C1B2A] dark:text-white">Paiement en ligne requis</p>
+                      <p className="text-xs text-gray-500">Ce professionnel exige un paiement en ligne pour confirmer la réservation</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => dispatch({ type: "SET_PAYMENT_METHOD", method: "on_site" })}
+                      className={cn(
+                        "p-4 rounded-2xl border-2 text-left transition-all duration-200",
+                        state.paymentMethod === "on_site"
+                          ? "border-[#0066FF] bg-[#0066FF]/[0.03] shadow-lg shadow-blue-500/10"
+                          : "border-gray-100 dark:border-gray-700 hover:border-gray-200"
+                      )}
+                    >
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <Banknote className={cn("h-5 w-5", state.paymentMethod === "on_site" ? "text-[#0066FF]" : "text-gray-400")} />
+                        {state.paymentMethod === "on_site" && (
+                          <div className="w-4 h-4 rounded-full bg-[#0066FF] flex items-center justify-center ml-auto">
+                            <Check className="h-2.5 w-2.5 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <p className={cn("font-semibold text-sm", state.paymentMethod === "on_site" ? "text-[#0066FF]" : "text-[#0C1B2A] dark:text-white")}>
+                        Sur place
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">Espèces ou CB au RDV</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => dispatch({ type: "SET_PAYMENT_METHOD", method: "online" })}
+                      className={cn(
+                        "p-4 rounded-2xl border-2 text-left transition-all duration-200",
+                        state.paymentMethod === "online"
+                          ? "border-[#0066FF] bg-[#0066FF]/[0.03] shadow-lg shadow-blue-500/10"
+                          : "border-gray-100 dark:border-gray-700 hover:border-gray-200"
+                      )}
+                    >
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <CreditCard className={cn("h-5 w-5", state.paymentMethod === "online" ? "text-[#0066FF]" : "text-gray-400")} />
+                        {state.paymentMethod === "online" && (
+                          <div className="w-4 h-4 rounded-full bg-[#0066FF] flex items-center justify-center ml-auto">
+                            <Check className="h-2.5 w-2.5 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <p className={cn("font-semibold text-sm", state.paymentMethod === "online" ? "text-[#0066FF]" : "text-[#0C1B2A] dark:text-white")}>
+                        En ligne
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">Payer maintenant par CB</p>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Notes */}
             <div className="mb-6">
               <label
@@ -704,11 +831,25 @@ export default function BookingPage() {
               <Button
                 variant="gradient"
                 onClick={handleConfirm}
-                loading={isPending}
+                loading={isPending || state.processingPayment}
                 size="lg"
               >
-                <Check className="h-4 w-4 mr-1.5" />
-                Confirmer la réservation
+                {state.processingPayment ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                    Redirection vers le paiement...
+                  </>
+                ) : (state.merchant?.paymentPolicy === "ONLINE_ONLY" || (state.merchant?.paymentPolicy === "FLEXIBLE" && state.paymentMethod === "online")) ? (
+                  <>
+                    <CreditCard className="h-4 w-4 mr-1.5" />
+                    Payer et confirmer
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4 mr-1.5" />
+                    Confirmer la réservation
+                  </>
+                )}
               </Button>
             </div>
           </div>

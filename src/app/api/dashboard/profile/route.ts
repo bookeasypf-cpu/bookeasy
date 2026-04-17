@@ -32,6 +32,19 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
+
+    // Partial update: paymentPolicy only
+    if (body.paymentPolicy && Object.keys(body).length === 1) {
+      if (!["NONE", "FLEXIBLE", "ONLINE_ONLY"].includes(body.paymentPolicy)) {
+        return NextResponse.json({ error: "Mode invalide" }, { status: 400 });
+      }
+      const updated = await prisma.merchant.update({
+        where: { userId: session.user.id },
+        data: { paymentPolicy: body.paymentPolicy },
+      });
+      return NextResponse.json(updated);
+    }
+
     const { businessName, description, phone, address, city, postalCode, sectorId } =
       body;
 

@@ -46,6 +46,7 @@ export const BOOKING_STATUSES = {
 
 export const BOOKING_STATUS_LABELS: Record<string, string> = {
   PENDING: "En attente",
+  PENDING_PAYMENT: "En attente de paiement",
   CONFIRMED: "Confirmé",
   CANCELLED_BY_CLIENT: "Annulé par le client",
   CANCELLED_BY_MERCHANT: "Annulé par le pro",
@@ -55,6 +56,7 @@ export const BOOKING_STATUS_LABELS: Record<string, string> = {
 
 export const BOOKING_STATUS_COLORS: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-800",
+  PENDING_PAYMENT: "bg-orange-100 text-orange-800",
   CONFIRMED: "bg-green-100 text-green-800",
   CANCELLED_BY_CLIENT: "bg-red-100 text-red-800",
   CANCELLED_BY_MERCHANT: "bg-red-100 text-red-800",

@@ -110,6 +110,7 @@ model Merchant {
   stripeCustomerId      String?  @unique
   stripeSubscriptionId  String?
   planExpiresAt         DateTime?
+  paymentPolicy     String   @default("NONE") // NONE, FLEXIBLE, ONLINE_ONLY
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -227,6 +228,15 @@ model Booking {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  // Payment fields
+  paymentStatus    String?   // PENDING, PAID, FAILED, REFUNDED
+  payzenOrderId    String?
+  payzenTransId    String?
+  amountPaid       Float?    // Amount charged via PayZen (XPF, after gift card)
+  giftCardCode     String?
+  giftCardAmount   Float?    // Gift card deduction (XPF)
+  paymentExpiresAt DateTime?
+
   client         User            @relation("ClientBookings", fields: [clientId], references: [id])
   merchant       Merchant        @relation("MerchantBookings", fields: [merchantId], references: [id])
   service        Service         @relation(fields: [serviceId], references: [id])
@@ -236,6 +246,7 @@ model Booking {
   @@index([clientId])
   @@index([merchantId, date])
   @@index([merchantId, date, startTime])
+  @@index([status, paymentExpiresAt])
   @@map("bookings")
 }
 

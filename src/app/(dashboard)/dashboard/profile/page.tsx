@@ -43,6 +43,8 @@ export default function DashboardProfilePage() {
   const [planExpiresAt, setPlanExpiresAt] = useState<string | null>(null);
   const [isMedical, setIsMedical] = useState(false);
   const [merchantId, setMerchantId] = useState<string | null>(null);
+  const [paymentPolicy, setPaymentPolicy] = useState<string>("NONE");
+  const [savingPayment, setSavingPayment] = useState(false);
   const [form, setForm] = useState({
     businessName: "",
     description: "",
@@ -81,6 +83,7 @@ export default function DashboardProfilePage() {
           setPlanExpiresAt(profile.planExpiresAt || null);
           setIsMedical(profile.isMedical || false);
           setMerchantId(profile.id || null);
+          setPaymentPolicy(profile.paymentPolicy || "NONE");
 
           const medicalParam = profile.isMedical ? "?medical=true" : "";
           return fetch(`/api/sectors${medicalParam}`).then((r) => r.json());
@@ -542,6 +545,69 @@ export default function DashboardProfilePage() {
               </p>
             </div>
             <PushNotificationToggle />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment Policy Card */}
+      <Card className="rounded-2xl border-0 shadow-sm mb-6 animate-fade-in-up">
+        <CardContent className="p-6">
+          <div className="mb-4">
+            <h3 className="font-semibold text-[#0C1B2A] dark:text-white">
+              Paiement en ligne
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              Choisissez comment vos clients paient lors de la réservation
+            </p>
+          </div>
+          <div className="space-y-3">
+            {([
+              { value: "NONE", label: "Pas de paiement en ligne", desc: "Le client réserve librement et paie sur place" },
+              { value: "FLEXIBLE", label: "Paiement flexible", desc: "Le client choisit : payer en ligne ou sur place" },
+              { value: "ONLINE_ONLY", label: "Paiement en ligne obligatoire", desc: "Le client doit payer en ligne pour confirmer sa réservation" },
+            ] as const).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                disabled={savingPayment}
+                onClick={async () => {
+                  setPaymentPolicy(opt.value);
+                  setSavingPayment(true);
+                  try {
+                    await fetch("/api/dashboard/profile", {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ paymentPolicy: opt.value }),
+                    });
+                    toast.success("Mode de paiement mis à jour");
+                  } catch {
+                    toast.error("Erreur lors de la mise à jour");
+                  }
+                  setSavingPayment(false);
+                }}
+                className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 ${
+                  paymentPolicy === opt.value
+                    ? `border-[#0066FF] bg-[#0066FF]/[0.03]`
+                    : "border-gray-100 dark:border-gray-700 hover:border-gray-200"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className={`font-semibold text-sm ${paymentPolicy === opt.value ? "text-[#0066FF]" : "text-[#0C1B2A] dark:text-white"}`}>
+                      {opt.label}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">{opt.desc}</p>
+                  </div>
+                  {paymentPolicy === opt.value && (
+                    <div className="w-5 h-5 rounded-full bg-[#0066FF] flex items-center justify-center shrink-0">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))}
           </div>
         </CardContent>
       </Card>

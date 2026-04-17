@@ -2,18 +2,21 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, formatDuration, formatDate, formatTime } from "@/lib/utils";
 import { isMedicalSector } from "@/lib/medical";
-import { Calendar, Clock, Briefcase, Home, CalendarCheck, Star } from "lucide-react";
+import { Calendar, Clock, Briefcase, Home, CalendarCheck, Star, CreditCard, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { ConfirmationContent } from "@/components/booking/ConfirmationContent";
 
 interface ConfirmationPageProps {
   params: Promise<{ bookingId: string }>;
+  searchParams: Promise<{ payment?: string }>;
 }
 
 export default async function BookingConfirmationPage({
   params,
+  searchParams,
 }: ConfirmationPageProps) {
   const { bookingId } = await params;
+  const { payment } = await searchParams;
 
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
@@ -25,11 +28,12 @@ export default async function BookingConfirmationPage({
 
   if (!booking) notFound();
 
-  // Check if merchant is in medical sector
   const isMedical = booking.merchant.sector ? isMedicalSector(booking.merchant.sector.slug) : false;
+  const isPendingPayment = booking.status === "PENDING_PAYMENT";
+  const isPaymentFailed = payment === "failed" || payment === "cancelled";
+  const isConfirmed = booking.status === "CONFIRMED";
 
-  // Get XP earned for this booking (only for non-medical)
-  const xpEarned = !isMedical ? await prisma.xpTransaction.findFirst({
+  const xpEarned = !isMedical && isConfirmed ? await prisma.xpTransaction.findFirst({
     where: { bookingId, type: "EARNED" },
     select: { amount: true },
   }) : null;
@@ -37,62 +41,93 @@ export default async function BookingConfirmationPage({
   return (
     <ConfirmationContent>
       <div className="page-transition min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex flex-col items-center justify-center px-4 sm:px-6 py-12">
-      {/* Success animation area */}
+      {/* Status animation */}
       <div className="animate-scale-in mb-6">
         <div className="relative w-24 h-24 mx-auto">
-          {/* Outer ring pulse */}
-          <div className="absolute inset-0 rounded-full bg-emerald-100 animate-pulse-soft" />
-          {/* Inner ring */}
-          <div className="absolute inset-2 rounded-full bg-emerald-50 flex items-center justify-center">
-            {/* Animated checkmark SVG */}
-            <svg
-              className="w-12 h-12"
-              viewBox="0 0 52 52"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                cx="26"
-                cy="26"
-                r="23"
-                fill="none"
-                stroke="#10B981"
-                strokeWidth="3"
-                className="animate-fade-in"
-              />
-              <path
-                d="M15 27L22 34L37 19"
-                fill="none"
-                stroke="#10B981"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeDasharray="100"
-                style={{
-                  animation: "checkmark 0.6s ease-out 0.3s forwards",
-                  strokeDashoffset: 100,
-                }}
-              />
-            </svg>
-          </div>
+          {isPaymentFailed ? (
+            <>
+              <div className="absolute inset-0 rounded-full bg-red-100 animate-pulse-soft" />
+              <div className="absolute inset-2 rounded-full bg-red-50 flex items-center justify-center">
+                <AlertTriangle className="w-12 h-12 text-red-500" />
+              </div>
+            </>
+          ) : isPendingPayment ? (
+            <>
+              <div className="absolute inset-0 rounded-full bg-orange-100 animate-pulse-soft" />
+              <div className="absolute inset-2 rounded-full bg-orange-50 flex items-center justify-center">
+                <CreditCard className="w-12 h-12 text-orange-500" />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="absolute inset-0 rounded-full bg-emerald-100 animate-pulse-soft" />
+              <div className="absolute inset-2 rounded-full bg-emerald-50 flex items-center justify-center">
+                <svg
+                  className="w-12 h-12"
+                  viewBox="0 0 52 52"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="26" cy="26" r="23" fill="none" stroke="#10B981" strokeWidth="3" className="animate-fade-in" />
+                  <path
+                    d="M15 27L22 34L37 19"
+                    fill="none"
+                    stroke="#10B981"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray="100"
+                    style={{ animation: "checkmark 0.6s ease-out 0.3s forwards", strokeDashoffset: 100 }}
+                  />
+                </svg>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Success text */}
+      {/* Status text */}
       <div className="animate-fade-in-up text-center mb-8">
-        <h1 className="text-2xl sm:text-3xl font-black text-[#0C1B2A] dark:text-white mb-2">
-          Rendez-vous confirmé !
-        </h1>
-        <p className="text-gray-500 text-sm max-w-xs mx-auto">
-          Votre rendez-vous a bien été enregistré. Vous recevrez une confirmation.
-        </p>
+        {isPaymentFailed ? (
+          <>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#0C1B2A] dark:text-white mb-2">
+              Paiement échoué
+            </h1>
+            <p className="text-gray-500 text-sm max-w-xs mx-auto">
+              Le paiement n&apos;a pas abouti. Votre réservation est en attente. Vous pouvez réessayer depuis vos rendez-vous.
+            </p>
+          </>
+        ) : isPendingPayment ? (
+          <>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#0C1B2A] dark:text-white mb-2">
+              En attente de paiement
+            </h1>
+            <p className="text-gray-500 text-sm max-w-xs mx-auto">
+              Votre réservation sera confirmée une fois le paiement reçu. Cela peut prendre quelques instants.
+            </p>
+          </>
+        ) : (
+          <>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#0C1B2A] dark:text-white mb-2">
+              Rendez-vous confirmé !
+            </h1>
+            <p className="text-gray-500 text-sm max-w-xs mx-auto">
+              Votre rendez-vous a bien été enregistré. Vous recevrez une confirmation.
+            </p>
+          </>
+        )}
       </div>
 
       {/* Summary card */}
       <div className="animate-fade-in-up w-full max-w-md" style={{ animationDelay: "0.15s" }}>
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden">
-          {/* Card header with gradient */}
-          <div className="bg-gradient-to-r from-[#0066FF] to-[#00B4D8] px-5 py-4">
+          <div className={`px-5 py-4 ${
+            isPaymentFailed
+              ? "bg-gradient-to-r from-red-500 to-red-600"
+              : isPendingPayment
+                ? "bg-gradient-to-r from-orange-500 to-amber-500"
+                : "bg-gradient-to-r from-[#0066FF] to-[#00B4D8]"
+          }`}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-bold text-sm">
                 {booking.merchant.businessName[0]}
@@ -101,12 +136,13 @@ export default async function BookingConfirmationPage({
                 <h2 className="font-bold text-white text-sm">
                   {booking.merchant.businessName}
                 </h2>
-                <p className="text-xs text-white/70">Réservation confirmée</p>
+                <p className="text-xs text-white/70">
+                  {isPaymentFailed ? "Paiement échoué" : isPendingPayment ? "En attente de paiement" : "Réservation confirmée"}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Card body */}
           <div className="p-5 space-y-4">
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-sm text-gray-500">
@@ -145,7 +181,6 @@ export default async function BookingConfirmationPage({
               </span>
             </div>
 
-            {/* Price */}
             <div className="border-t border-dashed border-gray-200 dark:border-gray-700 pt-4 flex items-center justify-between">
               <span className="font-bold text-[#0C1B2A] dark:text-white">Total</span>
               <span className="text-2xl font-black bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent">
@@ -153,7 +188,18 @@ export default async function BookingConfirmationPage({
               </span>
             </div>
 
-            {/* XP Earned */}
+            {booking.paymentStatus === "PAID" && booking.amountPaid && (
+              <div className="bg-green-50 rounded-xl px-4 py-3 flex items-center justify-between border border-green-200">
+                <span className="flex items-center gap-2 text-sm font-medium text-green-800">
+                  <CreditCard className="h-4 w-4 text-green-600" />
+                  Payé en ligne
+                </span>
+                <span className="font-bold text-green-700">
+                  {booking.amountPaid.toLocaleString()} F
+                </span>
+              </div>
+            )}
+
             {xpEarned && (
               <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl px-4 py-3 flex items-center justify-between border border-yellow-100 animate-fade-in-up">
                 <span className="flex items-center gap-2 text-sm font-medium text-yellow-800">
@@ -183,7 +229,7 @@ export default async function BookingConfirmationPage({
         <Link href="/" className="flex-1">
           <button className="btn-press w-full inline-flex items-center justify-center gap-2 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-[#0C1B2A] dark:text-white font-semibold px-6 py-3.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 transition-all text-sm">
             <Home className="h-4 w-4" />
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </button>
         </Link>
       </div>
