@@ -582,7 +582,9 @@ function RevenueBreakdown({ details }: { details: RevenueDetails }) {
         </h4>
         <div className="space-y-2">
           {byStatus.map((s) => {
-            const pct = bookingCount > 0 ? (s.count / bookingCount) * 100 : 0;
+            const totalBookings = byStatus.reduce((sum, st) => sum + st.count, 0);
+            const pct = totalBookings > 0 ? (s.count / totalBookings) * 100 : 0;
+            const isRevenue = s.status === "COMPLETED";
             return (
               <div
                 key={s.status}
@@ -599,9 +601,15 @@ function RevenueBreakdown({ details }: { details: RevenueDetails }) {
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   {s.count} · {pct.toFixed(0)}%
                 </span>
-                <span className="text-sm font-medium text-[#0C1B2A] dark:text-white min-w-[80px] text-right">
-                  {formatPrice(s.revenue)}
-                </span>
+                {isRevenue ? (
+                  <span className="text-sm font-medium text-[#0C1B2A] dark:text-white min-w-[80px] text-right">
+                    {formatPrice(s.revenue)}
+                  </span>
+                ) : (
+                  <span className="text-xs text-gray-400 min-w-[80px] text-right italic">
+                    non encaissé
+                  </span>
+                )}
               </div>
             );
           })}
