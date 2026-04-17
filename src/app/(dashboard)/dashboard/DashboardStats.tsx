@@ -271,8 +271,9 @@ export function DashboardStats({
                   )}
                   {modal === "revenue" && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      {revenueDetails.bookingCount} réservations ·{" "}
-                      {formatPrice(revenueDetails.avgTicket)} / RDV
+                      {revenueDetails.bookingCount > 0
+                        ? `${revenueDetails.bookingCount} terminé${revenueDetails.bookingCount > 1 ? "s" : ""} · ${formatPrice(revenueDetails.avgTicket)} / RDV`
+                        : "Aucun revenu encaissé"}
                     </p>
                   )}
                 </div>
@@ -422,7 +423,7 @@ function WeekList({
 }
 
 function RevenueBreakdown({ details }: { details: RevenueDetails }) {
-  const { total, pendingRevenue, prevTotal, bookingCount, byService, byStatus, daily } = details;
+  const { total, pendingRevenue, prevTotal, byService, byStatus, daily } = details;
 
   const deltaPct =
     prevTotal > 0
@@ -445,13 +446,15 @@ function RevenueBreakdown({ details }: { details: RevenueDetails }) {
     CANCELLED_BY_MERCHANT: "bg-red-400",
   };
 
-  if (bookingCount === 0) {
+  const totalActivity = byStatus.reduce((sum, s) => sum + s.count, 0);
+
+  if (totalActivity === 0) {
     return (
       <div className="text-center py-12">
         <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
           <DollarSign className="h-6 w-6 text-gray-400" />
         </div>
-        <p className="text-sm text-gray-500">Aucun revenu ce mois-ci</p>
+        <p className="text-sm text-gray-500">Aucune activité ce mois-ci</p>
       </div>
     );
   }

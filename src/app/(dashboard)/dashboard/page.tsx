@@ -140,9 +140,9 @@ export default async function DashboardPage() {
     .reduce((s, b) => s + b.totalPrice, 0);
   const prevMonthRevenue = prevMonthBookings.reduce((s, b) => s + b.totalPrice, 0);
 
-  // Service breakdown
+  // Service breakdown (only COMPLETED = real revenue)
   const serviceMap = new Map<string, { count: number; revenue: number }>();
-  for (const b of monthBookingsFull) {
+  for (const b of completedBookings) {
     const name = b.service.name;
     const cur = serviceMap.get(name) || { count: 0, revenue: 0 };
     cur.count += 1;
@@ -165,9 +165,9 @@ export default async function DashboardPage() {
     .map(([status, v]) => ({ status, ...v }))
     .sort((a, b) => b.revenue - a.revenue);
 
-  // Daily breakdown (all days of the month)
+  // Daily breakdown (only COMPLETED = real revenue)
   const dailyMap = new Map<string, number>();
-  for (const b of monthBookingsFull) {
+  for (const b of completedBookings) {
     dailyMap.set(b.date, (dailyMap.get(b.date) || 0) + b.totalPrice);
   }
   const monthY = monthStart.getFullYear();
