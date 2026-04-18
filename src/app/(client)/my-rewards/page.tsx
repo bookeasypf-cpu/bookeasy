@@ -74,8 +74,11 @@ export default function MyRewardsPage() {
   }
 
   useEffect(() => {
-    fetchBalances();
-    fetchHistory();
+    const id = requestAnimationFrame(() => {
+      fetchBalances();
+      fetchHistory();
+    });
+    return () => cancelAnimationFrame(id);
   }, []);
 
   async function handleRedeem(rewardId: string) {

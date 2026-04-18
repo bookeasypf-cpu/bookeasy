@@ -186,7 +186,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               Aucun résultat trouvé
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm text-center max-w-sm mb-6">
-              Nous n'avons trouvé aucun professionnel correspondant à vos critères.
+              Nous n&apos;avons trouvé aucun professionnel correspondant à vos critères.
               Essayez de modifier votre recherche.
             </p>
             <Link

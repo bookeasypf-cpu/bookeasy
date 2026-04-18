@@ -634,11 +634,9 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
         return (
           <Marker
             key={merchant.id}
-            ref={(ref: any) => {
+            ref={(ref: L.Marker | null) => {
               if (ref) {
-                // react-leaflet v4: ref is the Leaflet marker instance directly
-                const leafletMarker = ref._leaflet_id ? ref : ref.leafletElement;
-                markerRefs.current.set(merchant.id, leafletMarker || ref);
+                markerRefs.current.set(merchant.id, ref);
               }
             }}
             position={[merchant.latitude, merchant.longitude]}

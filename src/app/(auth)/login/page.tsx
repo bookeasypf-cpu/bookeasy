@@ -141,7 +141,7 @@ function LoginForm() {
             href={callbackUrl !== "/" ? `/register?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/register"}
             className="text-indigo-600 font-medium hover:text-indigo-500"
           >
-            S'inscrire
+            S&apos;inscrire
           </Link>
         </p>
       </CardContent>

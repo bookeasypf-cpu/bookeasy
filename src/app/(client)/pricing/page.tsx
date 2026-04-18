@@ -207,7 +207,7 @@ export default function PricingPage() {
 
           <div className="mt-12 text-center">
             <p className="text-gray-500 mb-4">
-              Vous avez d'autres questions ?
+              Vous avez d&apos;autres questions ?
             </p>
             <Link
               href="mailto:contact@bookeasy.me"

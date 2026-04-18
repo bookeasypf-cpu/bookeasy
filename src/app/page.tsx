@@ -81,7 +81,7 @@ export default async function HomePage() {
               style={{ animationDelay: "0.9s" }}
             >
               Coiffeurs, barbers, esthéticiennes, tatoueurs, spas et bien
-              plus. Trouvez et réservez le professionnel qu'il vous faut.
+              plus. Trouvez et réservez le professionnel qu&apos;il vous faut.
             </p>
 
             {/* Search bar with delayed entrance */}
@@ -215,7 +215,7 @@ export default async function HomePage() {
                   <CountUp end={activeSectorCount} />
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                  Secteurs d'activité
+                  Secteurs d&apos;activité
                 </div>
               </div>
             </ScrollReveal>

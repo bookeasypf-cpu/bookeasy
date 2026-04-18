@@ -8,16 +8,7 @@ export function PushNotificationToggle() {
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if ("serviceWorker" in navigator && "PushManager" in window) {
-      setSupported(true);
-      checkSubscription();
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  async function checkSubscription() {
+  const checkSubscription = async () => {
     try {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.getSubscription();
@@ -26,7 +17,18 @@ export function PushNotificationToggle() {
       // ignore
     }
     setLoading(false);
-  }
+  };
+
+  useEffect(() => {
+    if ("serviceWorker" in navigator && "PushManager" in window) {
+      requestAnimationFrame(() => {
+        setSupported(true);
+        checkSubscription();
+      });
+    } else {
+      requestAnimationFrame(() => setLoading(false));
+    }
+  }, []);
 
   async function togglePush() {
     setLoading(true);

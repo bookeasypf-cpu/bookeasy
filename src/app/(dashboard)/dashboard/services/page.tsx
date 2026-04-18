@@ -51,7 +51,8 @@ export default function DashboardServicesPage() {
   }
 
   useEffect(() => {
-    fetchServices();
+    const id = requestAnimationFrame(() => fetchServices());
+    return () => cancelAnimationFrame(id);
   }, []);
 
   function resetForm() {

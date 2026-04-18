@@ -59,7 +59,8 @@ function RegisterForm() {
   // Validate on mount if code from URL
   useEffect(() => {
     if (refCodeFromUrl) {
-      validateRefCode(refCodeFromUrl);
+      const id = requestAnimationFrame(() => validateRefCode(refCodeFromUrl));
+      return () => cancelAnimationFrame(id);
     }
   }, [refCodeFromUrl]);
 

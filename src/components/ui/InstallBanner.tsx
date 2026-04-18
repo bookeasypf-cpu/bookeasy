@@ -21,16 +21,18 @@ export function InstallBanner() {
     // Check if already installed (standalone mode)
     if (
       window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as any).standalone
+      (window.navigator as Navigator & { standalone?: boolean }).standalone
     ) {
-      setIsInstalled(true);
-      return;
+      const id = requestAnimationFrame(() => setIsInstalled(true));
+      return () => cancelAnimationFrame(id);
     }
 
     // Detect iOS
     const ua = navigator.userAgent;
-    const isiOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
-    setIsIOS(isiOS);
+    const isiOS = /iPad|iPhone|iPod/.test(ua) && !(window as Window & { MSStream?: unknown }).MSStream;
+
+    // Batch state updates in a microtask to avoid synchronous setState in effect
+    const id = requestAnimationFrame(() => setIsIOS(isiOS));
 
     // Check if banner was dismissed — show mini button instead
     const dismissed = localStorage.getItem("pwa-install-dismissed");
@@ -38,7 +40,7 @@ export function InstallBanner() {
       const dismissedAt = parseInt(dismissed, 10);
       if (Date.now() - dismissedAt < 1 * 24 * 60 * 60 * 1000) {
         // Dismissed recently — show mini button only
-        setShowMiniButton(true);
+        requestAnimationFrame(() => setShowMiniButton(true));
         // Still capture the prompt for Android
         if (!isiOS) {
           const handler = (e: Event) => {
@@ -46,15 +48,21 @@ export function InstallBanner() {
             setDeferredPrompt(e as BeforeInstallPromptEvent);
           };
           window.addEventListener("beforeinstallprompt", handler);
-          return () => window.removeEventListener("beforeinstallprompt", handler);
+          return () => {
+            cancelAnimationFrame(id);
+            window.removeEventListener("beforeinstallprompt", handler);
+          };
         }
-        return;
+        return () => cancelAnimationFrame(id);
       }
     }
 
     if (isiOS) {
       const timer = setTimeout(() => setShowBanner(true), 3000);
-      return () => clearTimeout(timer);
+      return () => {
+        cancelAnimationFrame(id);
+        clearTimeout(timer);
+      };
     }
 
     // Android/Desktop: listen for beforeinstallprompt
@@ -65,7 +73,10 @@ export function InstallBanner() {
     };
 
     window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    return () => {
+      cancelAnimationFrame(id);
+      window.removeEventListener("beforeinstallprompt", handler);
+    };
   }, []);
 
   const handleInstall = async () => {

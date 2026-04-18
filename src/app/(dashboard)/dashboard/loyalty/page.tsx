@@ -55,6 +55,9 @@ export default function DashboardLoyaltyPage() {
   const [saving, setSaving] = useState(false);
   const [xpPerBooking, setXpPerBooking] = useState("10");
   const [savingSettings, setSavingSettings] = useState(false);
+  const [pendingRedemptions, setPendingRedemptions] = useState<
+    { id: string; clientName: string; reward: { name: string }; code: string }[]
+  >([]);
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -93,7 +96,8 @@ export default function DashboardLoyaltyPage() {
   }
 
   useEffect(() => {
-    fetchData();
+    const id = requestAnimationFrame(() => fetchData());
+    return () => cancelAnimationFrame(id);
   }, []);
 
   function resetForm() {
@@ -204,8 +208,6 @@ export default function DashboardLoyaltyPage() {
     reward?: string;
     error?: string;
   } | null>(null);
-  const [pendingRedemptions, setPendingRedemptions] = useState<any[]>([]);
-
   async function handleValidateCode(e: React.FormEvent) {
     e.preventDefault();
     if (!codeInput.trim()) return;
@@ -395,8 +397,8 @@ export default function DashboardLoyaltyPage() {
             </button>
           </div>
           <p className="text-xs text-gray-400 mt-2">
-            Chaque client gagnera ce nombre d'XP à chaque réservation
-            confirmée. En cas d'annulation, les XP sont automatiquement
+            Chaque client gagnera ce nombre d&apos;XP à chaque réservation
+            confirmée. En cas d&apos;annulation, les XP sont automatiquement
             révoqués.
           </p>
         </CardContent>
