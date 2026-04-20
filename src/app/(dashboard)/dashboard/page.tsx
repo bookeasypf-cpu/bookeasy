@@ -11,7 +11,7 @@ import { Clock, Activity, Users, Heart } from "lucide-react";
 import Link from "next/link";
 import { isMedicalSectorName } from "@/lib/medical";
 import { AutoRefresh } from "@/components/AutoRefresh";
-import { DashboardStats, type BookingLite, type RevenueDetails } from "./DashboardStats";
+import { DashboardStats, type BookingLite } from "./DashboardStats";
 
 /** Return the current date in Tahiti (UTC-10) as YYYY-MM-DD */
 function getTahitiDate(): string {

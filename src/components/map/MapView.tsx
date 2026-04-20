@@ -508,6 +508,7 @@ export default function MapView({ merchants, sectors, initialSector }: MapViewPr
             style={{ backgroundColor: `${color}15` }}
           >
             {merchant.coverImage ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={merchant.coverImage}
                 alt={merchant.businessName}

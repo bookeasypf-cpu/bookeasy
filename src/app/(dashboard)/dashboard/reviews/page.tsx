@@ -3,7 +3,6 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/Card";
 import { StarRating } from "@/components/ui/StarRating";
-import { formatDate } from "@/lib/utils";
 import { isMedicalSectorName } from "@/lib/medical";
 
 export default async function DashboardReviewsPage() {

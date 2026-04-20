@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/Card";
-import { User, Mail, Phone, Pencil, Check, X, Upload, Image as ImageIcon } from "lucide-react";
-import Image from "next/image";
+import { Mail, Phone, Pencil, Check, X, Upload } from "lucide-react";
 import toast from "react-hot-toast";
 
 // Compress image before upload
@@ -57,7 +56,7 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const { data: session, status, update } = useSession();
+  const { status, update } = useSession();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -151,7 +150,7 @@ export default function ProfilePage() {
       let data;
       try {
         data = await res.json();
-      } catch (e) {
+      } catch {
         data = { error: `Erreur serveur (${res.status})` };
       }
 
@@ -196,7 +195,7 @@ export default function ProfilePage() {
       // Wait for DB to commit, then reload
       await new Promise((resolve) => setTimeout(resolve, 500));
       window.location.href = window.location.pathname;
-    } catch (error) {
+    } catch {
       toast.error("Erreur de connexion");
       setLocalImagePreview(null);
       setUploading(false);
@@ -267,7 +266,8 @@ export default function ProfilePage() {
             <div className="relative">
               {displayImage ? (
                 <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/20">
-                  <img
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                     src={displayImage}
                     alt={profile.name || "Profile"}
                     className="w-full h-full object-cover"

@@ -141,6 +141,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
       {/* Hero Section */}
       <div className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
         {merchant.coverImage ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={merchant.coverImage}
             alt={merchant.businessName}
@@ -345,6 +346,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
                   key={photo.id}
                   className="relative aspect-square rounded-2xl overflow-hidden group cursor-pointer"
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photo.url}
                     alt={photo.caption || merchant.businessName}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { DAYS_OF_WEEK } from "@/lib/constants";
@@ -74,7 +73,6 @@ export default function DashboardAvailabilityPage() {
   }
 
   // Colors
-  const accentColor = isMedical ? "emerald" : "blue";
   const btnGradient = isMedical
     ? "bg-gradient-to-r from-emerald-500 to-teal-500"
     : "bg-gradient-to-r from-[#0066FF] to-[#00B4D8]";

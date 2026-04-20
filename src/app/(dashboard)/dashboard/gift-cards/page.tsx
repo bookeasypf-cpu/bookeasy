@@ -41,10 +41,6 @@ export default async function DashboardGiftCardsPage() {
   );
 
   const totalRevenue = giftCards.reduce((sum, c) => sum + c.amount, 0);
-  const totalUsed = giftCards.reduce(
-    (sum, c) => sum + (c.amount - c.balance),
-    0
-  );
 
   return (
     <div className="page-transition">

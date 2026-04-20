@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     }
 
     // Mark as used
-    const updated = await prisma.xpRedemption.update({
+    await prisma.xpRedemption.update({
       where: { id: redemption.id },
       data: {
         status: "USED",

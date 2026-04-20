@@ -72,12 +72,38 @@ function GiftCardsContent() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  async function handleCheckCode(code: string) {
+    if (!code.trim()) return;
+    try {
+      const res = await fetch(`/api/gift-cards?code=${encodeURIComponent(code)}`);
+      const data = await res.json();
+      if (res.ok) {
+        setCheckResult(data);
+      } else {
+        toast.error(data.error);
+        setCheckResult(null);
+      }
+    } catch {
+      toast.error("Erreur de connexion");
+    }
+  }
+
   // Auto-check if code is in URL
   useEffect(() => {
-    if (codeFromUrl) {
-      handleCheckCode(codeFromUrl);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!codeFromUrl) return;
+    let cancelled = false;
+    fetch(`/api/gift-cards?code=${encodeURIComponent(codeFromUrl)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        if (data.error) {
+          toast.error(data.error);
+        } else {
+          setCheckResult(data);
+        }
+      })
+      .catch(() => { if (!cancelled) toast.error("Erreur de connexion"); });
+    return () => { cancelled = true; };
   }, [codeFromUrl]);
 
   // Generate QR code when gift card is created
@@ -125,22 +151,6 @@ function GiftCardsContent() {
       toast.error("Erreur de connexion");
     }
     setSending(false);
-  }
-
-  async function handleCheckCode(code: string) {
-    if (!code.trim()) return;
-    try {
-      const res = await fetch(`/api/gift-cards?code=${encodeURIComponent(code)}`);
-      const data = await res.json();
-      if (res.ok) {
-        setCheckResult(data);
-      } else {
-        toast.error(data.error);
-        setCheckResult(null);
-      }
-    } catch {
-      toast.error("Erreur de connexion");
-    }
   }
 
   function handleCheck() {

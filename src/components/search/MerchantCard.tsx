@@ -80,6 +80,7 @@ export function MerchantCard({ merchant }: MerchantCardProps) {
         {/* Image area with parallax effect */}
         <div className="relative h-44 overflow-hidden">
           {merchant.coverImage ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={merchant.coverImage}
               alt={merchant.businessName}

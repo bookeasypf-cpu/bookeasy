@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FileText, Plus, Trash2, Send, X } from "lucide-react";
+import { FileText, Trash2, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Note {
@@ -39,6 +39,7 @@ export default function PatientNotes({ clientId, patientName }: PatientNotesProp
     if (isOpen && notes.length === 0) {
       fetchNotes();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   async function handleAddNote() {

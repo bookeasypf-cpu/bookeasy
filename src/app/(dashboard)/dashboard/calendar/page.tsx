@@ -67,7 +67,6 @@ export default function DashboardCalendarPage() {
   const [panelOpen, setPanelOpen] = useState(false);
 
   // ── Theme colors ─────────────────────────────────────
-  const accent = isMedical ? "emerald" : "blue";
   const accentMap = useMemo(() => {
     if (isMedical) {
       return {

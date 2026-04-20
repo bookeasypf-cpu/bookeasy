@@ -88,9 +88,6 @@ const MOOREA =
 const ROUTE_PATH = "M 520,230 C 560,215 620,205 680,212 C 710,218 730,228 750,238";
 
 /* ── Coast paths for traveling dots ── */
-const TAHITI_COAST = TAHITI_NUI.replace(" Z", "").replace("M ", "");
-const MOOREA_COAST = MOOREA.replace(" Z", "").replace("M ", "");
-
 export function AnimatedBackground() {
   return (
     <div

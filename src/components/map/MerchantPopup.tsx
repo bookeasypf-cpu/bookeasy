@@ -30,6 +30,7 @@ export function MerchantPopup({ merchant }: MerchantPopupProps) {
       {/* Header with image or gradient */}
       <div className="relative h-28 -mx-[1px] -mt-[1px] rounded-t-lg overflow-hidden">
         {merchant.coverImage ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={merchant.coverImage}
             alt={merchant.businessName}

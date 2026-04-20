@@ -16,10 +16,6 @@ function minutesToTime(minutes: number): string {
   return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 }
 
-function addMinutes(time: string, mins: number): string {
-  return minutesToTime(timeToMinutes(time) + mins);
-}
-
 export function generateCandidateSlots(
   schedules: { startTime: string; endTime: string; isActive: boolean }[],
   serviceDuration: number,

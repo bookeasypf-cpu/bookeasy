@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useReducer, useTransition, useOptimistic } from "react";
+import { useEffect, useReducer, useTransition, useOptimistic } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -502,7 +502,6 @@ export default function BookingPage() {
                     month: "short",
                   });
                   const isSelected = state.selectedDate === date;
-                  const isToday = false; // Tomorrow at minimum
                   return (
                     <button
                       key={date}

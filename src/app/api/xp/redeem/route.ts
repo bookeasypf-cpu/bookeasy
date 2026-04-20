@@ -78,7 +78,7 @@ export async function POST(request: Request) {
     const code = `BE-${randomBytes(4).toString("hex").toUpperCase()}`;
 
     // Transaction : déduire les XP + créer le redemption
-    const [xpTransaction, redemption] = await prisma.$transaction([
+    const [, redemption] = await prisma.$transaction([
       prisma.xpTransaction.create({
         data: {
           userId: session.user.id,

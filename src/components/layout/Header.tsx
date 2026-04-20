@@ -147,6 +147,7 @@ export function Header() {
                 >
                   {session.user.image ? (
                     <div className="h-8 w-8 rounded-full overflow-hidden shadow-md flex-shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={session.user.image} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
                     </div>
                   ) : (
@@ -178,6 +179,7 @@ export function Header() {
                         <div className="flex items-center gap-2 w-full">
                           {session.user.image && (
                             <div className="h-6 w-6 rounded-full overflow-hidden flex-shrink-0">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={session.user.image} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
                             </div>
                           )}
@@ -374,6 +376,7 @@ export function Header() {
                 >
                   {session.user.image ? (
                     <div className="h-7 w-7 rounded-full overflow-hidden shadow-md flex-shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={session.user.image} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
                     </div>
                   ) : (

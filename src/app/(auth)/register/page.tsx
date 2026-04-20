@@ -33,7 +33,7 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [referrerName, setReferrerName] = useState<string | null>(null);
   const [refCode, setRefCode] = useState(refCodeFromUrl);
-  const [showRefInput, setShowRefInput] = useState(!refCodeFromUrl);
+  const [showRefInput] = useState(!refCodeFromUrl);
   const [validatingRef, setValidatingRef] = useState(false);
 
   // Validate referral code
