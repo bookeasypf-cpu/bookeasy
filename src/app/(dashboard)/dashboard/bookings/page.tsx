@@ -11,6 +11,7 @@ import { BookingActions } from "./BookingActions";
 import { isMedicalSectorName } from "@/lib/medical";
 import { Gift } from "lucide-react";
 import { AutoRefresh } from "@/components/AutoRefresh";
+import { autoCompleteBookings } from "@/lib/auto-complete";
 
 type BookingItem = {
   id: string;
@@ -106,6 +107,8 @@ export default async function DashboardBookingsPage() {
   if (!merchant) redirect("/dashboard/profile");
 
   const isMedical = isMedicalSectorName(merchant.sector?.name);
+
+  await autoCompleteBookings(merchant.id);
 
   const bookings = await prisma.booking.findMany({
     where: { merchantId: merchant.id },

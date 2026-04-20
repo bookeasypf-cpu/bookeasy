@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { autoCompleteBookings } from "@/lib/auto-complete";
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,6 +31,8 @@ export async function GET(request: NextRequest) {
       year = now.getFullYear();
       month = now.getMonth() + 1;
     }
+
+    await autoCompleteBookings(merchant.id);
 
     const daysInMonth = new Date(year, month, 0).getDate();
     const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;

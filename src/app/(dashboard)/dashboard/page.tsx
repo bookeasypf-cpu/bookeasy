@@ -12,6 +12,7 @@ import Link from "next/link";
 import { isMedicalSectorName } from "@/lib/medical";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { DashboardStats, type BookingLite } from "./DashboardStats";
+import { autoCompleteBookings } from "@/lib/auto-complete";
 
 /** Return the current date in Tahiti (UTC-10) as YYYY-MM-DD */
 function getTahitiDate(): string {
@@ -47,6 +48,8 @@ export default async function DashboardPage() {
   }
 
   const isMedical = isMedicalSectorName(merchant.sector?.name);
+
+  await autoCompleteBookings(merchant.id);
 
   const today = getTahitiDate();
 
