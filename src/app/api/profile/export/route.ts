@@ -45,7 +45,7 @@ export async function GET() {
       }),
       prisma.referral.findMany({
         where: { referrerId: userId },
-        select: { code: true, status: true, createdAt: true },
+        select: { id: true, status: true, createdAt: true },
       }),
       prisma.notification.findMany({
         where: { userId },
