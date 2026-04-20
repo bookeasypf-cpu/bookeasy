@@ -604,15 +604,9 @@ function RevenueBreakdown({ details }: { details: RevenueDetails }) {
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   {s.count} · {pct.toFixed(0)}%
                 </span>
-                {isRevenue ? (
-                  <span className="text-sm font-medium text-[#0C1B2A] dark:text-white min-w-[80px] text-right">
-                    {formatPrice(s.revenue)}
-                  </span>
-                ) : (
-                  <span className="text-xs text-gray-400 min-w-[80px] text-right italic">
-                    non encaissé
-                  </span>
-                )}
+                <span className={`text-sm font-medium min-w-[80px] text-right ${isRevenue ? "text-[#0C1B2A] dark:text-white" : "text-gray-500 dark:text-gray-400"}`}>
+                  {formatPrice(s.revenue)}
+                </span>
               </div>
             );
           })}
