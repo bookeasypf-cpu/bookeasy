@@ -37,20 +37,25 @@ export async function onBookingConfirmed(bookingId: string) {
     ? isMedicalSector(booking.merchant.sector.slug)
     : false;
 
-  // Award XP (non-medical only, inside transaction for atomicity)
+  // Award XP (non-medical only) — guard against duplicate awards
   if (!isMedical) {
     const xpToAward = booking.service.xpAmount ?? booking.merchant.xpPerBooking;
     if (xpToAward > 0) {
-      await prisma.xpTransaction.create({
-        data: {
-          userId: booking.clientId,
-          merchantId: booking.merchantId,
-          bookingId: booking.id,
-          amount: xpToAward,
-          type: "EARNED",
-          reason: `Réservation : ${booking.service.name}`,
-        },
+      const alreadyAwarded = await prisma.xpTransaction.findFirst({
+        where: { bookingId: booking.id, type: "EARNED", userId: booking.clientId },
       });
+      if (!alreadyAwarded) {
+        await prisma.xpTransaction.create({
+          data: {
+            userId: booking.clientId,
+            merchantId: booking.merchantId,
+            bookingId: booking.id,
+            amount: xpToAward,
+            type: "EARNED",
+            reason: `Réservation : ${booking.service.name}`,
+          },
+        });
+      }
     }
   }
 
@@ -96,6 +101,11 @@ export async function onBookingConfirmed(bookingId: string) {
     });
 
     if (referral && referral.status === "REGISTERED") {
+      const alreadyRewarded = await prisma.xpTransaction.findFirst({
+        where: { userId: referral.referrerId, type: "EARNED", reason: { startsWith: `Parrainage : ` }, bookingId: booking.id },
+      });
+      if (alreadyRewarded) return;
+
       await prisma.referral.update({
         where: { id: referral.id },
         data: { status: "FIRST_BOOKING" },

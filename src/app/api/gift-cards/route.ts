@@ -19,11 +19,14 @@ function generateGiftCardCode(): string {
 
 // GET - Vérifier le solde d'une carte cadeau
 export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+
   // Rate limit gift card lookups to prevent code enumeration
   try {
-    const ipAddress = req.headers.get("x-forwarded-for") ||
-                      req.headers.get("x-real-ip") || "unknown";
-    const { success } = await giftCardLimiter.limit(`giftcard-check-${ipAddress}`);
+    const { success } = await giftCardLimiter.limit(`giftcard-check-${session.user.id}`);
     if (!success) {
       return NextResponse.json({ error: "Trop de vérifications. Réessayez plus tard." }, { status: 429 });
     }
@@ -79,12 +82,14 @@ export async function GET(req: NextRequest) {
 // POST - Créer une carte cadeau
 export async function POST(req: NextRequest) {
   try {
-    // Rate limiting: 5 gift cards per hour per IP
-    const ipAddress = req.headers.get("x-forwarded-for") ||
-                      req.headers.get("x-real-ip") ||
-                      "unknown";
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
+    // Rate limiting: 5 gift cards per hour per user
     const { success, reset } = await giftCardLimiter.limit(
-      `giftcard-${ipAddress}`
+      `giftcard-${session.user.id}`
     );
     if (!success) {
       const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
@@ -135,8 +140,7 @@ export async function POST(req: NextRequest) {
 
     // Award XP to buyer: 1 XP per 1000 XPF
     const xpEarned = Math.floor(amountXPF / 1000);
-    const session = await getServerSession(authOptions);
-    if (session?.user?.id && xpEarned > 0 && merchantId) {
+    if (session.user.id && xpEarned > 0 && merchantId) {
       await prisma.xpTransaction.create({
         data: {
           userId: session.user.id,

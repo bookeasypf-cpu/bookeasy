@@ -383,6 +383,23 @@ export default function ProfilePage() {
           )}
         </CardContent>
       </Card>
+
+      {/* RGPD — Export des données */}
+      <Card className="rounded-2xl border-0 shadow-sm mt-6">
+        <CardContent className="py-5">
+          <h3 className="text-sm font-semibold text-[#0C1B2A] dark:text-white mb-2">Vos données personnelles</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+            Conformément au RGPD, vous pouvez télécharger l&apos;ensemble de vos données.
+          </p>
+          <a
+            href="/api/profile/export"
+            download
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gray-100 dark:bg-gray-800 text-[#0C1B2A] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          >
+            Télécharger mes données
+          </a>
+        </CardContent>
+      </Card>
     </div>
   );
 }
