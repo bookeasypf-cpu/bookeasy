@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/Card";
-import { formatPrice } from "@/lib/utils";
 import { isMedicalSectorName } from "@/lib/medical";
 import {
   Users,
@@ -131,7 +130,7 @@ export default async function DashboardAnalyticsPage() {
           <Card className="rounded-2xl border-0 shadow-sm card-hover">
             <CardContent className="py-5 text-center">
               <CheckCircle className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
-              <AnimatedNumber value={honorationRate} format={(n) => `${n}%`} className="text-2xl font-bold text-emerald-600 block" />
+              <AnimatedNumber value={honorationRate} formatType="percent" className="text-2xl font-bold text-emerald-600 block" />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Taux d&apos;honoration</p>
             </CardContent>
           </Card>
@@ -267,14 +266,14 @@ export default async function DashboardAnalyticsPage() {
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
           <CardContent className="py-5 text-center">
             <Users className="h-6 w-6 text-[#00B4D8] mx-auto mb-2" />
-            <AnimatedNumber value={totalRevenue} format={(n) => formatPrice(n)} className="text-2xl font-bold bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent block" />
+            <AnimatedNumber value={totalRevenue} formatType="price" className="text-2xl font-bold bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent block" />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Revenu total</p>
           </CardContent>
         </Card>
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
           <CardContent className="py-5 text-center">
             <UserCheck className="h-6 w-6 text-emerald-600 mx-auto mb-2" />
-            <AnimatedNumber value={recentRevenue} format={(n) => formatPrice(n)} className="text-2xl font-bold text-emerald-600 block" />
+            <AnimatedNumber value={recentRevenue} formatType="price" className="text-2xl font-bold text-emerald-600 block" />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">30 derniers jours</p>
           </CardContent>
         </Card>
