@@ -55,7 +55,11 @@ export function WriteReview({ merchantId }: { merchantId: string }) {
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success("Merci pour votre avis !");
+      if (result.xpEarned && result.xpEarned > 0) {
+        toast.success(`Merci ! +${result.xpEarned} XP gagnés`);
+      } else {
+        toast.success("Merci pour votre avis !");
+      }
       setOpen(false);
       setRating(0);
       setComment("");

@@ -45,8 +45,23 @@ export async function submitReview(data: {
     },
   });
 
+  // Award XP for leaving a review (positive = 3+ stars)
+  const XP_FOR_REVIEW = 2;
+  if (data.rating >= 3) {
+    await prisma.xpTransaction.create({
+      data: {
+        userId: user.id,
+        merchantId: booking.merchantId,
+        bookingId: data.bookingId,
+        amount: XP_FOR_REVIEW,
+        type: "EARNED",
+        reason: `Avis laissé (${data.rating} étoiles)`,
+      },
+    });
+  }
+
   revalidatePath(`/merchants/${booking.merchantId}`);
   revalidatePath("/dashboard/reviews");
 
-  return { success: true };
+  return { success: true, xpEarned: data.rating >= 3 ? XP_FOR_REVIEW : 0 };
 }

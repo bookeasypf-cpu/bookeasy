@@ -35,7 +35,11 @@ export function ReviewForm({ bookingId, merchantName, serviceName }: ReviewFormP
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success("Merci pour votre avis !");
+      if (result.xpEarned && result.xpEarned > 0) {
+        toast.success(`Merci ! +${result.xpEarned} XP gagnés`);
+      } else {
+        toast.success("Merci pour votre avis !");
+      }
       setOpen(false);
       router.refresh();
     }
