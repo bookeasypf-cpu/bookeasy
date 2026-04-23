@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import { reviewSchema } from "@/lib/validators";
 import { revalidatePath } from "next/cache";
+import { sendPushNotification } from "@/lib/push";
 
 export async function submitReview(data: {
   bookingId: string;
@@ -30,7 +31,7 @@ export async function submitReview(data: {
   // Les avis sont réservés aux commerçants Pro
   const merchant = await prisma.merchant.findUnique({
     where: { id: booking.merchantId },
-    select: { plan: true },
+    select: { plan: true, userId: true, businessName: true },
   });
   if (merchant?.plan !== "PRO")
     return { error: "Les avis clients sont disponibles uniquement pour les commerçants Pro" };
@@ -59,6 +60,26 @@ export async function submitReview(data: {
       },
     });
   }
+
+  // Notify merchant
+  const stars = "★".repeat(data.rating) + "☆".repeat(5 - data.rating);
+  const clientName = user.name || "Un client";
+
+  await prisma.notification.create({
+    data: {
+      userId: merchant.userId,
+      type: "NEW_REVIEW",
+      title: `Nouvel avis ${stars}`,
+      message: `${clientName} a laissé un avis ${data.rating}/5${data.comment ? ` : "${data.comment.substring(0, 80)}${data.comment.length > 80 ? "..." : ""}"` : ""}`,
+      metadata: JSON.stringify({ bookingId: data.bookingId, rating: data.rating }),
+    },
+  });
+
+  sendPushNotification(merchant.userId, {
+    title: `Nouvel avis ${stars}`,
+    body: `${clientName} vous a donné ${data.rating}/5`,
+    url: "/dashboard/reviews",
+  }).catch(() => {});
 
   revalidatePath(`/merchants/${booking.merchantId}`);
   revalidatePath("/dashboard/reviews");
