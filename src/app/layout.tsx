@@ -5,6 +5,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "react-hot-toast";
 import { InstallBanner } from "@/components/ui/InstallBanner";
+import { CookieBanner } from "@/components/ui/CookieBanner";
 import { ServiceWorkerProvider } from "@/components/providers/ServiceWorkerProvider";
 
 const inter = Inter({
@@ -64,6 +65,7 @@ export default function RootLayout({
           {children}
           <ServiceWorkerProvider />
           <InstallBanner />
+          <CookieBanner />
           <Toaster
             position="top-right"
             toastOptions={{
