@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/Card";
 import { StarRating } from "@/components/ui/StarRating";
 import { isMedicalSectorName } from "@/lib/medical";
+import { Star, TrendingUp, Users, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default async function DashboardReviewsPage() {
   const session = await getSession();
@@ -15,6 +17,49 @@ export default async function DashboardReviewsPage() {
   if (!merchant) redirect("/dashboard/profile");
 
   const isMedical = isMedicalSectorName(merchant.sector?.name);
+
+  // Upsell for non-PRO merchants
+  if (merchant.plan !== "PRO") {
+    return (
+      <div className="page-transition">
+        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white mb-6 animate-fade-in-up">
+          {isMedical ? "Avis patients" : "Avis clients"}
+        </h1>
+        <div className="bg-gradient-to-br from-[#0066FF]/5 via-white to-[#00B4D8]/5 dark:from-[#0066FF]/10 dark:via-gray-900 dark:to-[#00B4D8]/10 rounded-2xl border border-[#0066FF]/15 dark:border-[#0066FF]/20 p-8 text-center animate-fade-in-up">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20">
+            <Star className="h-7 w-7 text-white" />
+          </div>
+          <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white mb-2">
+            Activez les avis clients
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-md mx-auto mb-6">
+            Passez en PRO pour permettre à vos clients de noter et commenter vos services. Les avis renforcent votre crédibilité et attirent de nouveaux clients.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+              <Star className="h-4 w-4 text-amber-400" />
+              Notes et commentaires
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+              <TrendingUp className="h-4 w-4 text-green-500" />
+              Meilleure visibilité
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+              <Users className="h-4 w-4 text-[#0066FF]" />
+              Plus de clients
+            </div>
+          </div>
+          <Link
+            href="/pricing"
+            className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-[#0066FF] to-[#00B4D8] rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all"
+          >
+            Découvrir le plan Pro
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const reviews = await prisma.review.findMany({
     where: { merchantId: merchant.id },

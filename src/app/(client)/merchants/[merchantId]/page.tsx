@@ -364,7 +364,23 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
           </section>
         )}
 
-        {/* Reviews Section — Pro only */}
+        {/* Reviews Section */}
+        {merchant.plan !== "PRO" && (
+          <section id="avis" className="scroll-mt-24">
+            <div className="bg-gradient-to-br from-[#0066FF]/5 to-[#00B4D8]/5 dark:from-[#0066FF]/10 dark:to-[#00B4D8]/10 rounded-2xl border border-[#0066FF]/10 dark:border-[#0066FF]/20 p-6 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-[#0066FF]/10 flex items-center justify-center mx-auto mb-3">
+                <Star className="h-6 w-6 text-[#0066FF]" />
+              </div>
+              <h3 className="text-sm font-semibold text-[#0C1B2A] dark:text-white mb-1">
+                Avis clients bientôt disponibles
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed max-w-sm mx-auto">
+                Ce professionnel n&apos;a pas encore activé les avis clients. Les retours et notes seront disponibles prochainement.
+              </p>
+            </div>
+          </section>
+        )}
+
         {merchant.plan === "PRO" && (
           <section id="avis" className="scroll-mt-24">
             <div className="flex items-center gap-2 mb-5">
