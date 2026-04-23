@@ -7,6 +7,8 @@ import { isMedicalSectorName } from "@/lib/medical";
 import { Star, TrendingUp, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardReviewsPage() {
   const session = await getSession();
   if (!session?.user) redirect("/login");
