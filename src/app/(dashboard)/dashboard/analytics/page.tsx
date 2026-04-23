@@ -11,6 +11,10 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
+import { AnimatedChart } from "@/components/analytics/AnimatedChart";
+import { AnimatedNumber } from "@/components/analytics/AnimatedNumber";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardAnalyticsPage() {
   const session = await getSession();
@@ -93,8 +97,6 @@ export default async function DashboardAnalyticsPage() {
       revenue: monthBookings.reduce((s, b) => s + b.totalPrice, 0),
     });
   }
-  const maxMonthCount = Math.max(...monthlyStats.map((m) => m.count), 1);
-
   if (isMedical) {
     // ─────────────────────────────────────────
     // DASHBOARD ANALYTIQUES MEDICAL
@@ -115,28 +117,28 @@ export default async function DashboardAnalyticsPage() {
           <Card className="rounded-2xl border-0 shadow-sm card-hover">
             <CardContent className="py-5 text-center">
               <Users className="h-6 w-6 text-emerald-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">{uniqueClients}</p>
+              <AnimatedNumber value={uniqueClients} className="text-2xl font-bold text-[#0C1B2A] dark:text-white block" />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Patients</p>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-0 shadow-sm card-hover">
             <CardContent className="py-5 text-center">
               <CalendarDays className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">{completedBookings}</p>
+              <AnimatedNumber value={completedBookings} className="text-2xl font-bold text-[#0C1B2A] dark:text-white block" />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Consultations effectuées</p>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-0 shadow-sm card-hover">
             <CardContent className="py-5 text-center">
               <CheckCircle className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-emerald-600">{honorationRate}%</p>
+              <AnimatedNumber value={honorationRate} format={(n) => `${n}%`} className="text-2xl font-bold text-emerald-600 block" />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Taux d&apos;honoration</p>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-0 shadow-sm card-hover">
             <CardContent className="py-5 text-center">
               <UserCheck className="h-6 w-6 text-violet-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-violet-600">{newPatientsLast30}</p>
+              <AnimatedNumber value={newPatientsLast30} className="text-2xl font-bold text-violet-600 block" />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Nouveaux patients (30j)</p>
             </CardContent>
           </Card>
@@ -150,23 +152,7 @@ export default async function DashboardAnalyticsPage() {
             </h2>
           </div>
           <CardContent className="p-6">
-            <div className="flex items-end gap-3 h-40">
-              {monthlyStats.map((m) => (
-                <div key={m.month} className="flex-1 flex flex-col items-center gap-1">
-                  <span className="text-xs font-semibold text-emerald-600">
-                    {m.count}
-                  </span>
-                  <div
-                    className="w-full bg-gradient-to-t from-emerald-500 to-teal-400 rounded-t-lg transition-all duration-500"
-                    style={{
-                      height: `${Math.max((m.count / maxMonthCount) * 100, 4)}%`,
-                      minHeight: "4px",
-                    }}
-                  />
-                  <span className="text-[10px] text-gray-500 mt-1">{m.month}</span>
-                </div>
-              ))}
-            </div>
+            <AnimatedChart data={monthlyStats} color="emerald" />
           </CardContent>
         </Card>
 
@@ -266,31 +252,29 @@ export default async function DashboardAnalyticsPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
           <CardContent className="py-5 text-center">
-            <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">{totalBookings}</p>
+            <CalendarDays className="h-6 w-6 text-[#0066FF] mx-auto mb-2" />
+            <AnimatedNumber value={totalBookings} className="text-2xl font-bold text-[#0C1B2A] dark:text-white block" />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Total RDV</p>
           </CardContent>
         </Card>
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
           <CardContent className="py-5 text-center">
-            <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
-              {completedBookings}
-            </p>
+            <CheckCircle className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
+            <AnimatedNumber value={completedBookings} className="text-2xl font-bold text-[#0C1B2A] dark:text-white block" />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Terminés</p>
           </CardContent>
         </Card>
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
           <CardContent className="py-5 text-center">
-            <p className="text-2xl font-bold bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent">
-              {formatPrice(totalRevenue)}
-            </p>
+            <Users className="h-6 w-6 text-[#00B4D8] mx-auto mb-2" />
+            <AnimatedNumber value={totalRevenue} format={(n) => formatPrice(n)} className="text-2xl font-bold bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent block" />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Revenu total</p>
           </CardContent>
         </Card>
         <Card className="rounded-2xl border-0 shadow-sm card-hover">
           <CardContent className="py-5 text-center">
-            <p className="text-2xl font-bold text-emerald-600">
-              {formatPrice(recentRevenue)}
-            </p>
+            <UserCheck className="h-6 w-6 text-emerald-600 mx-auto mb-2" />
+            <AnimatedNumber value={recentRevenue} format={(n) => formatPrice(n)} className="text-2xl font-bold text-emerald-600 block" />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">30 derniers jours</p>
           </CardContent>
         </Card>
@@ -304,23 +288,7 @@ export default async function DashboardAnalyticsPage() {
           </h2>
         </div>
         <CardContent className="p-6">
-          <div className="flex items-end gap-3 h-40">
-            {monthlyStats.map((m) => (
-              <div key={m.month} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-xs font-semibold text-[#0066FF]">
-                  {m.count}
-                </span>
-                <div
-                  className="w-full bg-gradient-to-t from-[#0066FF] to-[#00B4D8] rounded-t-lg transition-all duration-500"
-                  style={{
-                    height: `${Math.max((m.count / maxMonthCount) * 100, 4)}%`,
-                    minHeight: "4px",
-                  }}
-                />
-                <span className="text-[10px] text-gray-500 mt-1">{m.month}</span>
-              </div>
-            ))}
-          </div>
+          <AnimatedChart data={monthlyStats} color="blue" />
         </CardContent>
       </Card>
 
