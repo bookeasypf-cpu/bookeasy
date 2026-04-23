@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendPushNotification } from "@/lib/push";
-import { xpValidateLimiter, formatRateLimitError } from "@/lib/ratelimit";
+import { xpValidateLimiter, checkRateLimit, formatRateLimitError } from "@/lib/ratelimit";
 
 async function getMerchant(userId: string) {
   return prisma.merchant.findUnique({ where: { userId } });
@@ -19,16 +19,14 @@ export async function POST(request: Request) {
     if (!merchant)
       return NextResponse.json({ error: "No merchant profile" }, { status: 400 });
 
-    // Rate limiting: 20 validations per hour per merchant
-    const { success, reset } = await xpValidateLimiter.limit(
+    // Rate limiting: 20 validations per hour per merchant (fail-open if Redis down)
+    const { success: rlSuccess, resetIn } = await checkRateLimit(
+      xpValidateLimiter,
       `validate-${session.user.id}`
     );
-    if (!success) {
-      const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
+    if (!rlSuccess) {
       return NextResponse.json(
-        {
-          error: formatRateLimitError(resetIn, "validations"),
-        },
+        { error: formatRateLimitError(resetIn, "validations") },
         { status: 429 }
       );
     }
@@ -117,7 +115,8 @@ export async function POST(request: Request) {
       value: redemption.reward.value,
       xpCost: redemption.reward.xpCost,
     });
-  } catch {
+  } catch (err) {
+    console.error("validate-code POST error:", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
