@@ -57,50 +57,64 @@ export async function POST(request: Request) {
       );
     }
 
-    // Calculer le solde XP du client chez ce commerçant
-    const balanceResult = await prisma.xpTransaction.aggregate({
-      where: { userId: session.user.id, merchantId: reward.merchantId },
-      _sum: { amount: true },
-    });
-
-    const balance = balanceResult._sum.amount || 0;
-
-    if (balance < reward.xpCost) {
-      return NextResponse.json(
-        {
-          error: `XP insuffisants. Vous avez ${balance} XP, il en faut ${reward.xpCost}.`,
-        },
-        { status: 400 }
-      );
-    }
-
     // Générer un code unique pour la récompense
     const code = `BE-${randomBytes(4).toString("hex").toUpperCase()}`;
 
-    // Transaction : déduire les XP + créer le redemption
-    const [, redemption] = await prisma.$transaction([
-      prisma.xpTransaction.create({
-        data: {
-          userId: session.user.id,
-          merchantId: reward.merchantId,
-          amount: -reward.xpCost,
-          type: "REDEEMED",
-          reason: `Échange : ${reward.name}`,
-        },
-      }),
-      prisma.xpRedemption.create({
-        data: {
-          rewardId: reward.id,
-          userId: session.user.id,
-          code,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 jours
-        },
-      }),
-      prisma.xpReward.update({
-        where: { id: reward.id },
-        data: { usedCount: { increment: 1 } },
-      }),
-    ]);
+    // Transaction : vérifier solde + déduire les XP + créer le redemption (atomique)
+    let balance: number;
+    let redemption: { code: string; expiresAt: Date | null };
+    try {
+      const result = await prisma.$transaction(async (tx) => {
+        // Balance check INSIDE transaction to prevent race condition
+        const balanceResult = await tx.xpTransaction.aggregate({
+          where: { userId: session.user.id, merchantId: reward.merchantId },
+          _sum: { amount: true },
+        });
+
+        const bal = balanceResult._sum.amount || 0;
+        if (bal < reward.xpCost) {
+          throw new Error(`XP_INSUFFICIENT:${bal}`);
+        }
+
+        await tx.xpTransaction.create({
+          data: {
+            userId: session.user.id,
+            merchantId: reward.merchantId,
+            amount: -reward.xpCost,
+            type: "REDEEMED",
+            reason: `Échange : ${reward.name}`,
+          },
+        });
+
+        const red = await tx.xpRedemption.create({
+          data: {
+            rewardId: reward.id,
+            userId: session.user.id,
+            code,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 jours
+          },
+        });
+
+        await tx.xpReward.update({
+          where: { id: reward.id },
+          data: { usedCount: { increment: 1 } },
+        });
+
+        return { balance: bal, redemption: red };
+      });
+
+      balance = result.balance;
+      redemption = result.redemption;
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith("XP_INSUFFICIENT:")) {
+        const bal = parseInt(e.message.split(":")[1], 10);
+        return NextResponse.json(
+          { error: `XP insuffisants. Vous avez ${bal} XP, il en faut ${reward.xpCost}.` },
+          { status: 400 }
+        );
+      }
+      throw e;
+    }
 
     // Notify merchant: client wants to use reward
     const clientName = session.user.name || "Un client";

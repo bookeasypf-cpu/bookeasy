@@ -75,6 +75,14 @@ function RegisterForm() {
       formData.set("referralCode", refCode);
     }
 
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+    if (password !== confirmPassword) {
+      setError("Les mots de passe ne correspondent pas");
+      setLoading(false);
+      return;
+    }
+
     const result = await registerUser(formData);
 
     if (result.error) {
