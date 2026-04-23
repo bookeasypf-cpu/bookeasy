@@ -9,6 +9,7 @@ import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import { StarRating } from "@/components/ui/StarRating";
 import { formatPrice, formatDuration } from "@/lib/utils";
 import Link from "next/link";
+import { WriteReview } from "./WriteReview";
 
 interface MerchantPageProps {
   params: Promise<{ merchantId: string }>;
@@ -372,6 +373,9 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
                 Avis ({merchant._count.reviews})
               </h2>
             </div>
+
+            {/* Write review button */}
+            <WriteReview merchantId={merchant.id} />
 
             {merchant.reviews.length > 0 ? (
               <div className="space-y-5">
