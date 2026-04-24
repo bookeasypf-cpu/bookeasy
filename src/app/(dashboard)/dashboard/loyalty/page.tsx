@@ -571,16 +571,34 @@ export default function DashboardLoyaltyPage() {
           >
             {/* Glow border */}
             <motion.div
-              className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-[#0066FF] via-[#00B4D8] to-[#0066FF] opacity-0"
+              className="absolute -inset-[2px] rounded-[18px] z-0"
+              style={{
+                background: "linear-gradient(135deg, #0066FF, #00B4D8, #0066FF, #00B4D8)",
+                backgroundSize: "300% 300%",
+              }}
               animate={{
-                opacity: [0, 0.6, 0.3],
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                opacity: [0, 1, 0.5],
+                backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
               }}
               transition={{
-                opacity: { duration: 1.5, ease: "easeOut" },
-                backgroundPosition: { duration: 3, repeat: Infinity, ease: "linear" },
+                opacity: { duration: 2, ease: "easeOut" },
+                backgroundPosition: { duration: 4, repeat: Infinity, ease: "linear" },
               }}
-              style={{ backgroundSize: "200% 200%" }}
+            />
+            <motion.div
+              className="absolute -inset-[2px] rounded-[18px] blur-md z-0"
+              style={{
+                background: "linear-gradient(135deg, #0066FF, #00B4D8, #0066FF)",
+                backgroundSize: "300% 300%",
+              }}
+              animate={{
+                opacity: [0, 0.6, 0.3],
+                backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
+              }}
+              transition={{
+                opacity: { duration: 2, ease: "easeOut" },
+                backgroundPosition: { duration: 4, repeat: Infinity, ease: "linear" },
+              }}
             />
             <Card className="rounded-2xl border-0 shadow-lg relative z-10">
               <CardContent className="p-6">

@@ -417,11 +417,26 @@ export default function MyRewardsPage() {
                           <p className="text-sm font-semibold text-[#0C1B2A] dark:text-white">
                             {r.reward.name}
                           </p>
-                          <p className="text-xs text-gray-500">
-                            {r.reward.merchant.businessName} • {r.reward.xpCost} XP
-                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                              r.reward.type === "DISCOUNT"
+                                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                                : r.reward.type === "FREE_SERVICE"
+                                  ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                                  : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400"
+                            }`}>
+                              {r.reward.type === "DISCOUNT"
+                                ? `−${r.reward.value}%`
+                                : r.reward.type === "FREE_SERVICE"
+                                  ? "Service gratuit"
+                                  : "Cadeau"}
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {r.reward.merchant.businessName}
+                            </span>
+                          </div>
                           <p className="text-xs text-gray-400 mt-1">
-                            {new Date(r.createdAt).toLocaleDateString("fr-FR", {
+                            {r.reward.xpCost} XP • {new Date(r.createdAt).toLocaleDateString("fr-FR", {
                               day: "numeric",
                               month: "long",
                               year: "numeric",
