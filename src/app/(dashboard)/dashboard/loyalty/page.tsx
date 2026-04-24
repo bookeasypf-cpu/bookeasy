@@ -81,7 +81,7 @@ function NeonField({ children, delay = 0 }: { children: React.ReactNode; delay?:
           backgroundPosition: { delay, duration: 3, repeat: Infinity, ease: "linear" },
         }}
       />
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 [&_label]:pl-1">{children}</div>
     </div>
   );
 }
