@@ -46,6 +46,46 @@ interface XpSettings {
   totalRedemptions: number;
 }
 
+function NeonField({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  return (
+    <div className="relative">
+      <motion.div
+        className="absolute -inset-[1px] rounded-xl z-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(90deg, #0066FF, #00B4D8, #0066FF)",
+          backgroundSize: "200% 100%",
+        }}
+        initial={{ opacity: 0 }}
+        animate={{
+          opacity: [0, 0.7, 0.25],
+          backgroundPosition: ["0% 0%", "100% 0%", "0% 0%"],
+        }}
+        transition={{
+          opacity: { delay, duration: 1.8, ease: "easeOut" },
+          backgroundPosition: { delay, duration: 3, repeat: Infinity, ease: "linear" },
+        }}
+      />
+      <motion.div
+        className="absolute -inset-[1px] rounded-xl blur-sm z-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(90deg, #0066FF, #00B4D8, #0066FF)",
+          backgroundSize: "200% 100%",
+        }}
+        initial={{ opacity: 0 }}
+        animate={{
+          opacity: [0, 0.4, 0.15],
+          backgroundPosition: ["0% 0%", "100% 0%", "0% 0%"],
+        }}
+        transition={{
+          opacity: { delay, duration: 1.8, ease: "easeOut" },
+          backgroundPosition: { delay, duration: 3, repeat: Infinity, ease: "linear" },
+        }}
+      />
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+}
+
 export default function DashboardLoyaltyPage() {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [settings, setSettings] = useState<XpSettings | null>(null);
@@ -608,63 +648,73 @@ export default function DashboardLoyaltyPage() {
                     : "Nouvelle récompense"}
                 </h3>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <Input
-                    id="reward-name"
-                    label="Nom de la récompense"
-                    placeholder="ex: 10% de réduction, Coupe gratuite..."
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    required
-                  />
-                  <Input
-                    id="reward-desc"
-                    label="Description (optionnel)"
-                    placeholder="Détails sur la récompense..."
-                    value={form.description}
-                    onChange={(e) =>
-                      setForm({ ...form, description: e.target.value })
-                    }
-                  />
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <NeonField delay={0.2}>
                     <Input
-                      id="reward-xp"
-                      label="Coût en XP"
-                      type="number"
-                      min="1"
-                      value={form.xpCost}
-                      onChange={(e) =>
-                        setForm({ ...form, xpCost: e.target.value })
-                      }
+                      id="reward-name"
+                      label="Nom de la récompense"
+                      placeholder="ex: 10% de réduction, Coupe gratuite..."
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
                       required
                     />
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Type
-                      </label>
-                      <select
-                        value={form.type}
-                        onChange={(e) =>
-                          setForm({ ...form, type: e.target.value })
-                        }
-                        className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
-                      >
-                        <option value="DISCOUNT">Réduction (%)</option>
-                        <option value="FREE_SERVICE">Prestation gratuite</option>
-                        <option value="GIFT">Cadeau</option>
-                      </select>
-                    </div>
-                    {form.type === "DISCOUNT" && (
+                  </NeonField>
+                  <NeonField delay={0.35}>
+                    <Input
+                      id="reward-desc"
+                      label="Description (optionnel)"
+                      placeholder="Détails sur la récompense..."
+                      value={form.description}
+                      onChange={(e) =>
+                        setForm({ ...form, description: e.target.value })
+                      }
+                    />
+                  </NeonField>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <NeonField delay={0.5}>
                       <Input
-                        id="reward-value"
-                        label="Valeur (%)"
+                        id="reward-xp"
+                        label="Coût en XP"
                         type="number"
                         min="1"
-                        max="100"
-                        value={form.value}
+                        value={form.xpCost}
                         onChange={(e) =>
-                          setForm({ ...form, value: e.target.value })
+                          setForm({ ...form, xpCost: e.target.value })
                         }
+                        required
                       />
+                    </NeonField>
+                    <NeonField delay={0.65}>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Type
+                        </label>
+                        <select
+                          value={form.type}
+                          onChange={(e) =>
+                            setForm({ ...form, type: e.target.value })
+                          }
+                          className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                        >
+                          <option value="DISCOUNT">Réduction (%)</option>
+                          <option value="FREE_SERVICE">Prestation gratuite</option>
+                          <option value="GIFT">Cadeau</option>
+                        </select>
+                      </div>
+                    </NeonField>
+                    {form.type === "DISCOUNT" && (
+                      <NeonField delay={0.8}>
+                        <Input
+                          id="reward-value"
+                          label="Valeur (%)"
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={form.value}
+                          onChange={(e) =>
+                            setForm({ ...form, value: e.target.value })
+                          }
+                        />
+                      </NeonField>
                     )}
                   </div>
                   <div className="flex gap-2">
