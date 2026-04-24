@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
-import { giftCardLimiter, formatRateLimitError } from "@/lib/ratelimit";
+import { giftCardLimiter, checkRateLimit, formatRateLimitError } from "@/lib/ratelimit";
 
 // Générer un code carte cadeau lisible
 function generateGiftCardCode(): string {
@@ -87,12 +87,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    // Rate limiting: 5 gift cards per hour per user
-    const { success, reset } = await giftCardLimiter.limit(
+    // Rate limiting: 5 gift cards per hour per user (fail-open if Redis down)
+    const { success: rlSuccess, resetIn } = await checkRateLimit(
+      giftCardLimiter,
       `giftcard-${session.user.id}`
     );
-    if (!success) {
-      const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
+    if (!rlSuccess) {
       return NextResponse.json(
         {
           error: formatRateLimitError(resetIn, "créations de cartes cadeaux"),

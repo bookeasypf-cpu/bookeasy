@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { formatPrice } from "@/lib/utils";
 import { GiftCardVerifier } from "./GiftCardVerifier";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardGiftCardsPage() {
   const session = await getSession();
   if (!session?.user) redirect("/login");
@@ -22,11 +24,14 @@ export default async function DashboardGiftCardsPage() {
     take: 50,
   });
 
-  // Count bookings that used gift cards
+  // Count bookings that used gift cards (legacy notes pattern + giftCardCode field)
   const bookingsWithGiftCards = await prisma.booking.count({
     where: {
       merchantId: merchant.id,
-      notes: { contains: "[Carte cadeau:" },
+      OR: [
+        { notes: { contains: "[Carte cadeau:" } },
+        { giftCardCode: { not: null } },
+      ],
     },
   });
 
