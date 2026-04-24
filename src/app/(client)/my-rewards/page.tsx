@@ -271,28 +271,50 @@ export default function MyRewardsPage() {
                             key={reward.id}
                             className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${
                               canRedeem
-                                ? "border-[#0066FF]/20 bg-[#0066FF]/5"
-                                : "border-gray-100 bg-gray-50"
+                                ? "border-[#0066FF]/20 bg-[#0066FF]/5 dark:bg-[#0066FF]/10"
+                                : "border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
                             }`}
                           >
-                            <div className="flex items-center gap-3 flex-1">
-                              <Gift
-                                className={`h-5 w-5 ${canRedeem ? "text-[#0066FF]" : "text-gray-300"}`}
-                              />
-                              <div className="flex-1">
-                                <p
-                                  className={`text-sm font-medium ${canRedeem ? "text-[#0C1B2A]" : "text-gray-500"}`}
-                                >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                                canRedeem
+                                  ? "bg-[#0066FF]/10"
+                                  : "bg-gray-100 dark:bg-gray-800"
+                              }`}>
+                                <Gift
+                                  className={`h-5 w-5 ${canRedeem ? "text-[#0066FF]" : "text-gray-300 dark:text-gray-600"}`}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-semibold ${canRedeem ? "text-[#0C1B2A] dark:text-white" : "text-gray-500 dark:text-gray-400"}`}>
                                   {reward.name}
                                 </p>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <div className="flex-1 h-1.5 bg-gray-200 rounded-full max-w-[120px]">
+                                {reward.description && (
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+                                    {reward.description}
+                                  </p>
+                                )}
+                                <div className="flex items-center gap-2 mt-1.5">
+                                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                                    reward.type === "DISCOUNT"
+                                      ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                                      : reward.type === "FREE_SERVICE"
+                                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                                        : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400"
+                                  }`}>
+                                    {reward.type === "DISCOUNT"
+                                      ? `−${reward.value}%`
+                                      : reward.type === "FREE_SERVICE"
+                                        ? "Gratuit"
+                                        : "Cadeau"}
+                                  </span>
+                                  <div className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full max-w-[80px]">
                                     <div
                                       className="h-full bg-gradient-to-r from-[#0066FF] to-[#00B4D8] rounded-full transition-all"
                                       style={{ width: `${progress}%` }}
                                     />
                                   </div>
-                                  <span className="text-xs text-gray-400">
+                                  <span className="text-[10px] text-gray-400">
                                     {item.balance}/{reward.xpCost} XP
                                   </span>
                                 </div>
