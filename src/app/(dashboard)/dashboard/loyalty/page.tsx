@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -58,6 +59,7 @@ export default function DashboardLoyaltyPage() {
   const [pendingRedemptions, setPendingRedemptions] = useState<
     { id: string; clientName: string; reward: { name: string }; code: string }[]
   >([]);
+  const formRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -122,6 +124,7 @@ export default function DashboardLoyaltyPage() {
     });
     setEditingId(reward.id);
     setShowForm(true);
+    setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -318,6 +321,7 @@ export default function DashboardLoyaltyPage() {
           onClick={() => {
             resetForm();
             setShowForm(true);
+            setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
           }}
           className="inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all duration-300"
         >
@@ -555,94 +559,118 @@ export default function DashboardLoyaltyPage() {
       </Card>
 
       {/* Reward Form */}
-      {showForm && (
-        <Card className="mb-6 rounded-2xl border-0 shadow-sm animate-fade-in-up">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-[#0C1B2A] dark:text-white mb-4">
-              {editingId
-                ? "Modifier la récompense"
-                : "Nouvelle récompense"}
-            </h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                id="reward-name"
-                label="Nom de la récompense"
-                placeholder="ex: 10% de réduction, Coupe gratuite..."
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                required
-              />
-              <Input
-                id="reward-desc"
-                label="Description (optionnel)"
-                placeholder="Détails sur la récompense..."
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-              />
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <Input
-                  id="reward-xp"
-                  label="Coût en XP"
-                  type="number"
-                  min="1"
-                  value={form.xpCost}
-                  onChange={(e) =>
-                    setForm({ ...form, xpCost: e.target.value })
-                  }
-                  required
-                />
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Type
-                  </label>
-                  <select
-                    value={form.type}
-                    onChange={(e) =>
-                      setForm({ ...form, type: e.target.value })
-                    }
-                    className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
-                  >
-                    <option value="DISCOUNT">Réduction (%)</option>
-                    <option value="FREE_SERVICE">Prestation gratuite</option>
-                    <option value="GIFT">Cadeau</option>
-                  </select>
-                </div>
-                {form.type === "DISCOUNT" && (
+      <AnimatePresence>
+        {showForm && (
+          <motion.div
+            ref={formRef}
+            initial={{ opacity: 0, y: 40, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.97 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="mb-6 relative"
+          >
+            {/* Glow border */}
+            <motion.div
+              className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-[#0066FF] via-[#00B4D8] to-[#0066FF] opacity-0"
+              animate={{
+                opacity: [0, 0.6, 0.3],
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+              }}
+              transition={{
+                opacity: { duration: 1.5, ease: "easeOut" },
+                backgroundPosition: { duration: 3, repeat: Infinity, ease: "linear" },
+              }}
+              style={{ backgroundSize: "200% 200%" }}
+            />
+            <Card className="rounded-2xl border-0 shadow-lg relative z-10">
+              <CardContent className="p-6">
+                <h3 className="font-semibold text-[#0C1B2A] dark:text-white mb-4">
+                  {editingId
+                    ? "Modifier la récompense"
+                    : "Nouvelle récompense"}
+                </h3>
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <Input
-                    id="reward-value"
-                    label="Valeur (%)"
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={form.value}
+                    id="reward-name"
+                    label="Nom de la récompense"
+                    placeholder="ex: 10% de réduction, Coupe gratuite..."
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    required
+                  />
+                  <Input
+                    id="reward-desc"
+                    label="Description (optionnel)"
+                    placeholder="Détails sur la récompense..."
+                    value={form.description}
                     onChange={(e) =>
-                      setForm({ ...form, value: e.target.value })
+                      setForm({ ...form, description: e.target.value })
                     }
                   />
-                )}
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all duration-300 disabled:opacity-50"
-                >
-                  {saving
-                    ? "..."
-                    : editingId
-                      ? "Modifier"
-                      : "Créer la récompense"}
-                </button>
-                <Button type="button" variant="ghost" onClick={resetForm}>
-                  Annuler
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <Input
+                      id="reward-xp"
+                      label="Coût en XP"
+                      type="number"
+                      min="1"
+                      value={form.xpCost}
+                      onChange={(e) =>
+                        setForm({ ...form, xpCost: e.target.value })
+                      }
+                      required
+                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Type
+                      </label>
+                      <select
+                        value={form.type}
+                        onChange={(e) =>
+                          setForm({ ...form, type: e.target.value })
+                        }
+                        className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                      >
+                        <option value="DISCOUNT">Réduction (%)</option>
+                        <option value="FREE_SERVICE">Prestation gratuite</option>
+                        <option value="GIFT">Cadeau</option>
+                      </select>
+                    </div>
+                    {form.type === "DISCOUNT" && (
+                      <Input
+                        id="reward-value"
+                        label="Valeur (%)"
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={form.value}
+                        onChange={(e) =>
+                          setForm({ ...form, value: e.target.value })
+                        }
+                      />
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="submit"
+                      disabled={saving}
+                      className="inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all duration-300 disabled:opacity-50"
+                    >
+                      {saving
+                        ? "..."
+                        : editingId
+                          ? "Modifier"
+                          : "Créer la récompense"}
+                    </button>
+                    <Button type="button" variant="ghost" onClick={resetForm}>
+                      Annuler
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Rewards List */}
       <div className="space-y-3 stagger-children">
