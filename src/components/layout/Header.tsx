@@ -223,7 +223,7 @@ export function Header() {
                 </Link>
                 <Link
                   href="/register"
-                  className="text-sm font-semibold text-white bg-[#0066FF] hover:bg-[#0052CC] px-4 py-2 rounded-lg transition-colors"
+                  className="text-sm font-semibold text-white bg-[#0066FF] hover:bg-[#0052CC] px-4 py-2 rounded-lg transition-all duration-300 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 glow-pulse"
                 >
                   Inscription
                 </Link>

@@ -178,20 +178,20 @@ function RegisterForm() {
             className={cn(
               "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
               role === "CLIENT"
-                ? "border-indigo-600 bg-indigo-50"
+                ? "border-[#0066FF] bg-[#0066FF]/5"
                 : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
             )}
           >
             <User
               className={cn(
                 "h-6 w-6",
-                role === "CLIENT" ? "text-indigo-600" : "text-gray-400"
+                role === "CLIENT" ? "text-[#0066FF]" : "text-gray-400"
               )}
             />
             <span
               className={cn(
                 "text-sm font-medium",
-                role === "CLIENT" ? "text-indigo-700" : "text-gray-600 dark:text-gray-300"
+                role === "CLIENT" ? "text-[#0066FF]" : "text-gray-600 dark:text-gray-300"
               )}
             >
               Client
@@ -206,20 +206,20 @@ function RegisterForm() {
             className={cn(
               "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
               role === "MERCHANT"
-                ? "border-indigo-600 bg-indigo-50"
+                ? "border-[#0066FF] bg-[#0066FF]/5"
                 : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
             )}
           >
             <Store
               className={cn(
                 "h-6 w-6",
-                role === "MERCHANT" ? "text-indigo-600" : "text-gray-400"
+                role === "MERCHANT" ? "text-[#0066FF]" : "text-gray-400"
               )}
             />
             <span
               className={cn(
                 "text-sm font-medium",
-                role === "MERCHANT" ? "text-indigo-700" : "text-gray-600 dark:text-gray-300"
+                role === "MERCHANT" ? "text-[#0066FF]" : "text-gray-600 dark:text-gray-300"
               )}
             >
               Professionnel
@@ -279,7 +279,7 @@ function RegisterForm() {
           Déjà un compte ?{" "}
           <Link
             href="/login"
-            className="text-indigo-600 font-medium hover:text-indigo-500"
+            className="text-[#0066FF] font-medium hover:text-[#0052CC]"
           >
             Se connecter
           </Link>

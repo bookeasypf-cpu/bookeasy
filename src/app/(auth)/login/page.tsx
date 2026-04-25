@@ -109,7 +109,7 @@ function LoginForm() {
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="w-full hover:shadow-md hover:shadow-blue-500/10 hover:border-[#0066FF]/30 transition-all duration-300"
               onClick={() => signIn("google", { callbackUrl })}
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -139,7 +139,7 @@ function LoginForm() {
           Pas encore de compte ?{" "}
           <Link
             href={callbackUrl !== "/" ? `/register?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/register"}
-            className="text-indigo-600 font-medium hover:text-indigo-500"
+            className="text-[#0066FF] font-medium hover:text-[#0052CC]"
           >
             S&apos;inscrire
           </Link>

@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { SearchBar } from "@/components/search/SearchBar";
 import { MerchantCard } from "@/components/search/MerchantCard";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { SearchX, MapIcon, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Recherche - BookEasy",
@@ -171,9 +174,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
         {/* Merchant Grid */}
         {merchantsWithRating.length > 0 ? (
-          <div className="stagger-children grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-12">
-            {merchantsWithRating.map((merchant) => (
-              <MerchantCard key={merchant.id} merchant={merchant} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-12">
+            {merchantsWithRating.map((merchant, index) => (
+              <ScrollReveal key={merchant.id} delay={index * 80}>
+                <MerchantCard merchant={merchant} />
+              </ScrollReveal>
             ))}
           </div>
         ) : (
