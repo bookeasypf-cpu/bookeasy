@@ -36,6 +36,8 @@ export async function POST(req: NextRequest) {
       await handleProSubscription(ipnData);
     } else if (ipnData.type === "BOOKING_PAYMENT") {
       await handleBookingPayment(ipnData);
+    } else if (ipnData.type === "GIFT_CARD_PAYMENT") {
+      await handleGiftCardPayment(ipnData);
     }
 
     return new NextResponse("OK", { status: 200 });
@@ -176,6 +178,87 @@ async function handleBookingPayment(ipnData: ReturnType<typeof parseIPNData>) {
           },
         });
       }
+      break;
+    }
+  }
+}
+
+async function handleGiftCardPayment(ipnData: ReturnType<typeof parseIPNData>) {
+  if (!ipnData.giftCardId) return;
+
+  const card = await prisma.giftCard.findUnique({
+    where: { id: ipnData.giftCardId },
+    select: {
+      id: true,
+      status: true,
+      amount: true,
+      senderEmail: true,
+      merchantId: true,
+    },
+  });
+
+  if (!card) return;
+
+  switch (ipnData.transactionStatus) {
+    case "AUTHORISED":
+    case "CAPTURED": {
+      if (card.status !== "PENDING_PAYMENT") return;
+
+      await prisma.$transaction(async (tx) => {
+        await tx.giftCard.update({
+          where: { id: card.id },
+          data: {
+            status: "ACTIVE",
+            balance: card.amount,
+            paymentStatus: "PAID",
+            payzenTransId: ipnData.transId,
+          },
+        });
+
+        // Award XP to buyer: 1 XP per 1000 XPF
+        const amountXPF = Math.round(card.amount * 119.33);
+        const xpEarned = Math.floor(amountXPF / 1000);
+
+        if (xpEarned > 0 && card.merchantId) {
+          const buyer = await tx.user.findFirst({
+            where: { email: card.senderEmail },
+            select: { id: true },
+          });
+
+          if (buyer) {
+            await tx.xpTransaction.create({
+              data: {
+                userId: buyer.id,
+                merchantId: card.merchantId,
+                amount: xpEarned,
+                type: "EARNED",
+                reason: `Carte cadeau offerte (${amountXPF.toLocaleString()} F)`,
+              },
+            });
+          }
+        }
+      });
+      break;
+    }
+
+    case "REFUSED":
+    case "ERROR": {
+      await prisma.giftCard.update({
+        where: { id: card.id },
+        data: { paymentStatus: "FAILED" },
+      });
+      break;
+    }
+
+    case "CANCELLED":
+    case "EXPIRED": {
+      await prisma.giftCard.update({
+        where: { id: card.id },
+        data: {
+          status: "CANCELLED",
+          paymentStatus: "FAILED",
+        },
+      });
       break;
     }
   }

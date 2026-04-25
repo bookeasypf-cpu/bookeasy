@@ -370,9 +370,12 @@ model GiftCard {
   recipientEmail String   // Email du destinataire
   message       String?   // Message personnalisé
   merchantId    String?   // null = valable partout, sinon chez un marchand spécifique
-  status        String    @default("ACTIVE") // ACTIVE, USED, EXPIRED
+  status        String    @default("ACTIVE") // ACTIVE, USED, EXPIRED, PENDING_PAYMENT
   expiresAt     DateTime  // Date d'expiration (1 an)
   usedAt        DateTime?
+  paymentStatus String?   // PENDING, PAID, FAILED (null = pas de paiement requis)
+  payzenOrderId String?
+  payzenTransId String?
   createdAt     DateTime  @default(now())
 
   merchant Merchant? @relation(fields: [merchantId], references: [id], onDelete: SetNull)

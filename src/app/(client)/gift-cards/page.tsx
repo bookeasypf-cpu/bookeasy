@@ -141,12 +141,50 @@ function GiftCardsContent() {
         }),
       });
       const data = await res.json();
-      if (res.ok) {
-        setSent({ code: data.code, amountXPF: data.amountXPF, xpEarned: data.xpEarned || 0, merchantName });
-        toast.success("Carte cadeau créée !");
-      } else {
+      if (!res.ok) {
         toast.error(data.error);
+        setSending(false);
+        return;
       }
+
+      // PayZen configured: redirect to payment
+      if (data.requiresPayment) {
+        try {
+          const checkoutRes = await fetch("/api/payzen/gift-card-checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ giftCardId: data.giftCardId }),
+          });
+          const checkoutData = await checkoutRes.json();
+          if (!checkoutRes.ok) {
+            toast.error(checkoutData.error || "Erreur paiement");
+            setSending(false);
+            return;
+          }
+          // Create hidden form and submit to PayZen
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = checkoutData.actionUrl;
+          for (const [key, value] of Object.entries(checkoutData.fields)) {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = value as string;
+            form.appendChild(input);
+          }
+          document.body.appendChild(form);
+          form.submit();
+          return;
+        } catch {
+          toast.error("Erreur de connexion au paiement");
+          setSending(false);
+          return;
+        }
+      }
+
+      // No PayZen: show card directly (test mode)
+      setSent({ code: data.code, amountXPF: data.amountXPF, xpEarned: data.xpEarned || 0, merchantName });
+      toast.success("Carte cadeau créée !");
     } catch {
       toast.error("Erreur de connexion");
     }

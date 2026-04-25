@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { giftCardLimiter, checkRateLimit, formatRateLimitError } from "@/lib/ratelimit";
+import { PAYZEN_CONFIGURED } from "@/lib/payzen";
+import { nanoid } from "nanoid";
 
 // Générer un code carte cadeau lisible
 function generateGiftCardCode(): string {
@@ -119,7 +121,37 @@ export async function POST(req: NextRequest) {
     const amountEUR = amountXPF / 119.33;
 
     const code = generateGiftCardCode();
+    const payzenOrderId = `GC-${nanoid(12)}`;
 
+    // Mode dual : si PayZen configuré → paiement requis, sinon → gratuit (test)
+    if (PAYZEN_CONFIGURED) {
+      const card = await prisma.giftCard.create({
+        data: {
+          code,
+          amount: amountEUR,
+          balance: 0, // Solde activé après paiement
+          currency: "XPF",
+          senderName,
+          senderEmail,
+          recipientName,
+          recipientEmail,
+          message: message || null,
+          merchantId: merchantId || null,
+          status: "PENDING_PAYMENT",
+          paymentStatus: "PENDING",
+          payzenOrderId,
+          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      return NextResponse.json({
+        giftCardId: card.id,
+        requiresPayment: true,
+        amountXPF,
+      });
+    }
+
+    // Fallback : pas de PayZen → carte active immédiatement (mode test)
     const card = await prisma.giftCard.create({
       data: {
         code,
@@ -132,7 +164,7 @@ export async function POST(req: NextRequest) {
         recipientEmail,
         message: message || null,
         merchantId: merchantId || null,
-        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 an
+        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
       },
     });
 
@@ -158,6 +190,7 @@ export async function POST(req: NextRequest) {
       balanceXPF,
       xpEarned: session?.user?.id ? xpEarned : 0,
       expiresAt: card.expiresAt,
+      requiresPayment: false,
       message: `Carte cadeau créée ! Code : ${card.code}`,
     });
   } catch (error) {
