@@ -89,9 +89,15 @@ export default async function HomePage() {
                 "vos",
                 "rendez-vous",
                 "en",
-                { text: "Polynésie", highlight: true },
-                { text: "française", highlight: true },
+                { text: "Polynésie française", highlight: true },
               ]}
+              rotatingWords={[
+                "Polynésie française",
+                "toute simplicité",
+                "quelques clics",
+                "toute confiance",
+              ]}
+              rotateInterval={3000}
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5 leading-tight tracking-tight"
             />
 
