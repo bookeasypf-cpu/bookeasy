@@ -12,6 +12,7 @@ import { StarRating } from "@/components/ui/StarRating";
 import { formatPrice, formatDuration } from "@/lib/utils";
 import Link from "next/link";
 import { WriteReview } from "./WriteReview";
+import { PhotoLightbox } from "@/components/ui/PhotoLightbox";
 
 interface MerchantPageProps {
   params: Promise<{ merchantId: string }>;
@@ -343,26 +344,14 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
               <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white">Photos</h2>
               <span className="text-sm text-gray-400 ml-1">({merchant.photos.length})</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {merchant.photos.map((photo) => (
-                <div
-                  key={photo.id}
-                  className="relative aspect-square rounded-2xl overflow-hidden group cursor-pointer"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={photo.url}
-                    alt={photo.caption || merchant.businessName}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  {photo.caption && (
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p className="text-xs text-white font-medium">{photo.caption}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <PhotoLightbox
+              photos={merchant.photos.map((p) => ({
+                id: p.id,
+                url: p.url,
+                caption: p.caption,
+              }))}
+              businessName={merchant.businessName}
+            />
           </section>
         )}
 
