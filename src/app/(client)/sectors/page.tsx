@@ -5,6 +5,7 @@ import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { CountUp } from "@/components/ui/CountUp";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { FAQ } from "@/components/ui/FAQ";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,14 @@ export default async function SectorsPage() {
   });
 
   const totalPros = sectors.reduce((sum, s) => sum + s._count.merchants, 0);
+
+  // Get distinct cities for SEO links
+  const cityCounts = await prisma.merchant.groupBy({
+    by: ["city"],
+    where: { isActive: true, city: { not: null } },
+    _count: true,
+    orderBy: { _count: { city: "desc" } },
+  });
 
   return (
     <>
@@ -83,6 +92,55 @@ export default async function SectorsPage() {
               </Link>
             </ScrollReveal>
           ))}
+        </div>
+
+        {/* SEO Local Links */}
+        {cityCounts.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+              Réservation par ville
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+              {sectors.slice(0, 8).flatMap((sector) =>
+                cityCounts.slice(0, 6).map((cc) => {
+                  const city = cc.city as string;
+                  const citySlug = city.toLowerCase().replace(/\s+/g, "-");
+                  return (
+                    <Link
+                      key={`${sector.slug}-${citySlug}`}
+                      href={`/reservation/${sector.slug}-${citySlug}`}
+                      className="px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:text-[#0066FF] hover:bg-[#0066FF]/5 transition-colors truncate"
+                    >
+                      {sector.name} à {city}
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* FAQ */}
+        <div className="mt-16 max-w-3xl mx-auto">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-6">
+            Questions fréquentes
+          </h2>
+          <FAQ
+            items={[
+              {
+                question: "Comment trouver un professionnel dans mon secteur ?",
+                answer: "Cliquez sur le secteur qui vous intéresse ci-dessus, ou utilisez la barre de recherche pour filtrer par nom, ville ou type de service. Vous pouvez aussi explorer la carte interactive pour trouver les professionnels proches de vous.",
+              },
+              {
+                question: "Les professionnels sont-ils vérifiés ?",
+                answer: "Tous les professionnels sur BookEasy ont créé un compte vérifié. Les professionnels avec le badge « Pro vérifié » ont souscrit à un abonnement et bénéficient de fonctionnalités avancées comme les avis clients.",
+              },
+              {
+                question: "Puis-je réserver en dehors des heures d'ouverture ?",
+                answer: "Oui ! BookEasy vous permet de réserver 24h/24, 7j/7. Le professionnel recevra votre demande et vous recevrez une confirmation par email.",
+              },
+            ]}
+          />
         </div>
       </div>
     </>

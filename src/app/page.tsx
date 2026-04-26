@@ -23,7 +23,9 @@ import {
   CheckCircle,
   Star,
   Quote,
+  HelpCircle,
 } from "lucide-react";
+import { FAQ } from "@/components/ui/FAQ";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -380,6 +382,50 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ===== FAQ SECTION ===== */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 w-full">
+        <ScrollReveal>
+          <div className="flex items-center gap-3 justify-center mb-2">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0066FF]/10 to-[#00B4D8]/10 flex items-center justify-center">
+              <HelpCircle className="h-5 w-5 text-[#0066FF]" />
+            </div>
+          </div>
+          <SectionTitle
+            title="Questions fréquentes"
+            subtitle="Tout ce que vous devez savoir sur BookEasy"
+          />
+        </ScrollReveal>
+
+        <ScrollReveal delay={100}>
+          <div className="mt-10 max-w-3xl mx-auto">
+            <FAQ
+              items={[
+                {
+                  question: "BookEasy est-il gratuit pour les clients ?",
+                  answer: "Oui, BookEasy est 100% gratuit pour les clients. Vous pouvez rechercher des professionnels, consulter leurs disponibilités et réserver en ligne sans aucun frais.",
+                },
+                {
+                  question: "Comment annuler ou modifier un rendez-vous ?",
+                  answer: "Rendez-vous dans « Mes réservations » depuis votre compte. Vous pouvez annuler un rendez-vous à tout moment. Le professionnel sera notifié automatiquement par email.",
+                },
+                {
+                  question: "Qu'est-ce que les points XP ?",
+                  answer: "Les points XP sont notre programme de fidélité. Vous gagnez des XP à chaque réservation honorée, en parrainant des amis ou en offrant des cartes cadeaux. Vous pouvez les échanger contre des réductions chez les professionnels participants.",
+                },
+                {
+                  question: "Les cartes cadeaux sont-elles valables partout ?",
+                  answer: "Vous pouvez offrir une carte cadeau universelle (valable chez tous les partenaires BookEasy) ou ciblée sur un professionnel précis. Les cartes sont valables 1 an à compter de la date d'achat.",
+                },
+                {
+                  question: "Je suis professionnel, comment m'inscrire ?",
+                  answer: "Créez un compte en choisissant « Professionnel » lors de l'inscription. Vous pourrez configurer vos services, horaires et disponibilités immédiatement. Le plan Gratuit vous permet de démarrer sans engagement.",
+                },
+              ]}
+            />
+          </div>
+        </ScrollReveal>
+      </section>
 
       {/* ===== CTA FOR PROS ===== */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0C1B2A] via-[#0C1B2A] to-[#0066FF]/20 mt-auto">

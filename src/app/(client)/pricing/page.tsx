@@ -3,6 +3,8 @@ import { Check, Star, Zap, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import { UpgradeButton } from "@/components/ui/UpgradeButton";
 import { QuickRegisterForm } from "@/components/ui/QuickRegisterForm";
+import { FAQ } from "@/components/ui/FAQ";
+import { ROICalculator } from "@/components/ui/ROICalculator";
 
 export const metadata: Metadata = {
   title: "Tarifs - BookEasy",
@@ -172,6 +174,13 @@ export default function PricingPage() {
         </div>
       </div>
 
+      {/* ROI Calculator */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+        <div className="max-w-xl mx-auto">
+          <ROICalculator />
+        </div>
+      </div>
+
       {/* Quick Registration */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
         <div className="max-w-md mx-auto bg-gradient-to-br from-[#0C1B2A] to-[#132D46] rounded-2xl p-8 text-center">
@@ -191,26 +200,19 @@ export default function PricingPage() {
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">
             Questions fréquentes
           </h2>
-          <div className="space-y-4">
-            {faqs.map((faq) => (
-              <div
-                key={faq.q}
-                className="bg-white rounded-xl p-5 border border-gray-100"
-              >
-                <h3 className="font-semibold text-gray-900 mb-2">{faq.q}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {faq.a}
-                </p>
-              </div>
-            ))}
-          </div>
+          <FAQ
+            items={faqs.map((faq) => ({
+              question: faq.q,
+              answer: faq.a,
+            }))}
+          />
 
           <div className="mt-12 text-center">
             <p className="text-gray-500 mb-4">
               Vous avez d&apos;autres questions ?
             </p>
             <Link
-              href="mailto:contact@bookeasy.me"
+              href="mailto:bookeasy.pf@gmail.com"
               className="inline-flex items-center gap-2 text-[#0066FF] font-semibold hover:underline"
             >
               Contactez-nous <ArrowRight className="h-4 w-4" />

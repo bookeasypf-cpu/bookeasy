@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Gift, Send, CheckCircle, Search, Download, Store, ChevronDown } from "lucide-react";
+import { FAQ } from "@/components/ui/FAQ";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import toast from "react-hot-toast";
@@ -536,6 +537,32 @@ function GiftCardsContent() {
             </CardContent>
           </Card>
         )}
+        {/* FAQ */}
+        <div className="mt-12">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-6">
+            Questions fréquentes
+          </h3>
+          <FAQ
+            items={[
+              {
+                question: "Comment utiliser une carte cadeau ?",
+                answer: "Lors de votre réservation, indiquez le code de la carte cadeau dans le champ prévu. Le montant sera automatiquement déduit du solde de la carte.",
+              },
+              {
+                question: "La carte cadeau est-elle valable chez tous les professionnels ?",
+                answer: "Cela dépend du type de carte. Une carte universelle est valable chez tous les partenaires BookEasy. Une carte ciblée est uniquement utilisable chez le professionnel choisi lors de l'achat.",
+              },
+              {
+                question: "Quelle est la durée de validité ?",
+                answer: "Les cartes cadeaux BookEasy sont valables 1 an à compter de la date d'achat. Le solde non utilisé à l'expiration est perdu.",
+              },
+              {
+                question: "Puis-je offrir une carte cadeau sans connaître le professionnel ?",
+                answer: "Oui ! Choisissez « Tous les partenaires » lors de l'achat. Le destinataire pourra l'utiliser chez n'importe quel professionnel sur BookEasy.",
+              },
+            ]}
+          />
+        </div>
       </div>
     </>
   );
