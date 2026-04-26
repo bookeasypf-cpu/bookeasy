@@ -142,6 +142,17 @@ body {
              textShimmer 3s linear 1s infinite;
 }
 
+/* Rotating highlighted word — gradient applied directly on the text element */
+.hero-rotating-text {
+  display: inline-block;
+  background: linear-gradient(90deg, #67E8F9, #00B4D8, #ffffff, #00B4D8, #67E8F9);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: textShimmer 3s linear infinite;
+}
+
 /* Gradient text shimmer sweep */
 @keyframes textShimmer {
   0% { background-position: -200% center; }

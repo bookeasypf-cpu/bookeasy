@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { cn } from "@/lib/utils";
 
 interface HeroTitleProps {
   words: Array<string | { text: string; highlight: boolean }>;
@@ -20,7 +19,7 @@ export function HeroTitle({
 }: HeroTitleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [currentRotation, setCurrentRotation] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [phase, setPhase] = useState<"visible" | "hiding" | "showing">("visible");
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
@@ -29,11 +28,20 @@ export function HeroTitle({
 
   const rotate = useCallback(() => {
     if (!rotatingWords || rotatingWords.length <= 1) return;
-    setIsTransitioning(true);
+
+    // Phase 1: hide current word (slide up + fade out)
+    setPhase("hiding");
+
+    // Phase 2: swap text and show new word (slide up from below + fade in)
     setTimeout(() => {
       setCurrentRotation((prev) => (prev + 1) % rotatingWords.length);
-      setIsTransitioning(false);
-    }, 400);
+      setPhase("showing");
+    }, 350);
+
+    // Phase 3: settle
+    setTimeout(() => {
+      setPhase("visible");
+    }, 700);
   }, [rotatingWords]);
 
   useEffect(() => {
@@ -48,10 +56,37 @@ export function HeroTitle({
     };
   }, [rotatingWords, rotateInterval, rotate]);
 
-  // Find where the highlight words are to replace them with rotating text
+  // Find where the highlight words start
   const highlightStartIndex = words.findIndex(
     (w) => typeof w === "object" && w.highlight
   );
+
+  // Compute rotating word inline styles for the 3-phase animation
+  function getRotatingStyle(): React.CSSProperties {
+    switch (phase) {
+      case "hiding":
+        return {
+          opacity: 0,
+          transform: "translateY(-20px)",
+          filter: "blur(4px)",
+          transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+        };
+      case "showing":
+        return {
+          opacity: 1,
+          transform: "translateY(0)",
+          filter: "blur(0)",
+          transition: "all 0.35s cubic-bezier(0.0, 0, 0.2, 1)",
+        };
+      default:
+        return {
+          opacity: 1,
+          transform: "translateY(0)",
+          filter: "blur(0)",
+          transition: "none",
+        };
+    }
+  }
 
   return (
     <h1 className={className}>
@@ -60,35 +95,31 @@ export function HeroTitle({
         const text = typeof word === "object" ? word.text : word;
         const delay = 0.15 + i * 0.12;
 
-        // If rotating mode and this is a highlight word
+        // Rotating highlight word
         if (isHighlight && rotatingWords && rotatingWords.length > 0) {
-          // Only render the rotating block on the first highlight word
+          // Only render once (on the first highlight word)
           if (i !== highlightStartIndex) return null;
 
           return (
             <span
-              key="rotating"
-              className="hero-word hero-word--highlight inline-block"
+              key="rotating-wrapper"
+              className="hero-word"
               style={{
                 animationDelay: `${delay}s`,
                 animationPlayState: isVisible ? "running" : "paused",
               }}
             >
               <span
-                className={cn(
-                  "inline-block transition-all duration-400",
-                  isTransitioning
-                    ? "opacity-0 translate-y-4 blur-sm"
-                    : "opacity-100 translate-y-0 blur-0"
-                )}
+                className="hero-rotating-text"
+                style={getRotatingStyle()}
               >
                 {rotatingWords[currentRotation]}
               </span>
-              {"\u00A0"}
             </span>
           );
         }
 
+        // Static highlight word (no rotating)
         if (isHighlight) {
           return (
             <span
@@ -105,6 +136,7 @@ export function HeroTitle({
           );
         }
 
+        // Normal word
         return (
           <span
             key={i}
