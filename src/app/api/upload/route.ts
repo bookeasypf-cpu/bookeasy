@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { put } from "@vercel/blob";
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { uploadLimiter, formatRateLimitError } from "@/lib/ratelimit";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -12,12 +12,11 @@ export async function POST(request: Request) {
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    // Allow both CLIENT and MERCHANT to upload
     if (!["CLIENT", "MERCHANT"].includes(session.user.role || "")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Rate limiting: 5 uploads per minute per user (fail-open)
+    // Rate limiting (fail-open)
     try {
       const { success, reset } = await uploadLimiter.limit(`upload-${session.user.id}`);
       if (!success) {
@@ -31,49 +30,28 @@ export async function POST(request: Request) {
       console.warn("Rate limiter unavailable, allowing upload:", e);
     }
 
-    // Check Vercel Blob is configured
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      console.error("BLOB_READ_WRITE_TOKEN is not set");
-      return NextResponse.json(
-        { error: "Le stockage d'images n'est pas configuré. Contactez l'administrateur." },
-        { status: 503 }
-      );
-    }
+    const body = (await request.json()) as HandleUploadBody;
 
-    const formData = await request.formData();
-    const file = formData.get("file") as File | null;
-
-    if (!file) {
-      return NextResponse.json({ error: "Aucun fichier fourni" }, { status: 400 });
-    }
-
-    // Validate file type
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json(
-        { error: "Type de fichier non autorisé. Utilisez JPG, PNG ou WebP." },
-        { status: 400 }
-      );
-    }
-
-    // Validate file size
-    if (file.size > MAX_SIZE) {
-      return NextResponse.json(
-        { error: "Le fichier est trop volumineux (max 10 Mo)." },
-        { status: 400 }
-      );
-    }
-
-    // Generate unique filename
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}.${ext}`;
-
-    // Upload to Vercel Blob
-    const blob = await put(`uploads/${uniqueName}`, file, {
-      access: "public",
-      contentType: file.type,
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (pathname) => {
+        // Validate the upload before generating a token
+        return {
+          allowedContentTypes: ALLOWED_TYPES,
+          maximumSizeInBytes: MAX_SIZE,
+          tokenPayload: JSON.stringify({
+            userId: session.user.id,
+            pathname,
+          }),
+        };
+      },
+      onUploadCompleted: async ({ blob }) => {
+        console.log("Upload completed:", blob.url);
+      },
     });
 
-    return NextResponse.json({ url: blob.url });
+    return NextResponse.json(jsonResponse);
   } catch (error) {
     console.error("Upload error:", error);
     const message = error instanceof Error ? error.message : "Erreur inconnue";

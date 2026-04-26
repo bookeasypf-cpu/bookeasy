@@ -16,6 +16,7 @@ import {
   ImageIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { upload } from "@vercel/blob/client";
 import { PushNotificationToggle } from "@/components/ui/PushNotificationToggle";
 import { UpgradeButton } from "@/components/ui/UpgradeButton";
 import Image from "next/image";
@@ -110,29 +111,18 @@ export default function DashboardProfilePage() {
       .catch(() => {});
   }, []);
 
-  // Upload helper
+  // Upload helper — client-direct upload to Vercel Blob (no 4.5MB server limit)
   async function uploadFile(file: File): Promise<string | null> {
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        toast.error(data?.error || `Erreur upload (${res.status})`);
-        return null;
-      }
-
-      const data = await res.json();
-      if (data.error) {
-        toast.error(data.error);
-        return null;
-      }
-      return data.url;
+      const blob = await upload(file.name, file, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+      });
+      return blob.url;
     } catch (err) {
       console.error("Upload failed:", err);
-      toast.error("Erreur de connexion lors de l'upload");
+      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      toast.error(`Erreur upload: ${message}`);
       return null;
     }
   }
