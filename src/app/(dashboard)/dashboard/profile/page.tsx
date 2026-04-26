@@ -112,17 +112,29 @@ export default function DashboardProfilePage() {
 
   // Upload helper
   async function uploadFile(file: File): Promise<string | null> {
-    const formData = new FormData();
-    formData.append("file", file);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    const res = await fetch("/api/upload", { method: "POST", body: formData });
-    const data = await res.json();
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
 
-    if (data.error) {
-      toast.error(data.error);
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        toast.error(data?.error || `Erreur upload (${res.status})`);
+        return null;
+      }
+
+      const data = await res.json();
+      if (data.error) {
+        toast.error(data.error);
+        return null;
+      }
+      return data.url;
+    } catch (err) {
+      console.error("Upload failed:", err);
+      toast.error("Erreur de connexion lors de l'upload");
       return null;
     }
-    return data.url;
   }
 
   // Cover image upload

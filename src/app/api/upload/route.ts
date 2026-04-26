@@ -17,13 +17,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Rate limiting: 5 uploads per minute per user
-    const { success, reset } = await uploadLimiter.limit(`upload-${session.user.id}`);
-    if (!success) {
-      const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
+    // Rate limiting: 5 uploads per minute per user (fail-open)
+    try {
+      const { success, reset } = await uploadLimiter.limit(`upload-${session.user.id}`);
+      if (!success) {
+        const resetIn = reset ? Math.ceil((reset - Date.now()) / 1000) : 0;
+        return NextResponse.json(
+          { error: formatRateLimitError(resetIn, "uploads") },
+          { status: 429 }
+        );
+      }
+    } catch (e) {
+      console.warn("Rate limiter unavailable, allowing upload:", e);
+    }
+
+    // Check Vercel Blob is configured
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.error("BLOB_READ_WRITE_TOKEN is not set");
       return NextResponse.json(
-        { error: formatRateLimitError(resetIn, "uploads") },
-        { status: 429 }
+        { error: "Le stockage d'images n'est pas configuré. Contactez l'administrateur." },
+        { status: 503 }
       );
     }
 
@@ -63,6 +76,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: blob.url });
   } catch (error) {
     console.error("Upload error:", error);
-    return NextResponse.json({ error: "Erreur lors de l'upload" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
+    return NextResponse.json(
+      { error: `Erreur lors de l'upload: ${message}` },
+      { status: 500 }
+    );
   }
 }
