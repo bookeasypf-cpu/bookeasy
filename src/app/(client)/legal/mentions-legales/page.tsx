@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Mentions légales - BookEasy",
+  description: "Mentions légales de BookEasy : éditeur, hébergeur et informations juridiques de la plateforme de réservation en ligne en Polynésie française.",
 };
 
 export default function MentionsLegales() {

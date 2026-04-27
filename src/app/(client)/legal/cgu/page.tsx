@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Conditions Générales d'Utilisation - BookEasy",
+  description: "Consultez les conditions générales d'utilisation de BookEasy, plateforme de réservation en ligne en Polynésie française.",
 };
 
 export default function CGU() {

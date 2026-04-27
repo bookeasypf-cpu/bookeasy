@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { UpgradeButton } from "@/components/ui/UpgradeButton";
 import { QuickRegisterForm } from "@/components/ui/QuickRegisterForm";
 import { FAQ } from "@/components/ui/FAQ";
+import { FAQPageJsonLd } from "@/lib/jsonld";
 import { ROICalculator } from "@/components/ui/ROICalculator";
 
 export const metadata: Metadata = {
@@ -197,6 +198,7 @@ export default function PricingPage() {
       {/* FAQ */}
       <div className="bg-gray-50 border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
+          <FAQPageJsonLd items={faqs.map((f) => ({ question: f.q, answer: f.a }))} />
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">
             Questions fréquentes
           </h2>

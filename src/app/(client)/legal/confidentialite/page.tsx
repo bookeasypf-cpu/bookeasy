@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité - BookEasy",
+  description: "Politique de confidentialité et protection des données personnelles de BookEasy. Découvrez comment nous protégeons vos informations en Polynésie française.",
 };
 
 export default function Confidentialite() {

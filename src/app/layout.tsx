@@ -59,6 +59,60 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning className="scroll-smooth">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": "https://bookeasy.me/#organization",
+                  name: "BookEasy",
+                  url: "https://bookeasy.me",
+                  logo: {
+                    "@type": "ImageObject",
+                    url: "https://bookeasy.me/icon-512x512.png",
+                    width: 512,
+                    height: 512,
+                  },
+                  description:
+                    "Plateforme de réservation en ligne pour les professionnels de la beauté, du bien-être et des services en Polynésie française.",
+                  areaServed: {
+                    "@type": "Country",
+                    name: "Polynésie française",
+                    sameAs: "https://fr.wikipedia.org/wiki/Polyn%C3%A9sie_fran%C3%A7aise",
+                  },
+                  contactPoint: {
+                    "@type": "ContactPoint",
+                    email: "bookeasy.pf@gmail.com",
+                    contactType: "customer service",
+                    availableLanguage: "French",
+                  },
+                  sameAs: [],
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": "https://bookeasy.me/#website",
+                  url: "https://bookeasy.me",
+                  name: "BookEasy",
+                  publisher: { "@id": "https://bookeasy.me/#organization" },
+                  inLanguage: "fr-PF",
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: {
+                      "@type": "EntryPoint",
+                      urlTemplate: "https://bookeasy.me/search?q={search_term_string}",
+                    },
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+      </head>
       <body className={`${inter.variable} font-sans antialiased bg-gray-50 dark:bg-gray-950`}>
         <SessionProvider>
           <ThemeProvider>

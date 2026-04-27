@@ -5,6 +5,7 @@ import { MerchantCard } from "@/components/search/MerchantCard";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { FAQ } from "@/components/ui/FAQ";
+import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/lib/jsonld";
 import { SearchBar } from "@/components/search/SearchBar";
 import { MapPin, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -116,8 +117,80 @@ export default async function ReservationSeoPage({ params }: PageProps) {
   const locationLabel = cityLabel || "Polynésie française";
   const sectorLower = sector.name.toLowerCase();
 
+  // FAQ items for both rendering and JSON-LD
+  const faqItems = [
+    {
+      question: `Comment réserver un ${sectorLower} à ${locationLabel} ?`,
+      answer: `Sur BookEasy, recherchez « ${sector.name} » dans la barre de recherche${cityLabel ? ` ou filtrez par la ville de ${cityLabel}` : ""}. Consultez les profils, les avis clients et les disponibilités, puis réservez en quelques clics. C'est gratuit et disponible 24h/24.`,
+    },
+    {
+      question: `Combien coûte un ${sectorLower} à ${locationLabel} ?`,
+      answer: `Les tarifs varient selon le professionnel et le service choisi. Sur BookEasy, chaque professionnel affiche ses prix en toute transparence. Comparez les offres et choisissez celle qui correspond à votre budget.`,
+    },
+    {
+      question: `Peut-on annuler un rendez-vous chez un ${sectorLower} ?`,
+      answer: `Oui, vous pouvez annuler votre rendez-vous à tout moment depuis votre espace « Mes réservations ». Le professionnel sera notifié automatiquement. Nous vous recommandons d'annuler le plus tôt possible par courtoisie.`,
+    },
+    {
+      question: `Les ${sectorLower}s sur BookEasy sont-ils vérifiés ?`,
+      answer: `Tous les professionnels sur BookEasy ont créé un compte vérifié avec leurs informations d'activité. Les professionnels « Pro vérifié » bénéficient d'un abonnement et sont mis en avant grâce à leurs avis clients.`,
+    },
+  ];
+
+  // JSON-LD: ItemList of local businesses + Breadcrumb + FAQ
+  const reservationUrl = `https://bookeasy.me/reservation/${slug}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      // ItemList of local businesses
+      ...(merchantsWithRating.length > 0 ? [{
+        "@type": "ItemList",
+        name: `${sector.name} à ${locationLabel}`,
+        description: `Liste des ${sectorLower}s à ${locationLabel} sur BookEasy`,
+        numberOfItems: merchantsWithRating.length,
+        itemListElement: merchantsWithRating.slice(0, 10).map((m, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          item: {
+            "@type": "LocalBusiness",
+            name: m.businessName,
+            url: `https://bookeasy.me/merchants/${m.id}`,
+            address: m.city ? {
+              "@type": "PostalAddress",
+              addressLocality: m.city,
+              addressCountry: "PF",
+            } : undefined,
+            ...(m.avgRating > 0 ? {
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: m.avgRating.toFixed(1),
+                reviewCount: m._count.reviews,
+                bestRating: 5,
+              },
+            } : {}),
+          },
+        })),
+      }] : []),
+    ],
+  };
+
   return (
     <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Accueil", url: "https://bookeasy.me" },
+          { name: "Secteurs", url: "https://bookeasy.me/sectors" },
+          { name: sector.name, url: `https://bookeasy.me/search?sector=${sector.slug}` },
+          ...(cityLabel ? [{ name: `${sector.name} à ${cityLabel}`, url: reservationUrl }] : []),
+        ]}
+      />
+      <FAQPageJsonLd items={faqItems} />
+
       {/* Hero */}
       <div className="bg-gradient-to-b from-[#0C1B2A] to-[#132D46] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
@@ -213,26 +286,7 @@ export default async function ReservationSeoPage({ params }: PageProps) {
           <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-6">
             Questions fréquentes — {sector.name} à {locationLabel}
           </h2>
-          <FAQ
-            items={[
-              {
-                question: `Comment réserver un ${sectorLower} à ${locationLabel} ?`,
-                answer: `Sur BookEasy, recherchez « ${sector.name} » dans la barre de recherche${cityLabel ? ` ou filtrez par la ville de ${cityLabel}` : ""}. Consultez les profils, les avis clients et les disponibilités, puis réservez en quelques clics. C'est gratuit et disponible 24h/24.`,
-              },
-              {
-                question: `Combien coûte un ${sectorLower} à ${locationLabel} ?`,
-                answer: `Les tarifs varient selon le professionnel et le service choisi. Sur BookEasy, chaque professionnel affiche ses prix en toute transparence. Comparez les offres et choisissez celle qui correspond à votre budget.`,
-              },
-              {
-                question: `Peut-on annuler un rendez-vous chez un ${sectorLower} ?`,
-                answer: `Oui, vous pouvez annuler votre rendez-vous à tout moment depuis votre espace « Mes réservations ». Le professionnel sera notifié automatiquement. Nous vous recommandons d'annuler le plus tôt possible par courtoisie.`,
-              },
-              {
-                question: `Les ${sectorLower}s sur BookEasy sont-ils vérifiés ?`,
-                answer: `Tous les professionnels sur BookEasy ont créé un compte vérifié avec leurs informations d'activité. Les professionnels « Pro vérifié » bénéficient d'un abonnement et sont mis en avant grâce à leurs avis clients.`,
-              },
-            ]}
-          />
+          <FAQ items={faqItems} />
         </div>
 
         {/* Internal links */}

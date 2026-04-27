@@ -79,6 +79,10 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
         orderBy: { createdAt: "desc" },
         take: 10,
       },
+      availability: {
+        where: { isActive: true },
+        orderBy: { dayOfWeek: "asc" },
+      },
       _count: { select: { reviews: true } },
     },
   });
@@ -103,36 +107,124 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
         : 0,
   }));
 
-  // JSON-LD Structured Data
+  // ── JSON-LD Structured Data (GEO optimized) ────────────────────────
+  const DAY_MAP = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+  const openingHours = merchant.availability.length > 0
+    ? merchant.availability.map((s) => ({
+        "@type": "OpeningHoursSpecification" as const,
+        dayOfWeek: DAY_MAP[s.dayOfWeek],
+        opens: s.startTime,
+        closes: s.endTime,
+      }))
+    : undefined;
+
+  const merchantUrl = `https://bookeasy.me/merchants/${merchant.id}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    name: merchant.businessName,
-    description: merchant.description || undefined,
-    address: merchant.address || merchant.city ? {
-      "@type": "PostalAddress",
-      streetAddress: merchant.address || undefined,
-      addressLocality: merchant.city || undefined,
-      postalCode: merchant.postalCode || undefined,
-      addressCountry: "PF",
-    } : undefined,
-    telephone: merchant.phone || undefined,
-    geo: merchant.latitude && merchant.longitude ? {
-      "@type": "GeoCoordinates",
-      latitude: merchant.latitude,
-      longitude: merchant.longitude,
-    } : undefined,
-    url: `https://bookeasy.me/merchants/${merchant.id}`,
-    image: merchant.coverImage || undefined,
-    ...(merchant.reviews.length > 0 ? {
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: avgRating.toFixed(1),
-        reviewCount: merchant._count.reviews,
-        bestRating: 5,
-        worstRating: 1,
+    "@graph": [
+      // 1. LocalBusiness
+      {
+        "@type": "LocalBusiness",
+        "@id": `${merchantUrl}#business`,
+        name: merchant.businessName,
+        description: merchant.description || undefined,
+        url: merchantUrl,
+        image: merchant.coverImage || undefined,
+        telephone: merchant.phone || undefined,
+        priceRange: "$$",
+        currenciesAccepted: "XPF",
+        paymentAccepted: "Cash, Card",
+        address: (merchant.address || merchant.city) ? {
+          "@type": "PostalAddress",
+          streetAddress: merchant.address || undefined,
+          addressLocality: merchant.city || undefined,
+          postalCode: merchant.postalCode || undefined,
+          addressRegion: "Polynésie française",
+          addressCountry: "PF",
+        } : undefined,
+        geo: (merchant.latitude && merchant.longitude) ? {
+          "@type": "GeoCoordinates",
+          latitude: merchant.latitude,
+          longitude: merchant.longitude,
+        } : undefined,
+        openingHoursSpecification: openingHours,
+        ...(merchant.reviews.length > 0 ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: avgRating.toFixed(1),
+            reviewCount: merchant._count.reviews,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        } : {}),
+        // Individual reviews for rich snippets
+        ...(merchant.reviews.length > 0 ? {
+          review: merchant.reviews.slice(0, 5).map((r) => ({
+            "@type": "Review",
+            reviewRating: {
+              "@type": "Rating",
+              ratingValue: r.rating,
+              bestRating: 5,
+            },
+            author: {
+              "@type": "Person",
+              name: r.client.name || "Client BookEasy",
+            },
+            reviewBody: r.comment || undefined,
+          })),
+        } : {}),
+        // Services as offers
+        ...(merchant.services.length > 0 ? {
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: `Services de ${merchant.businessName}`,
+            itemListElement: merchant.services.map((s) => ({
+              "@type": "Offer",
+              itemOffered: {
+                "@type": "Service",
+                name: s.name,
+                description: s.description || undefined,
+                provider: { "@id": `${merchantUrl}#business` },
+                areaServed: {
+                  "@type": "City",
+                  name: merchant.city || "Polynésie française",
+                },
+              },
+              price: s.price,
+              priceCurrency: "XPF",
+              availability: "https://schema.org/InStock",
+              url: `https://bookeasy.me/booking/${merchant.id}`,
+            })),
+          },
+        } : {}),
       },
-    } : {}),
+      // 2. BreadcrumbList
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Accueil",
+            item: "https://bookeasy.me",
+          },
+          ...(merchant.sector ? [{
+            "@type": "ListItem",
+            position: 2,
+            name: merchant.sector.name,
+            item: `https://bookeasy.me/search?sector=${merchant.sector.slug}`,
+          }] : []),
+          {
+            "@type": "ListItem",
+            position: merchant.sector ? 3 : 2,
+            name: merchant.businessName,
+            item: merchantUrl,
+          },
+        ],
+      },
+    ],
   };
 
   return (

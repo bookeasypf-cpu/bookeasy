@@ -1,72 +1,99 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
-const COMMUNES_TAHITI = [
-  "Papeete",
-  "Faa'a",
-  "Punaauia",
-  "Pirae",
-  "Arue",
-  "Mahina",
-  "Paea",
-  "Papara",
-  "Taravao",
+// All communes & islands in French Polynesia for GEO coverage
+const VILLES_PF = [
+  // Tahiti
+  "Papeete", "Faa'a", "Punaauia", "Pirae", "Arue", "Mahina",
+  "Paea", "Papara", "Taravao", "Teva I Uta", "Mataiea", "Afaahiti",
+  "Toahotu", "Vairao",
+  // Moorea
   "Moorea",
+  // Iles Sous-le-Vent
+  "Bora Bora", "Raiatea", "Tahaa", "Huahine",
+  // Tuamotu
+  "Rangiroa", "Tikehau", "Fakarava",
+  // Marquises
+  "Nuku Hiva", "Hiva Oa",
 ];
 
+function toSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[']/g, "")
+    .replace(/\s+/g, "-");
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const merchants = await prisma.merchant.findMany({
-    where: { isActive: true },
-    select: { id: true, updatedAt: true },
-  });
+  const [merchants, sectors] = await Promise.all([
+    prisma.merchant.findMany({
+      where: { isActive: true },
+      select: { id: true, updatedAt: true },
+    }),
+    prisma.sector.findMany({
+      select: { slug: true },
+    }),
+  ]);
 
-  const sectors = await prisma.sector.findMany({
-    select: { slug: true },
-  });
+  const now = new Date();
 
-  const staticPages = [
-    { url: "https://bookeasy.me", lastModified: new Date(), changeFrequency: "daily" as const, priority: 1 },
-    { url: "https://bookeasy.me/search", lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.9 },
-    { url: "https://bookeasy.me/map", lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.8 },
-    { url: "https://bookeasy.me/pricing", lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
-    { url: "https://bookeasy.me/gift-cards", lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.6 },
-    { url: "https://bookeasy.me/register", lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
-    { url: "https://bookeasy.me/mentions-legales", lastModified: new Date(), changeFrequency: "yearly" as const, priority: 0.3 },
-    { url: "https://bookeasy.me/cgu", lastModified: new Date(), changeFrequency: "yearly" as const, priority: 0.3 },
-    { url: "https://bookeasy.me/confidentialite", lastModified: new Date(), changeFrequency: "yearly" as const, priority: 0.3 },
+  // 1. Static pages
+  const staticPages: MetadataRoute.Sitemap = [
+    { url: "https://bookeasy.me", lastModified: now, changeFrequency: "daily", priority: 1 },
+    { url: "https://bookeasy.me/search", lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: "https://bookeasy.me/sectors", lastModified: now, changeFrequency: "daily", priority: 0.8 },
+    { url: "https://bookeasy.me/map", lastModified: now, changeFrequency: "daily", priority: 0.8 },
+    { url: "https://bookeasy.me/pricing", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: "https://bookeasy.me/gift-cards", lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: "https://bookeasy.me/register", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: "https://bookeasy.me/register?role=MERCHANT", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: "https://bookeasy.me/login", lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: "https://bookeasy.me/legal/mentions-legales", lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: "https://bookeasy.me/legal/cgu", lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: "https://bookeasy.me/legal/confidentialite", lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  const merchantPages = merchants.map((m) => ({
+  // 2. Merchant pages
+  const merchantPages: MetadataRoute.Sitemap = merchants.map((m) => ({
     url: `https://bookeasy.me/merchants/${m.id}`,
     lastModified: m.updatedAt,
-    changeFrequency: "weekly" as const,
+    changeFrequency: "weekly",
     priority: 0.8,
   }));
 
-  const sectorPages = sectors.map((s) => ({
-    url: `https://bookeasy.me/search?sector=${s.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "daily" as const,
-    priority: 0.7,
+  // 3. Sector-only reservation pages (/reservation/coiffeur)
+  const sectorPages: MetadataRoute.Sitemap = sectors.map((s) => ({
+    url: `https://bookeasy.me/reservation/${s.slug}`,
+    lastModified: now,
+    changeFrequency: "daily",
+    priority: 0.8,
   }));
 
-  // City-specific pages for each commune
-  const cityPages = COMMUNES_TAHITI.map((city) => ({
-    url: `https://bookeasy.me/search?city=${encodeURIComponent(city)}`,
-    lastModified: new Date(),
-    changeFrequency: "daily" as const,
-    priority: 0.6,
-  }));
-
-  // Sector + city combination pages for SEO
-  const sectorCityPages = sectors.flatMap((s) =>
-    COMMUNES_TAHITI.map((city) => ({
-      url: `https://bookeasy.me/search?sector=${s.slug}&city=${encodeURIComponent(city)}`,
-      lastModified: new Date(),
+  // 4. Sector x City reservation pages (/reservation/coiffeur-papeete) — 60+ pages
+  const sectorCityPages: MetadataRoute.Sitemap = sectors.flatMap((s) =>
+    VILLES_PF.map((city) => ({
+      url: `https://bookeasy.me/reservation/${s.slug}-${toSlug(city)}`,
+      lastModified: now,
       changeFrequency: "weekly" as const,
-      priority: 0.5,
+      priority: 0.7,
     }))
   );
 
-  return [...staticPages, ...merchantPages, ...sectorPages, ...cityPages, ...sectorCityPages];
+  // 5. City search pages
+  const cityPages: MetadataRoute.Sitemap = VILLES_PF.map((city) => ({
+    url: `https://bookeasy.me/search?city=${encodeURIComponent(city)}`,
+    lastModified: now,
+    changeFrequency: "daily",
+    priority: 0.6,
+  }));
+
+  return [
+    ...staticPages,
+    ...merchantPages,
+    ...sectorPages,
+    ...sectorCityPages,
+    ...cityPages,
+  ];
 }
