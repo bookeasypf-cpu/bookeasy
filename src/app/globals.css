@@ -719,6 +719,18 @@ body {
 .stagger-fade-in > *:nth-child(5) { animation-delay: 320ms; }
 .stagger-fade-in > *:nth-child(6) { animation-delay: 400ms; }
 
+/* ===== NEON TRACE ANIMATION ===== */
+.neon-trace-path {
+  stroke-dasharray: 2400;
+  stroke-dashoffset: 2400;
+  animation: neonTrace 4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes neonTrace {
+  0% { stroke-dashoffset: 2400; }
+  100% { stroke-dashoffset: 0; }
+}
+
 /* Smooth scroll for tab anchors */
 html {
   scroll-behavior: smooth;

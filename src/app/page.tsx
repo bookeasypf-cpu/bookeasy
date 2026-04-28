@@ -26,6 +26,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { MagneticButton } from "@/components/ui/MagneticButton";
+import { NeonSteps } from "@/components/ui/NeonSteps";
 import { FAQ } from "@/components/ui/FAQ";
 import { FAQPageJsonLd } from "@/lib/jsonld";
 import Link from "next/link";
@@ -281,63 +282,38 @@ export default async function HomePage() {
           subtitle="Réservez en 3 étapes simples"
         />
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {/* Timeline connector (desktop only) */}
-          <div className="hidden md:block absolute top-16 left-[16.6%] right-[16.6%] h-[2px]">
-            <div className="w-full h-full bg-gradient-to-r from-[#0066FF]/20 via-[#00B4D8]/30 to-[#0066FF]/20 rounded-full" />
-          </div>
-
-          {[
-            {
-              icon: Search,
-              step: "1",
-              title: "Trouvez",
-              description: "Recherchez par secteur, nom ou ville parmi les professionnels de Polynésie",
-              color: "from-[#0066FF] to-[#3B82F6]",
-            },
-            {
-              icon: CalendarCheck,
-              step: "2",
-              title: "Réservez",
-              description: "Choisissez votre créneau, confirmez en quelques clics, 24h/24 et 7j/7",
-              color: "from-[#00B4D8] to-[#06B6D4]",
-            },
-            {
-              icon: CheckCircle,
-              step: "3",
-              title: "Profitez",
-              description: "Recevez la confirmation et gagnez des points fidélité à chaque visite",
-              color: "from-[#10B981] to-[#34D399]",
-            },
-          ].map((item, index) => (
-            <ScrollReveal key={item.step} delay={index * 150}>
-              <div className="relative text-center group">
-                {/* Step circle */}
-                <div className="relative mx-auto mb-6 w-28 h-28">
-                  <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${item.color} opacity-10 group-hover:opacity-20 transition-opacity duration-500`} />
-                  <div className={`absolute inset-3 rounded-full bg-gradient-to-br ${item.color} opacity-5 group-hover:opacity-10 transition-opacity duration-500`} />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <item.icon className="h-7 w-7 text-white" />
-                    </div>
-                  </div>
-                  {/* Step number badge */}
-                  <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-white dark:bg-gray-900 shadow-md flex items-center justify-center">
-                    <span className={`text-xs font-bold bg-gradient-to-r ${item.color} bg-clip-text text-transparent`}>
-                      {item.step}
-                    </span>
-                  </div>
-                </div>
-
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-xs mx-auto">
-                  {item.description}
-                </p>
-              </div>
-            </ScrollReveal>
-          ))}
+        <div className="mt-12">
+          <NeonSteps
+            steps={[
+              {
+                icon: Search,
+                step: "1",
+                title: "Trouvez",
+                description: "Recherchez par secteur, nom ou ville parmi les professionnels de Polynésie",
+                color: "from-[#0066FF] to-[#3B82F6]",
+                neonColor: "#0066FF",
+                glowColor: "rgba(0, 102, 255, 0.4)",
+              },
+              {
+                icon: CalendarCheck,
+                step: "2",
+                title: "Réservez",
+                description: "Choisissez votre créneau, confirmez en quelques clics, 24h/24 et 7j/7",
+                color: "from-[#00B4D8] to-[#06B6D4]",
+                neonColor: "#00B4D8",
+                glowColor: "rgba(0, 180, 216, 0.4)",
+              },
+              {
+                icon: CheckCircle,
+                step: "3",
+                title: "Profitez",
+                description: "Recevez la confirmation et gagnez des points fidélité à chaque visite",
+                color: "from-[#10B981] to-[#34D399]",
+                neonColor: "#10B981",
+                glowColor: "rgba(16, 185, 129, 0.4)",
+              },
+            ]}
+          />
         </div>
       </section>
 
