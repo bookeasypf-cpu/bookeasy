@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   MapPin,
   Search,
@@ -28,6 +28,30 @@ export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
+  // Logo rotating words
+  const logoWords = ["Easy", "Smart", "Quick", "Now", "Fast"];
+  const [logoIndex, setLogoIndex] = useState(0);
+  const [logoPhase, setLogoPhase] = useState<"visible" | "hiding" | "ready" | "showing">("visible");
+
+  const rotateLogo = useCallback(() => {
+    setLogoPhase("hiding");
+    setTimeout(() => {
+      setLogoIndex((prev) => (prev + 1) % logoWords.length);
+      setLogoPhase("ready");
+    }, 350);
+    setTimeout(() => {
+      setLogoPhase("showing");
+    }, 370);
+    setTimeout(() => {
+      setLogoPhase("visible");
+    }, 720);
+  }, [logoWords.length]);
+
+  useEffect(() => {
+    const interval = setInterval(rotateLogo, 3000);
+    return () => clearInterval(interval);
+  }, [rotateLogo]);
 
   const isActive = (path: string) => pathname === path;
 
@@ -61,8 +85,25 @@ export function Header() {
               <span className="text-xl font-bold text-[#0C1B2A] dark:text-white tracking-tight">
                 Book
               </span>
-              <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent">
-                Easy
+              <span
+                className="text-xl font-bold tracking-tight overflow-hidden inline-flex items-center"
+                style={{ perspective: "600px", height: "1.5em" }}
+              >
+                <span
+                  className="inline-block bg-gradient-to-r from-[#0066FF] to-[#00B4D8] bg-clip-text text-transparent"
+                  style={{
+                    transformOrigin: "center center",
+                    ...(logoPhase === "hiding"
+                      ? { opacity: 0, transform: "translateY(-80%) rotateX(90deg)", transition: "opacity 0.35s ease-in, transform 0.35s ease-in" }
+                      : logoPhase === "ready"
+                        ? { opacity: 0, transform: "translateY(80%) rotateX(-90deg)", transition: "none" }
+                        : logoPhase === "showing"
+                          ? { opacity: 1, transform: "translateY(0) rotateX(0deg)", transition: "opacity 0.35s ease-out, transform 0.35s ease-out" }
+                          : { opacity: 1, transform: "translateY(0) rotateX(0deg)" }),
+                  }}
+                >
+                  {logoWords[logoIndex]}
+                </span>
               </span>
             </span>
           </Link>
