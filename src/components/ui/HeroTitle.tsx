@@ -32,21 +32,21 @@ export function HeroTitle({
     // Phase 1: fade out + slide up
     setPhase("hiding");
 
-    // Phase 2: swap text, position below (no transition)
+    // Phase 2: swap text instantly, position below
     setTimeout(() => {
       setCurrentRotation((prev) => (prev + 1) % rotatingWords.length);
       setPhase("ready");
-    }, 400);
+    }, 350);
 
-    // Phase 3: animate from below to center (fade in + slide up)
+    // Phase 3: fade in + slide up from below (immediate after ready)
     setTimeout(() => {
       setPhase("showing");
-    }, 430);
+    }, 370);
 
     // Phase 4: settle
     setTimeout(() => {
       setPhase("visible");
-    }, 830);
+    }, 720);
   }, [rotatingWords]);
 
   useEffect(() => {
@@ -70,25 +70,22 @@ export function HeroTitle({
   function getRotatingStyle(): React.CSSProperties {
     switch (phase) {
       case "hiding":
-        // Exit: fade out + slide up
         return {
           opacity: 0,
-          transform: "translateY(-100%)",
-          transition: "opacity 0.4s ease, transform 0.4s ease",
+          transform: "translateY(-80%)",
+          transition: "opacity 0.35s ease-out, transform 0.35s ease-out",
         };
       case "ready":
-        // Position new word below, no transition (instant placement)
         return {
           opacity: 0,
-          transform: "translateY(100%)",
+          transform: "translateY(80%)",
           transition: "none",
         };
       case "showing":
-        // Enter: fade in + slide up from below to center
         return {
           opacity: 1,
           transform: "translateY(0)",
-          transition: "opacity 0.4s ease, transform 0.4s ease",
+          transition: "opacity 0.35s ease-out, transform 0.35s ease-out",
         };
       default:
         return {
