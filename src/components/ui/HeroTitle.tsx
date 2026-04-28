@@ -19,7 +19,7 @@ export function HeroTitle({
 }: HeroTitleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [currentRotation, setCurrentRotation] = useState(0);
-  const [phase, setPhase] = useState<"visible" | "hiding" | "showing">("visible");
+  const [phase, setPhase] = useState<"visible" | "hiding" | "ready" | "showing">("visible");
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
@@ -29,19 +29,24 @@ export function HeroTitle({
   const rotate = useCallback(() => {
     if (!rotatingWords || rotatingWords.length <= 1) return;
 
-    // Phase 1: hide current word (slide up + fade out)
+    // Phase 1: fade out + slide up
     setPhase("hiding");
 
-    // Phase 2: swap text and show new word (slide up from below + fade in)
+    // Phase 2: swap text, position below (no transition)
     setTimeout(() => {
       setCurrentRotation((prev) => (prev + 1) % rotatingWords.length);
-      setPhase("showing");
-    }, 350);
+      setPhase("ready");
+    }, 400);
 
-    // Phase 3: settle
+    // Phase 3: animate from below to center (fade in + slide up)
+    setTimeout(() => {
+      setPhase("showing");
+    }, 430);
+
+    // Phase 4: settle
     setTimeout(() => {
       setPhase("visible");
-    }, 700);
+    }, 830);
   }, [rotatingWords]);
 
   useEffect(() => {
@@ -61,29 +66,34 @@ export function HeroTitle({
     (w) => typeof w === "object" && w.highlight
   );
 
-  // Compute rotating word inline styles for the 3-phase animation
+  // Rotating word styles — smooth slide like PacifikAI (no blur)
   function getRotatingStyle(): React.CSSProperties {
     switch (phase) {
       case "hiding":
+        // Exit: fade out + slide up
         return {
           opacity: 0,
-          transform: "translateY(-20px)",
-          filter: "blur(4px)",
-          transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+          transform: "translateY(-100%)",
+          transition: "opacity 0.4s ease, transform 0.4s ease",
+        };
+      case "ready":
+        // Position new word below, no transition (instant placement)
+        return {
+          opacity: 0,
+          transform: "translateY(100%)",
+          transition: "none",
         };
       case "showing":
+        // Enter: fade in + slide up from below to center
         return {
           opacity: 1,
           transform: "translateY(0)",
-          filter: "blur(0)",
-          transition: "all 0.35s cubic-bezier(0.0, 0, 0.2, 1)",
+          transition: "opacity 0.4s ease, transform 0.4s ease",
         };
       default:
         return {
           opacity: 1,
           transform: "translateY(0)",
-          filter: "blur(0)",
-          transition: "none",
         };
     }
   }
@@ -107,11 +117,17 @@ export function HeroTitle({
               style={{
                 animationDelay: `${delay}s`,
                 animationPlayState: isVisible ? "running" : "paused",
+                overflow: "hidden",
+                display: "inline-block",
+                verticalAlign: "bottom",
               }}
             >
               <span
                 className="hero-rotating-text"
-                style={getRotatingStyle()}
+                style={{
+                  display: "inline-block",
+                  ...getRotatingStyle(),
+                }}
               >
                 {rotatingWords[currentRotation]}
               </span>
