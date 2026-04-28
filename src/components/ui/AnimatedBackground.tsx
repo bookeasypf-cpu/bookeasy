@@ -144,6 +144,10 @@ export function AnimatedBackground() {
         viewBox="0 0 1400 600"
         preserveAspectRatio="xMidYMid slice"
         xmlns="http://www.w3.org/2000/svg"
+        style={{
+          transform: "perspective(1200px) rotateX(8deg) rotateY(-2deg)",
+          transformOrigin: "center 60%",
+        }}
       >
         <defs>
           {/* ── Stroke gradients ── */}
@@ -194,6 +198,43 @@ export function AnimatedBackground() {
             <stop offset="55%" stopColor="#0066FF" stopOpacity="0.04" />
             <stop offset="100%" stopColor="transparent" stopOpacity="0" />
           </radialGradient>
+
+          {/* ── 3D Terrain fill gradients ── */}
+          <radialGradient id="ab-terrain1" cx="45%" cy="40%" r="55%">
+            <stop offset="0%" stopColor="#00B4D8" stopOpacity="0.18" />
+            <stop offset="35%" stopColor="#0066FF" stopOpacity="0.10" />
+            <stop offset="70%" stopColor="#0066FF" stopOpacity="0.05" />
+            <stop offset="100%" stopColor="#0C1B2A" stopOpacity="0.02" />
+          </radialGradient>
+          <radialGradient id="ab-terrain2" cx="50%" cy="35%" r="50%">
+            <stop offset="0%" stopColor="#00B4D8" stopOpacity="0.15" />
+            <stop offset="40%" stopColor="#0066FF" stopOpacity="0.08" />
+            <stop offset="100%" stopColor="#0C1B2A" stopOpacity="0.02" />
+          </radialGradient>
+          <radialGradient id="ab-terrain-iti" cx="48%" cy="38%" r="50%">
+            <stop offset="0%" stopColor="#00B4D8" stopOpacity="0.12" />
+            <stop offset="50%" stopColor="#0066FF" stopOpacity="0.06" />
+            <stop offset="100%" stopColor="#0C1B2A" stopOpacity="0.01" />
+          </radialGradient>
+
+          {/* ── Drop shadow for 3D depth ── */}
+          <filter id="ab-shadow" x="-10%" y="-5%" width="120%" height="130%">
+            <feDropShadow dx="4" dy="6" stdDeviation="8" floodColor="#000" floodOpacity="0.3" />
+          </filter>
+          <filter id="ab-shadow-sm" x="-10%" y="-5%" width="120%" height="130%">
+            <feDropShadow dx="3" dy="4" stdDeviation="6" floodColor="#000" floodOpacity="0.25" />
+          </filter>
+
+          {/* ── Inner elevation glow ── */}
+          <filter id="ab-inner-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="6" result="b" />
+            <feFlood floodColor="#00B4D8" floodOpacity="0.15" result="c" />
+            <feComposite in="c" in2="b" operator="in" result="g" />
+            <feMerge>
+              <feMergeNode in="g" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
         {/* ═══════ TAHITI ═══════ */}
@@ -203,47 +244,100 @@ export function AnimatedBackground() {
             <animate attributeName="opacity" values="0;1;1" dur="3.5s" begin="0.5s" fill="freeze" />
           </ellipse>
 
-          {/* Tahiti-Nui (main island — detailed coastline) */}
+          {/* Tahiti-Nui — 3D shadow layer */}
           <path
             d={TAHITI_NUI}
-            fill="url(#ab-f1)"
+            fill="rgba(0,0,0,0.25)"
+            stroke="none"
+            transform="translate(5, 7)"
+            style={{ filter: "blur(10px)", opacity: 0, animation: "ab-fade-in 2s ease-out 1s forwards" }}
+          />
+
+          {/* Tahiti-Nui (main island — 3D terrain fill) */}
+          <path
+            d={TAHITI_NUI}
+            fill="url(#ab-terrain1)"
             stroke="url(#ab-s1)"
             strokeWidth="1.8"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeDasharray="1200"
             strokeDashoffset="1200"
-            filter="url(#ab-iglow)"
+            filter="url(#ab-inner-glow)"
             style={{ animation: "ab-draw 4.5s ease-out 0.5s forwards" }}
           />
 
-          {/* Tahiti-Iti (peninsula — detailed coastline) */}
+          {/* Tahiti-Iti — 3D shadow layer */}
           <path
             d={TAHITI_ITI}
-            fill="url(#ab-f1)"
+            fill="rgba(0,0,0,0.2)"
+            stroke="none"
+            transform="translate(4, 5)"
+            style={{ filter: "blur(8px)", opacity: 0, animation: "ab-fade-in 2s ease-out 2.5s forwards" }}
+          />
+
+          {/* Tahiti-Iti (peninsula — 3D terrain fill) */}
+          <path
+            d={TAHITI_ITI}
+            fill="url(#ab-terrain-iti)"
             stroke="url(#ab-s1)"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeDasharray="600"
             strokeDashoffset="600"
-            filter="url(#ab-iglow)"
+            filter="url(#ab-inner-glow)"
             style={{ animation: "ab-draw 3s ease-out 2.5s forwards" }}
           />
+
+          {/* ── Topographic contour lines (3D elevation) ── */}
+          {/* Contour 1 — Outer coast */}
+          <path
+            d="M 830,165 C 860,160 890,175 910,200 C 935,240 945,280 940,320 C 930,345 910,355 895,358"
+            fill="none" stroke="#00B4D8" strokeWidth="0.5" strokeOpacity="0"
+          >
+            <animate attributeName="stroke-opacity" values="0;0.12;0.12" dur="2s" begin="4s" fill="freeze" />
+          </path>
+          {/* Contour 2 — Mid elevation */}
+          <path
+            d="M 810,185 C 835,178 860,190 878,215 C 900,250 905,285 895,320 C 885,340 870,350 858,355"
+            fill="none" stroke="#00B4D8" strokeWidth="0.5" strokeOpacity="0"
+          >
+            <animate attributeName="stroke-opacity" values="0;0.15;0.15" dur="2s" begin="4.5s" fill="freeze" />
+          </path>
+          {/* Contour 3 — High elevation (summit area) */}
+          <path
+            d="M 795,215 C 815,205 840,210 858,235 C 872,260 875,290 865,315"
+            fill="none" stroke="#00B4D8" strokeWidth="0.6" strokeOpacity="0"
+          >
+            <animate attributeName="stroke-opacity" values="0;0.2;0.2" dur="2s" begin="5s" fill="freeze" />
+          </path>
+          {/* Contour 4 — Peak center glow */}
+          <path
+            d="M 820,240 C 835,232 850,240 855,260 C 858,275 852,290 840,298"
+            fill="none" stroke="#67E8F9" strokeWidth="0.7" strokeOpacity="0"
+          >
+            <animate attributeName="stroke-opacity" values="0;0.25;0.25" dur="2s" begin="5.5s" fill="freeze" />
+          </path>
 
           {/* Interior mountain ridgeline */}
           <path
             d="M 760,260 C 780,225 810,215 840,230 C 860,240 880,260 900,280"
-            fill="none" stroke="#00B4D8" strokeWidth="0.6" strokeDasharray="4 8" strokeOpacity="0"
+            fill="none" stroke="#00B4D8" strokeWidth="0.8" strokeDasharray="4 8" strokeOpacity="0"
           >
-            <animate attributeName="stroke-opacity" values="0;0.22;0.22" dur="2s" begin="5s" fill="freeze" />
+            <animate attributeName="stroke-opacity" values="0;0.28;0.28" dur="2s" begin="5s" fill="freeze" />
           </path>
           <path
             d="M 890,380 C 900,400 910,420 915,440"
-            fill="none" stroke="#00B4D8" strokeWidth="0.5" strokeDasharray="3 7" strokeOpacity="0"
+            fill="none" stroke="#00B4D8" strokeWidth="0.6" strokeDasharray="3 7" strokeOpacity="0"
           >
-            <animate attributeName="stroke-opacity" values="0;0.18;0.18" dur="2s" begin="5.5s" fill="freeze" />
+            <animate attributeName="stroke-opacity" values="0;0.22;0.22" dur="2s" begin="5.5s" fill="freeze" />
           </path>
+
+          {/* Summit glow point — Orohena */}
+          <circle cx="838" cy="255" r="4" fill="#67E8F9" opacity="0" filter="url(#ab-glow)">
+            <animate attributeName="opacity" values="0;0.3;0.15;0.3;0" dur="4s" begin="6s" repeatCount="indefinite" />
+          </circle>
 
           {/* Reef ring */}
           <ellipse cx="835" cy="290" rx="170" ry="150" fill="none"
@@ -281,17 +375,26 @@ export function AnimatedBackground() {
             <animate attributeName="opacity" values="0;1;1" dur="3.5s" begin="1s" fill="freeze" />
           </ellipse>
 
-          {/* Moorea outline (detailed — Cook's Bay + Opunohu Bay) */}
+          {/* Moorea — 3D shadow layer */}
           <path
             d={MOOREA}
-            fill="url(#ab-f2)"
+            fill="rgba(0,0,0,0.2)"
+            stroke="none"
+            transform="translate(4, 5)"
+            style={{ filter: "blur(8px)", opacity: 0, animation: "ab-fade-in 2s ease-out 1.5s forwards" }}
+          />
+
+          {/* Moorea outline (detailed — 3D terrain fill) */}
+          <path
+            d={MOOREA}
+            fill="url(#ab-terrain2)"
             stroke="url(#ab-s2)"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeDasharray="900"
             strokeDashoffset="900"
-            filter="url(#ab-iglow)"
+            filter="url(#ab-inner-glow)"
             style={{ animation: "ab-draw 4s ease-out 1.2s forwards" }}
           />
 
@@ -309,10 +412,35 @@ export function AnimatedBackground() {
 
           {/* Mountain ridge between bays (Mt Rotui) */}
           <path d="M 420,200 C 430,188 440,186 450,196"
-            fill="none" stroke="#00B4D8" strokeWidth="0.5" strokeDasharray="3 6" strokeOpacity="0"
+            fill="none" stroke="#00B4D8" strokeWidth="0.6" strokeDasharray="3 6" strokeOpacity="0"
           >
-            <animate attributeName="stroke-opacity" values="0;0.2;0.2" dur="2s" begin="5.8s" fill="freeze" />
+            <animate attributeName="stroke-opacity" values="0;0.25;0.25" dur="2s" begin="5.8s" fill="freeze" />
           </path>
+
+          {/* ── Moorea topographic contour lines ── */}
+          {/* Contour 1 — Outer */}
+          <path d="M 380,200 C 400,192 430,188 460,195 C 490,205 510,225 515,255"
+            fill="none" stroke="#00B4D8" strokeWidth="0.4" strokeOpacity="0"
+          >
+            <animate attributeName="stroke-opacity" values="0;0.12;0.12" dur="2s" begin="4.5s" fill="freeze" />
+          </path>
+          {/* Contour 2 — Mid */}
+          <path d="M 395,215 C 415,205 440,202 460,212 C 485,225 498,248 495,270"
+            fill="none" stroke="#00B4D8" strokeWidth="0.5" strokeOpacity="0"
+          >
+            <animate attributeName="stroke-opacity" values="0;0.15;0.15" dur="2s" begin="5s" fill="freeze" />
+          </path>
+          {/* Contour 3 — Peak area */}
+          <path d="M 420,230 C 435,222 455,225 465,240 C 472,252 468,265 458,272"
+            fill="none" stroke="#67E8F9" strokeWidth="0.5" strokeOpacity="0"
+          >
+            <animate attributeName="stroke-opacity" values="0;0.2;0.2" dur="2s" begin="5.5s" fill="freeze" />
+          </path>
+
+          {/* Summit glow — Mt Tohivea */}
+          <circle cx="442" cy="238" r="3" fill="#67E8F9" opacity="0" filter="url(#ab-glow)">
+            <animate attributeName="opacity" values="0;0.25;0.12;0.25;0" dur="4.5s" begin="6.5s" repeatCount="indefinite" />
+          </circle>
 
           {/* Reef ring */}
           <ellipse cx="435" cy="250" rx="110" ry="90" fill="none"
@@ -460,6 +588,10 @@ export function AnimatedBackground() {
         @keyframes ab-reef {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.015); }
+        }
+        @keyframes ab-fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
         @keyframes ab-particle {
           0%, 100% { transform: translateY(0) translateX(0); opacity: 0.06; }
