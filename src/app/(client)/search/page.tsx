@@ -106,8 +106,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <div className="relative bg-gradient-to-br from-[#0C1B2A] via-[#0C1B2A] to-[#003D99] overflow-hidden">
         {/* Background decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#0066FF]/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-[#00B4D8]/10 rounded-full blur-3xl" />
+          <div className="auth-orb absolute -top-24 -right-24 w-96 h-96 bg-[#0066FF]/10 rounded-full blur-3xl" />
+          <div className="auth-orb-2 absolute -bottom-32 -left-32 w-80 h-80 bg-[#00B4D8]/10 rounded-full blur-3xl" />
+          <div className="float-slow absolute top-8 left-[15%] w-2 h-2 rounded-full bg-[#00B4D8]/20" />
+          <div className="float-medium absolute bottom-6 right-[20%] w-3 h-3 rounded-full bg-[#0066FF]/15" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-10">

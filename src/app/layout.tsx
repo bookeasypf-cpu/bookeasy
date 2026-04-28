@@ -7,6 +7,8 @@ import { Toaster } from "react-hot-toast";
 import { InstallBanner } from "@/components/ui/InstallBanner";
 import { CookieBanner } from "@/components/ui/CookieBanner";
 import { ServiceWorkerProvider } from "@/components/providers/ServiceWorkerProvider";
+import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
+import { ScrollProgress } from "@/components/ui/ScrollProgress";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -116,6 +118,8 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased bg-gray-50 dark:bg-gray-950`}>
         <SessionProvider>
           <ThemeProvider>
+          <SmoothScrollProvider />
+          <ScrollProgress />
           {children}
           <ServiceWorkerProvider />
           <InstallBanner />

@@ -8,10 +8,10 @@ export default function AuthLayout({
 }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden bg-gradient-to-br from-[#F8FAFC] via-white to-[#EFF6FF] dark:from-gray-950 dark:via-gray-950 dark:to-[#0C1B2A]">
-      {/* Background decorative orbs */}
-      <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#0066FF]/5 rounded-full blur-3xl" />
-      <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-[#00B4D8]/5 rounded-full blur-3xl" />
-      <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-[#0066FF]/3 rounded-full blur-3xl" />
+      {/* Animated background orbs */}
+      <div className="auth-orb absolute -top-32 -right-32 w-96 h-96 bg-[#0066FF]/8 rounded-full blur-3xl" />
+      <div className="auth-orb-2 absolute -bottom-32 -left-32 w-80 h-80 bg-[#00B4D8]/8 rounded-full blur-3xl" />
+      <div className="auth-orb-3 absolute top-1/3 left-1/4 w-64 h-64 bg-[#0066FF]/5 rounded-full blur-3xl" />
 
       {/* Logo */}
       <Link href="/" className="relative flex items-center gap-2 mb-8 group animate-fade-in-up">

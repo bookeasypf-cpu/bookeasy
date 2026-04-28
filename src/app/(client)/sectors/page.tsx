@@ -39,14 +39,14 @@ export default async function SectorsPage() {
       {/* Hero */}
       <div className="bg-gradient-to-b from-[#0C1B2A] to-[#132D46] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-3 animate-fade-in-up">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-clip-reveal">
             Secteurs d&apos;activité
           </h1>
-          <p className="text-white/60 max-w-xl animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+          <p className="text-white/60 max-w-xl animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             Explorez tous les types de professionnels disponibles sur BookEasy
             en Polynésie française.
           </p>
-          <div className="flex items-center gap-6 mt-4 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+          <div className="flex items-center gap-6 mt-4 animate-fade-in-up" style={{ animationDelay: "0.35s" }}>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-white">
                 <CountUp end={sectors.length} />
@@ -77,7 +77,7 @@ export default async function SectorsPage() {
             <ScrollReveal key={sector.id} delay={index * 60}>
               <Link
                 href={`/search?sector=${sector.slug}`}
-                className="group flex items-center justify-between p-5 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700 card-hover"
+                className="group flex items-center justify-between p-5 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700 card-hover gradient-border-hover"
               >
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-[#0066FF] transition-colors">

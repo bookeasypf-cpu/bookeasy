@@ -25,6 +25,7 @@ import {
   Quote,
   HelpCircle,
 } from "lucide-react";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 import { FAQ } from "@/components/ui/FAQ";
 import { FAQPageJsonLd } from "@/lib/jsonld";
 import Link from "next/link";
@@ -74,6 +75,16 @@ export default async function HomePage() {
       {/* ===== HERO SECTION ===== */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0C1B2A] via-[#0C1B2A]/95 to-[#0066FF]/20">
         <AnimatedBackground />
+
+        {/* Parallax floating elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="float-slow absolute top-20 left-[10%] w-3 h-3 rounded-full bg-[#00B4D8]/20" />
+          <div className="float-medium absolute top-32 right-[15%] w-2 h-2 rounded-full bg-[#0066FF]/25" />
+          <div className="float-fast absolute bottom-28 left-[20%] w-4 h-4 rounded-full bg-[#67E8F9]/15" />
+          <div className="float-slow absolute top-1/2 right-[8%] w-2.5 h-2.5 rounded-full bg-[#0066FF]/15" style={{ animationDelay: "-2s" }} />
+          <div className="float-medium absolute bottom-20 right-[25%] w-3 h-3 rounded-full bg-[#00B4D8]/20" style={{ animationDelay: "-1s" }} />
+          <div className="float-fast absolute top-24 left-[40%] w-1.5 h-1.5 rounded-full bg-white/10" style={{ animationDelay: "-3s" }} />
+        </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-28 lg:py-36">
           <div className="text-center max-w-4xl mx-auto">
@@ -145,7 +156,7 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <div className="flex-shrink-0">
+            <MagneticButton className="flex-shrink-0" strength={0.2}>
               <span className="btn-slide inline-flex items-center gap-2 bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-blue-500/25 group-hover:shadow-blue-500/40 transition-all duration-300 text-sm">
                 <span className="btn-text">
                   Explorer la carte
@@ -156,7 +167,7 @@ export default async function HomePage() {
                   <ArrowRight className="h-4 w-4" />
                 </span>
               </span>
-            </div>
+            </MagneticButton>
           </div>
         </Link>
       </ScrollReveal>
@@ -342,7 +353,7 @@ export default async function HomePage() {
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {recentReviews.map((review, index) => (
                 <ScrollReveal key={review.id} delay={index * 100}>
-                  <div className="relative bg-[#F8FAFC] dark:bg-gray-800/50 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 card-hover group">
+                  <div className="relative bg-[#F8FAFC] dark:bg-gray-800/50 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 card-hover gradient-border-hover group">
                     {/* Quote icon */}
                     <Quote className="absolute top-4 right-4 h-6 w-6 text-[#0066FF]/10 group-hover:text-[#0066FF]/20 transition-colors" />
 
@@ -459,19 +470,21 @@ export default async function HomePage() {
             </p>
           </ScrollReveal>
           <ScrollReveal delay={300}>
-            <Link
-              href="/register?role=MERCHANT"
-              className="btn-slide btn-press inline-flex items-center gap-2 bg-gradient-to-r from-[#0066FF] to-[#00B4D8] hover:from-[#0052CC] hover:to-[#0891B2] text-white px-7 py-3.5 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 text-base"
-            >
-              <span className="btn-text">
-                Créer mon compte pro
-                <ArrowRight className="h-4 w-4" />
-              </span>
-              <span className="btn-text-clone">
-                Créer mon compte pro
-                <ArrowRight className="h-4 w-4" />
-              </span>
-            </Link>
+            <MagneticButton className="inline-block">
+              <Link
+                href="/register?role=MERCHANT"
+                className="btn-slide btn-press inline-flex items-center gap-2 bg-gradient-to-r from-[#0066FF] to-[#00B4D8] hover:from-[#0052CC] hover:to-[#0891B2] text-white px-7 py-3.5 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 text-base"
+              >
+                <span className="btn-text">
+                  Créer mon compte pro
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+                <span className="btn-text-clone">
+                  Créer mon compte pro
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </Link>
+            </MagneticButton>
           </ScrollReveal>
         </div>
       </section>
