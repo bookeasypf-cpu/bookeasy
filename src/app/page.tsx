@@ -18,9 +18,6 @@ import {
   Globe,
   Map,
   Sparkles,
-  Search,
-  CalendarCheck,
-  CheckCircle,
   Star,
   Quote,
   HelpCircle,
@@ -286,7 +283,7 @@ export default async function HomePage() {
           <NeonSteps
             steps={[
               {
-                icon: Search,
+                iconName: "search",
                 step: "1",
                 title: "Trouvez",
                 description: "Recherchez par secteur, nom ou ville parmi les professionnels de Polynésie",
@@ -295,7 +292,7 @@ export default async function HomePage() {
                 glowColor: "rgba(0, 102, 255, 0.4)",
               },
               {
-                icon: CalendarCheck,
+                iconName: "calendar",
                 step: "2",
                 title: "Réservez",
                 description: "Choisissez votre créneau, confirmez en quelques clics, 24h/24 et 7j/7",
@@ -304,7 +301,7 @@ export default async function HomePage() {
                 glowColor: "rgba(0, 180, 216, 0.4)",
               },
               {
-                icon: CheckCircle,
+                iconName: "check",
                 step: "3",
                 title: "Profitez",
                 description: "Recevez la confirmation et gagnez des points fidélité à chaque visite",

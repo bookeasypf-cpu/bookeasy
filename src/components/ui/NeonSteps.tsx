@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Search, CalendarCheck, CheckCircle } from "lucide-react";
 
 interface Step {
-  icon: React.ElementType;
+  iconName: "search" | "calendar" | "check";
   step: string;
   title: string;
   description: string;
@@ -11,6 +12,12 @@ interface Step {
   neonColor: string;
   glowColor: string;
 }
+
+const iconMap = {
+  search: Search,
+  calendar: CalendarCheck,
+  check: CheckCircle,
+};
 
 export function NeonSteps({ steps }: { steps: Step[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -180,7 +187,7 @@ export function NeonSteps({ steps }: { steps: Step[] }) {
                     transitionDelay: `${1 + index * 0.6}s`,
                   }}
                 >
-                  <item.icon className="h-7 w-7 text-white" />
+                  {(() => { const Icon = iconMap[item.iconName]; return <Icon className="h-7 w-7 text-white" />; })()}
                 </div>
               </div>
               {/* Step number badge */}
