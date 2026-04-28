@@ -64,7 +64,7 @@ export function MerchantCard({ merchant }: MerchantCardProps) {
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="card-glow rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-400"
+        className="card-glow rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm shadow-gray-200/80 dark:shadow-none overflow-hidden transition-all duration-400"
         style={{
           willChange: "transform",
           transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)",

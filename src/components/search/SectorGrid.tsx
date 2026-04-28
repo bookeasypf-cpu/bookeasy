@@ -130,7 +130,7 @@ function SectorCard({
       href={`/search?sector=${sector.slug}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="card-glow group flex flex-col items-center gap-3 p-4 sm:p-5 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700 transition-all duration-400"
+      className="card-glow group flex flex-col items-center gap-3 p-4 sm:p-5 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 shadow-sm shadow-gray-200/60 dark:shadow-none transition-all duration-400"
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible
@@ -142,7 +142,7 @@ function SectorCard({
         willChange: "transform, opacity, filter",
         boxShadow: isDark
           ? "0 2px 12px rgba(0,0,0,0.3)"
-          : "0 2px 12px rgba(0,0,0,0.04)",
+          : "0 2px 12px rgba(0,0,0,0.08)",
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget;
@@ -152,7 +152,7 @@ function SectorCard({
       onMouseOut={(e) => {
         const el = e.currentTarget;
         const dk = document.documentElement.classList.contains('dark');
-        el.style.boxShadow = dk ? "0 2px 12px rgba(0,0,0,0.3)" : "0 2px 12px rgba(0,0,0,0.04)";
+        el.style.boxShadow = dk ? "0 2px 12px rgba(0,0,0,0.3)" : "0 2px 12px rgba(0,0,0,0.08)";
         el.style.borderColor = "";
       }}
     >

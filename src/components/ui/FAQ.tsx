@@ -24,7 +24,7 @@ export function FAQ({ items, className }: FAQProps) {
         return (
           <div
             key={index}
-            className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden transition-shadow duration-300 hover:shadow-md"
+            className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm shadow-gray-200/60 dark:shadow-none overflow-hidden transition-shadow duration-300 hover:shadow-md"
           >
             <button
               type="button"

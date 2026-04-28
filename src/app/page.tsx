@@ -137,7 +137,7 @@ export default async function HomePage() {
       <ScrollReveal direction="scale" className="max-w-7xl mx-auto px-4 sm:px-6 w-full -mt-8 relative z-10">
         <Link
           href="/map"
-          className="group block rounded-2xl bg-white dark:bg-gray-900 shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-xl transition-all duration-400"
+          className="group block rounded-2xl bg-white dark:bg-gray-900 shadow-md shadow-gray-200/80 dark:shadow-lg border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-xl transition-all duration-400"
           style={{ transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)" }}
         >
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-5 sm:p-6">
@@ -224,7 +224,7 @@ export default async function HomePage() {
       )}
 
       {/* ===== STATS SECTION (with CountUp) ===== */}
-      <section className="border-y border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+      <section className="border-y border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4">
             <ScrollReveal delay={0}>
@@ -316,7 +316,7 @@ export default async function HomePage() {
 
       {/* ===== RECENT REVIEWS (Social Proof) ===== */}
       {recentReviews.length > 0 && (
-        <section className="border-y border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <section className="border-y border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
             <SectionTitle
               title="Ce qu'en disent nos clients"
@@ -326,7 +326,7 @@ export default async function HomePage() {
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {recentReviews.map((review, index) => (
                 <ScrollReveal key={review.id} delay={index * 100}>
-                  <div className="relative bg-[#F8FAFC] dark:bg-gray-800/50 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 card-hover gradient-border-hover group">
+                  <div className="relative bg-white dark:bg-gray-800/50 rounded-2xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm shadow-gray-200/60 dark:shadow-none card-hover gradient-border-hover group">
                     {/* Quote icon */}
                     <Quote className="absolute top-4 right-4 h-6 w-6 text-[#0066FF]/10 group-hover:text-[#0066FF]/20 transition-colors" />
 

@@ -122,7 +122,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {/* Results Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-4">
         {/* Results header card */}
-        <div className="glass rounded-2xl shadow-lg px-5 py-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="glass rounded-2xl shadow-md shadow-gray-200/80 dark:shadow-lg border border-gray-200/50 dark:border-gray-800 px-5 py-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[#0C1B2A] dark:text-white">
               {sectorName

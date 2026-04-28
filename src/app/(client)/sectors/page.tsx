@@ -77,7 +77,7 @@ export default async function SectorsPage() {
             <ScrollReveal key={sector.id} delay={index * 60}>
               <Link
                 href={`/search?sector=${sector.slug}`}
-                className="group flex items-center justify-between p-5 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700 card-hover gradient-border-hover"
+                className="group flex items-center justify-between p-5 rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 shadow-sm shadow-gray-200/60 dark:shadow-none card-hover gradient-border-hover"
               >
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-[#0066FF] transition-colors">
