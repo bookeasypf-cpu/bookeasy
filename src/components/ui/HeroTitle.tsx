@@ -70,27 +70,30 @@ export function HeroTitle({
   function getRotatingStyle(): React.CSSProperties {
     switch (phase) {
       case "hiding":
+        // Exit: slide up + rotate backward (like a roller)
         return {
           opacity: 0,
-          transform: "translateY(-80%)",
-          transition: "opacity 0.35s ease-out, transform 0.35s ease-out",
+          transform: "translateY(-80%) rotateX(90deg)",
+          transition: "opacity 0.4s ease-in, transform 0.4s ease-in",
         };
       case "ready":
+        // Position below, rotated forward (instant, no transition)
         return {
           opacity: 0,
-          transform: "translateY(80%)",
+          transform: "translateY(80%) rotateX(-90deg)",
           transition: "none",
         };
       case "showing":
+        // Enter: slide up from below + rotate into place
         return {
           opacity: 1,
-          transform: "translateY(0)",
-          transition: "opacity 0.35s ease-out, transform 0.35s ease-out",
+          transform: "translateY(0) rotateX(0deg)",
+          transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
         };
       default:
         return {
           opacity: 1,
-          transform: "translateY(0)",
+          transform: "translateY(0) rotateX(0deg)",
         };
     }
   }
@@ -117,12 +120,14 @@ export function HeroTitle({
                 overflow: "hidden",
                 display: "inline-block",
                 verticalAlign: "bottom",
+                perspective: "600px",
               }}
             >
               <span
                 className="hero-rotating-text"
                 style={{
                   display: "inline-block",
+                  transformOrigin: "center center",
                   ...getRotatingStyle(),
                 }}
               >
