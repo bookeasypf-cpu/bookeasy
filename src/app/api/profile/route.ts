@@ -3,6 +3,35 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { updateUserProfileSchema, zodFirstError } from "@/lib/validations";
 
+export async function DELETE() {
+  try {
+    const session = await getSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+
+    await prisma.$transaction(async (tx) => {
+      // Delete reviews (no cascade on clientId)
+      await tx.review.deleteMany({ where: { clientId: userId } });
+
+      // Delete bookings as client (no cascade on clientId)
+      await tx.booking.deleteMany({ where: { clientId: userId } });
+
+      // Delete the user — cascades: accounts, sessions, merchant (→ services,
+      // photos, schedules, blocked_slots, bookings as merchant), notifications,
+      // xp_transactions, xp_redemptions, favorites, push_subscriptions,
+      // patient_notes, referrals
+      await tx.user.delete({ where: { id: userId } });
+    });
+
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  }
+}
+
 export async function GET() {
   try {
     const session = await getSession();
