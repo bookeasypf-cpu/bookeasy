@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { pushSubscribeSchema, zodFirstError } from "@/lib/validations";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,10 +10,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { subscription } = await req.json();
-    if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
-      return NextResponse.json({ error: "Subscription invalide" }, { status: 400 });
+    const parsed = pushSubscribeSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
+    const { subscription } = parsed.data;
 
     // Upsert la subscription
     await prisma.pushSubscription.upsert({

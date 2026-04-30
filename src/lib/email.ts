@@ -402,6 +402,57 @@ export async function sendReferralRewardEmail(
 }
 
 // ─────────────────────────────────────────────
+// PASSWORD RESET
+// ─────────────────────────────────────────────
+
+export async function sendPasswordResetEmail(to: string, name: string, token: string) {
+  if (!resend) {
+    console.log("[EMAIL] Resend not configured – skipping password reset to", to);
+    return;
+  }
+
+  const resetLink = `${BASE_URL}/reset-password?token=${token}`;
+
+  const html = layout(`
+    <div style="background:linear-gradient(135deg,#0C1B2A,#132D46);padding:32px 24px;text-align:center;">
+      <div style="font-size:40px;margin-bottom:8px;">🔐</div>
+      <h1 style="color:#fff;font-size:22px;margin:0;font-weight:700;">Réinitialisation du mot de passe</h1>
+    </div>
+    <div style="padding:24px;">
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${name}</strong>,</p>
+      <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
+        Vous avez demandé la réinitialisation de votre mot de passe BookEasy.
+        Cliquez sur le bouton ci-dessous pour définir un nouveau mot de passe.
+      </p>
+      <div style="text-align:center;margin:24px 0;">
+        <a href="${resetLink}" style="display:inline-block;background:linear-gradient(135deg,#0066FF,#00B4D8);color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:600;font-size:15px;">Réinitialiser mon mot de passe</a>
+      </div>
+      <div style="background:#fef3c7;border-radius:12px;padding:16px;margin-bottom:16px;">
+        <p style="margin:0;color:#92400e;font-size:13px;line-height:1.5;">
+          ⚠️ Ce lien expire dans <strong>1 heure</strong>. Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.
+        </p>
+      </div>
+      <p style="margin:0;color:#9ca3af;font-size:12px;text-align:center;">
+        Si le bouton ne fonctionne pas, copiez ce lien :<br/>
+        <a href="${resetLink}" style="color:#0066FF;word-break:break-all;">${resetLink}</a>
+      </p>
+    </div>
+  `);
+
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to,
+      subject: "🔐 Réinitialisation de votre mot de passe BookEasy",
+      html,
+    });
+    console.log("[EMAIL] Password reset email sent to", to);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send password reset:", err);
+  }
+}
+
+// ─────────────────────────────────────────────
 // SUPPORT MESSAGE (from Pro merchant)
 // ─────────────────────────────────────────────
 

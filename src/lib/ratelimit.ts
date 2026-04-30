@@ -85,6 +85,17 @@ export const loginLimiter = new Ratelimit({
   analytics: true,
 });
 
+/**
+ * Password reset rate limit
+ * Prevents abuse of reset email sending
+ * Limit: 3 requests per hour per email
+ */
+export const passwordResetLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(3, "1 h"),
+  analytics: true,
+});
+
 // ────────────────────────────────────────
 // HELPER FUNCTIONS
 // ────────────────────────────────────────

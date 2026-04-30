@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createServiceSchema, updateServiceSchema, zodFirstError } from "@/lib/validations";
 
 async function getMerchant(userId: string) {
   return prisma.merchant.findUnique({ where: { userId } });
@@ -31,11 +32,11 @@ export async function POST(request: Request) {
     if (!merchant)
       return NextResponse.json({ error: "No merchant profile" }, { status: 400 });
 
-    const body = await request.json();
-
-    if (!body.name || !body.duration || body.price == null) {
-      return NextResponse.json({ error: "Nom, durée et prix requis" }, { status: 400 });
+    const parsed = createServiceSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
+    const { name, duration, price, description, xpAmount } = parsed.data;
 
     // Enforce 1-service limit for FREE plan
     if (merchant.plan !== "PRO") {
@@ -48,16 +49,14 @@ export async function POST(request: Request) {
       }
     }
 
-    const xpAmount = body.xpAmount ? Math.max(1, Math.floor(Number(body.xpAmount))) : null;
-
     const service = await prisma.service.create({
       data: {
         merchantId: merchant.id,
-        name: body.name,
-        description: body.description,
-        duration: Math.max(5, Math.floor(Number(body.duration))),
-        price: Math.max(0, Number(body.price)),
-        xpAmount,
+        name,
+        description,
+        duration,
+        price,
+        xpAmount: xpAmount ?? null,
       },
     });
     return NextResponse.json(service);
@@ -85,20 +84,14 @@ export async function PUT(request: NextRequest) {
     if (!existing)
       return NextResponse.json({ error: "Service non trouvé" }, { status: 404 });
 
-    const body = await request.json();
-    const xpAmount = body.xpAmount !== undefined
-      ? (body.xpAmount ? Math.max(1, Math.floor(Number(body.xpAmount))) : null)
-      : undefined;
+    const parsed = updateServiceSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
+    }
 
     const service = await prisma.service.update({
       where: { id },
-      data: {
-        name: body.name,
-        description: body.description,
-        duration: body.duration ? Math.max(5, Math.floor(Number(body.duration))) : undefined,
-        price: body.price != null ? Math.max(0, Number(body.price)) : undefined,
-        xpAmount,
-      },
+      data: parsed.data,
     });
     return NextResponse.json(service);
   } catch {

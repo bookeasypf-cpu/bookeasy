@@ -95,6 +95,15 @@ function LoginForm() {
           </Button>
         </form>
 
+        <div className="mt-3 text-right">
+          <Link
+            href="/forgot-password"
+            className="text-xs text-gray-400 dark:text-gray-500 hover:text-[#0066FF] transition-colors"
+          >
+            Mot de passe oublié ?
+          </Link>
+        </div>
+
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">

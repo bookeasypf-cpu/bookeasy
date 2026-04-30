@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { addPhotoSchema, updateCoverSchema, zodFirstError } from "@/lib/validations";
 
 export async function GET() {
   try {
@@ -42,12 +43,14 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { coverImage } = body;
+    const parsed = updateCoverSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
+    }
 
     const merchant = await prisma.merchant.update({
       where: { userId: session.user.id },
-      data: { coverImage: coverImage || null },
+      data: { coverImage: parsed.data.coverImage || null },
       select: { coverImage: true },
     });
 
@@ -65,12 +68,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { url, caption } = body;
-
-    if (!url) {
-      return NextResponse.json({ error: "URL requise" }, { status: 400 });
+    const parsed = addPhotoSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
+    const { url, caption } = parsed.data;
 
     const merchant = await prisma.merchant.findUnique({
       where: { userId: session.user.id },

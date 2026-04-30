@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { updateUserProfileSchema, zodFirstError } from "@/lib/validations";
 
 export async function GET() {
   try {
@@ -31,15 +32,11 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { name, phone, image } = body;
-
-    if (!name || name.trim().length < 2) {
-      return NextResponse.json(
-        { error: "Le nom doit contenir au moins 2 caractères" },
-        { status: 400 }
-      );
+    const parsed = updateUserProfileSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
+    const { name, phone, image } = parsed.data;
 
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },

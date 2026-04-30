@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth-options";
 import { giftCardLimiter, checkRateLimit, formatRateLimitError } from "@/lib/ratelimit";
 import { PAYZEN_CONFIGURED } from "@/lib/payzen";
 import { nanoid } from "nanoid";
+import { createGiftCardSchema, zodFirstError } from "@/lib/validations";
 
 // Générer un code carte cadeau lisible
 function generateGiftCardCode(): string {
@@ -103,19 +104,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json();
-
-    const { amountXPF, senderName, senderEmail, recipientName, recipientEmail, message, merchantId } = body;
-
-    if (!amountXPF || !senderName || !senderEmail || !recipientName || !recipientEmail) {
-      return NextResponse.json({ error: "Champs requis manquants" }, { status: 400 });
+    const parsed = createGiftCardSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
-
-    // Montants autorisés en XPF
-    const allowedAmounts = [2000, 5000, 10000, 20000, 50000];
-    if (!allowedAmounts.includes(amountXPF)) {
-      return NextResponse.json({ error: "Montant non autorisé" }, { status: 400 });
-    }
+    const { amountXPF, senderName, senderEmail, recipientName, recipientEmail, message, merchantId } = parsed.data;
 
     // Convertir XPF en EUR (1 EUR = 119.33 XPF)
     const amountEUR = amountXPF / 119.33;

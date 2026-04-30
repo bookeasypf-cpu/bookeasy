@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createPatientNoteSchema, zodFirstError } from "@/lib/validations";
 
 // GET — Récupérer les notes d'un patient
 export async function GET(request: NextRequest) {
@@ -45,14 +46,11 @@ export async function POST(request: NextRequest) {
     if (!merchant)
       return NextResponse.json({ error: "No merchant" }, { status: 404 });
 
-    const body = await request.json();
-    const { clientId, content } = body;
-
-    if (!clientId || !content?.trim())
-      return NextResponse.json(
-        { error: "clientId et contenu requis" },
-        { status: 400 }
-      );
+    const parsed = createPatientNoteSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
+    }
+    const { clientId, content } = parsed.data;
 
     // Verify merchant has seen this client (at least one booking)
     const hasBooking = await prisma.booking.findFirst({

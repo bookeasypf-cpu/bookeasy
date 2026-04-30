@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geocodeAddress } from "@/lib/geocode";
 import { isMedicalSectorName } from "@/lib/medical";
+import { updateMerchantProfileSchema, updatePaymentPolicySchema, zodFirstError } from "@/lib/validations";
 
 export async function GET() {
   try {
@@ -35,25 +36,22 @@ export async function PUT(request: Request) {
 
     // Partial update: paymentPolicy only
     if (body.paymentPolicy && Object.keys(body).length === 1) {
-      if (!["NONE", "FLEXIBLE", "ONLINE_ONLY"].includes(body.paymentPolicy)) {
+      const policyParsed = updatePaymentPolicySchema.safeParse(body);
+      if (!policyParsed.success) {
         return NextResponse.json({ error: "Mode invalide" }, { status: 400 });
       }
       const updated = await prisma.merchant.update({
         where: { userId: session.user.id },
-        data: { paymentPolicy: body.paymentPolicy },
+        data: { paymentPolicy: policyParsed.data.paymentPolicy },
       });
       return NextResponse.json(updated);
     }
 
-    const { businessName, description, phone, address, city, postalCode, sectorId } =
-      body;
-
-    if (!businessName || !sectorId) {
-      return NextResponse.json(
-        { error: "Nom et secteur requis" },
-        { status: 400 }
-      );
+    const parsed = updateMerchantProfileSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
+    const { businessName, description, phone, address, city, postalCode, sectorId } = parsed.data;
 
     const existing = await prisma.merchant.findUnique({
       where: { userId: session.user.id },

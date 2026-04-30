@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createXpRewardSchema, updateXpRewardSchema, zodFirstError } from "@/lib/validations";
 
 async function getMerchant(userId: string) {
   return prisma.merchant.findUnique({ where: { userId } });
@@ -42,24 +43,21 @@ export async function POST(request: Request) {
     if (!merchant)
       return NextResponse.json({ error: "No merchant profile" }, { status: 400 });
 
-    const body = await request.json();
-
-    if (!body.name || !body.xpCost || body.xpCost < 1) {
-      return NextResponse.json(
-        { error: "Nom et coût XP requis (minimum 1 XP)" },
-        { status: 400 }
-      );
+    const parsed = createXpRewardSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
+    const { name, xpCost, description, type, value, maxUses } = parsed.data;
 
     const reward = await prisma.xpReward.create({
       data: {
         merchantId: merchant.id,
-        name: body.name,
-        description: body.description || null,
-        xpCost: body.xpCost,
-        type: body.type || "DISCOUNT",
-        value: body.value || null,
-        maxUses: body.maxUses || null,
+        name,
+        description: description || null,
+        xpCost,
+        type,
+        value: value || null,
+        maxUses: maxUses || null,
       },
     });
 
@@ -84,19 +82,14 @@ export async function PUT(request: NextRequest) {
     if (!id)
       return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
-    const body = await request.json();
+    const parsed = updateXpRewardSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
+    }
 
     const reward = await prisma.xpReward.updateMany({
       where: { id, merchantId: merchant.id },
-      data: {
-        name: body.name,
-        description: body.description,
-        xpCost: body.xpCost,
-        type: body.type,
-        value: body.value,
-        isActive: body.isActive,
-        maxUses: body.maxUses,
-      },
+      data: parsed.data,
     });
 
     return NextResponse.json(reward);

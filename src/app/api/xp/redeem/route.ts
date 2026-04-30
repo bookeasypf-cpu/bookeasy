@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { sendPushNotification } from "@/lib/push";
 import { xpRedeemLimiter, checkRateLimit, formatRateLimitError } from "@/lib/ratelimit";
 import { randomBytes } from "crypto";
+import { redeemXpSchema, zodFirstError } from "@/lib/validations";
 
 // POST: Échanger des XP contre une récompense
 export async function POST(request: Request) {
@@ -24,15 +25,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
-    const { rewardId } = body;
-
-    if (!rewardId) {
-      return NextResponse.json(
-        { error: "ID de récompense requis" },
-        { status: 400 }
-      );
+    const parsed = redeemXpSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
+    const { rewardId } = parsed.data;
 
     // Récupérer la récompense
     const reward = await prisma.xpReward.findUnique({

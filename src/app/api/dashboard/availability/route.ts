@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { updateAvailabilitySchema, zodFirstError } from "@/lib/validations";
 
 export async function GET() {
   try {
@@ -34,8 +35,11 @@ export async function PUT(request: Request) {
         { status: 400 }
       );
 
-    const body = await request.json();
-    const { schedule } = body;
+    const parsed = updateAvailabilitySchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
+    }
+    const { schedule } = parsed.data;
 
     // Delete existing and recreate atomically
     await prisma.$transaction(async (tx) => {

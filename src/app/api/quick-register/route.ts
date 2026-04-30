@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
 import { signupLimiter, formatRateLimitError } from "@/lib/ratelimit";
+import { quickRegisterSchema, zodFirstError } from "@/lib/validations";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,11 +22,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, email, phone, plan } = await req.json();
-
-    if (!name || !email) {
-      return NextResponse.json({ error: "Nom et email requis" }, { status: 400 });
+    const parsed = quickRegisterSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
+    const { name, email, phone, plan } = parsed.data;
 
     // Vérifier si l'email existe déjà
     const existing = await prisma.user.findUnique({ where: { email } });

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { updateXpSettingsSchema, zodFirstError } from "@/lib/validations";
 
 // GET: Récupérer les paramètres XP du commerçant
 export async function GET() {
@@ -55,18 +56,14 @@ export async function PUT(request: Request) {
     if (!session?.user)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const body = await request.json();
-
-    if (!body.xpPerBooking || body.xpPerBooking < 1 || body.xpPerBooking > 100) {
-      return NextResponse.json(
-        { error: "XP par réservation doit être entre 1 et 100" },
-        { status: 400 }
-      );
+    const parsed = updateXpSettingsSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
 
     const merchant = await prisma.merchant.update({
       where: { userId: session.user.id },
-      data: { xpPerBooking: body.xpPerBooking },
+      data: { xpPerBooking: parsed.data.xpPerBooking },
     });
 
     return NextResponse.json({ xpPerBooking: merchant.xpPerBooking });

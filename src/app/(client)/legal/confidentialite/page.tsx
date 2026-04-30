@@ -39,7 +39,7 @@ export default function Confidentialite() {
       <h3>3.1 Données fournies directement</h3>
       <ul>
         <li><strong>Inscription Client :</strong> nom, prénom, adresse email, mot de passe (chiffré via bcrypt)</li>
-        <li><strong>Inscription via OAuth :</strong> nom, prénom, adresse email, photo de profil (via Google ou Facebook)</li>
+        <li><strong>Inscription via OAuth :</strong> nom, prénom, adresse email, photo de profil (via Google)</li>
         <li><strong>Profil professionnel :</strong> nom commercial, adresse, description, secteur d&apos;activité, coordonnées GPS, numéro de téléphone, horaires, services et tarifs, photos</li>
         <li><strong>Réservations :</strong> date, heure, service choisi, notes éventuelles</li>
         <li><strong>Avis :</strong> texte de l&apos;avis, note attribuée (1 à 5 étoiles)</li>
@@ -83,7 +83,7 @@ export default function Confidentialite() {
         <li><strong>Les Prestataires :</strong> nom et coordonnées du client pour les rendez-vous confirmés uniquement</li>
         <li><strong>Prestataires de paiement :</strong> données nécessaires au traitement des paiements (Cartes Cadeaux, abonnements Pro)</li>
         <li><strong>Hébergeur :</strong> Vercel Inc. (données techniques de serveur)</li>
-        <li><strong>Services d&apos;authentification :</strong> Google et Facebook (si connexion via OAuth)</li>
+        <li><strong>Services d&apos;authentification :</strong> Google (si connexion via OAuth)</li>
         <li><strong>Service d&apos;emails :</strong> pour l&apos;envoi de confirmations et notifications</li>
         <li><strong>Autorités compétentes :</strong> sur demande judiciaire légitime</li>
       </ul>

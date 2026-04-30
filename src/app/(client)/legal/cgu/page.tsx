@@ -91,7 +91,7 @@ export default function CGU() {
       <p>
         L&apos;inscription est gratuite et ouverte à toute personne physique majeure.
         Lors de la création de compte, l&apos;Utilisateur renseigne : nom, prénom, adresse email et mot de passe.
-        L&apos;inscription peut également être réalisée via les services tiers Google ou Facebook.
+        L&apos;inscription peut également être réalisée via le service tiers Google.
       </p>
       <p>
         L&apos;Utilisateur certifie que les informations fournies sont exactes et s&apos;engage à les maintenir à jour.

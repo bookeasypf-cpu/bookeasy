@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendPushNotification } from "@/lib/push";
 import { xpValidateLimiter, checkRateLimit, formatRateLimitError } from "@/lib/ratelimit";
+import { validateCodeSchema, zodFirstError } from "@/lib/validations";
 
 async function getMerchant(userId: string) {
   return prisma.merchant.findUnique({ where: { userId } });
@@ -31,12 +32,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
-    const { code } = body;
-
-    if (!code) {
-      return NextResponse.json({ error: "Code requis" }, { status: 400 });
+    const parsed = validateCodeSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
+    const { code } = parsed.data;
 
     // Find the redemption by code and check it belongs to this merchant's rewards
     const redemption = await prisma.xpRedemption.findUnique({

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { createBookingPaymentForm, PAYZEN_CONFIGURED } from "@/lib/payzen";
+import { bookingCheckoutSchema, zodFirstError } from "@/lib/validations";
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
@@ -13,7 +14,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Paiement en ligne non disponible" }, { status: 503 });
   }
 
-  const { bookingId } = await req.json();
+  const parsed = bookingCheckoutSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
+  }
+  const { bookingId } = parsed.data;
 
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },

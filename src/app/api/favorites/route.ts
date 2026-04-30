@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
+import { toggleFavoriteSchema, zodFirstError } from "@/lib/validations";
 
 // GET /api/favorites — list user's favorites (just merchant IDs)
 export async function GET() {
@@ -27,10 +28,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Non connecté" }, { status: 401 });
   }
 
-  const { merchantId } = await req.json();
-  if (!merchantId) {
-    return NextResponse.json({ error: "merchantId requis" }, { status: 400 });
+  const parsed = toggleFavoriteSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
   }
+  const { merchantId } = parsed.data;
 
   // Check if already favorited
   const existing = await prisma.favorite.findUnique({

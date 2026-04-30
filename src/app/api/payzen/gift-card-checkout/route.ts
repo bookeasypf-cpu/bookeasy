@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { createGiftCardPaymentForm, PAYZEN_CONFIGURED } from "@/lib/payzen";
+import { giftCardCheckoutSchema, zodFirstError } from "@/lib/validations";
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
@@ -13,7 +14,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Paiement en ligne non disponible" }, { status: 503 });
   }
 
-  const { giftCardId } = await req.json();
+  const parsed = giftCardCheckoutSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
+  }
+  const { giftCardId } = parsed.data;
 
   const card = await prisma.giftCard.findUnique({
     where: { id: giftCardId },
