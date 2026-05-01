@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Mail, Phone, Pencil, Check, X, Upload } from "lucide-react";
+import { Mail, Phone, Pencil, Check, X, Upload, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 // Compress image before upload
@@ -67,6 +67,8 @@ export default function ProfilePage() {
   const [uploadStep, setUploadStep] = useState<string>("");
   const [form, setForm] = useState({ name: "", phone: "", image: "" });
   const [localImagePreview, setLocalImagePreview] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -230,6 +232,23 @@ export default function ProfilePage() {
       toast.error("Erreur de connexion");
     }
     setSaving(false);
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/profile", { method: "DELETE" });
+      if (res.ok) {
+        toast.success("Compte supprimé");
+        await signOut({ callbackUrl: "/" });
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Erreur lors de la suppression");
+      }
+    } catch {
+      toast.error("Erreur de connexion");
+    }
+    setDeleting(false);
   }
 
   if (loading || status === "loading") {
@@ -398,6 +417,48 @@ export default function ProfilePage() {
           >
             Télécharger mes données
           </a>
+        </CardContent>
+      </Card>
+
+      {/* RGPD — Suppression du compte */}
+      <Card className="rounded-2xl border-0 shadow-sm mt-6 border-red-200 dark:border-red-900/30">
+        <CardContent className="py-5">
+          <h3 className="text-sm font-semibold text-red-600 dark:text-red-400 mb-2">Supprimer mon compte</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+            Cette action est irréversible. Toutes vos données (réservations, avis, favoris, points XP) seront définitivement supprimées.
+          </p>
+          {!showDeleteConfirm ? (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+            >
+              <Trash2 className="h-4 w-4" />
+              Supprimer mon compte
+            </button>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                Êtes-vous sûr ? Cette action ne peut pas être annulée.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {deleting ? "Suppression..." : "Oui, supprimer définitivement"}
+                </button>
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deleting}
+                  className="px-4 py-2 rounded-xl text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

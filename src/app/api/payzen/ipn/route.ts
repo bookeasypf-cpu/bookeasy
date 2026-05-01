@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const receivedSignature = body.signature;
     if (!receivedSignature || !verifySignature(body, receivedSignature)) {
       console.error("PayZen IPN: signature invalide");
-      return new NextResponse("Invalid signature", { status: 400 });
+      return new NextResponse("OK", { status: 200 });
     }
 
     const ipnData = parseIPNData(body);

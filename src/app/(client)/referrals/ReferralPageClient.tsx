@@ -6,7 +6,6 @@ import {
   Copy,
   Check,
   MessageCircle,
-  Send,
   Link as LinkIcon,
   Gift,
   Star,
@@ -67,13 +66,6 @@ export function ReferralPageClient() {
     );
   };
 
-  const shareMessenger = () => {
-    if (!data) return;
-    window.open(
-      `https://www.facebook.com/dialog/send?link=${encodeURIComponent(data.referralLink)}&app_id=1196589471477498&redirect_uri=${encodeURIComponent(data.referralLink)}`,
-      "_blank"
-    );
-  };
 
   const statusLabel = (status: string) => {
     switch (status) {
@@ -167,20 +159,13 @@ export function ReferralPageClient() {
           </div>
 
           {/* Share buttons */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <button
               onClick={shareWhatsApp}
               className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#25D366]/20 hover:bg-[#25D366]/30 transition-colors group"
             >
               <MessageCircle className="h-6 w-6 text-[#25D366] group-hover:scale-110 transition-transform" />
               <span className="text-[#25D366] text-xs font-medium">WhatsApp</span>
-            </button>
-            <button
-              onClick={shareMessenger}
-              className="flex flex-col items-center gap-2 p-3 rounded-xl bg-[#0084FF]/20 hover:bg-[#0084FF]/30 transition-colors group"
-            >
-              <Send className="h-6 w-6 text-[#0084FF] group-hover:scale-110 transition-transform" />
-              <span className="text-[#0084FF] text-xs font-medium">Messenger</span>
             </button>
             <button
               onClick={() => copyToClipboard(data.referralLink, "link")}
