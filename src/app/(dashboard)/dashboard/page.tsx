@@ -14,6 +14,8 @@ import { AutoRefresh } from "@/components/AutoRefresh";
 import { DashboardStats, type BookingLite } from "./DashboardStats";
 import { autoCompleteBookings } from "@/lib/auto-complete";
 
+export const dynamic = "force-dynamic";
+
 /** Return the current date in Tahiti (UTC-10) as YYYY-MM-DD */
 function getTahitiDate(): string {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'Pacific/Tahiti' });

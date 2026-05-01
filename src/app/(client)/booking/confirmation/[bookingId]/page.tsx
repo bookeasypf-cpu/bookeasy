@@ -6,6 +6,8 @@ import { Calendar, Clock, Briefcase, Home, CalendarCheck, Star, CreditCard, Aler
 import Link from "next/link";
 import { ConfirmationContent } from "@/components/booking/ConfirmationContent";
 
+export const dynamic = "force-dynamic";
+
 interface ConfirmationPageProps {
   params: Promise<{ bookingId: string }>;
   searchParams: Promise<{ payment?: string }>;

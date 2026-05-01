@@ -6,6 +6,8 @@ import { Heart } from "lucide-react";
 import { MerchantCard } from "@/components/search/MerchantCard";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Mes favoris | BookEasy",
   description: "Vos professionnels favoris sur BookEasy.",

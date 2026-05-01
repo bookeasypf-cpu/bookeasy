@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import MapViewLoader from "@/components/map/MapViewLoader";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Explorer la carte | BookEasy",
   description:

@@ -13,6 +13,8 @@ import { Gift } from "lucide-react";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { autoCompleteBookings } from "@/lib/auto-complete";
 
+export const dynamic = "force-dynamic";
+
 type BookingItem = {
   id: string;
   status: string;
