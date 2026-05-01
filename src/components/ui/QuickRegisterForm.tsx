@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, CheckCircle, Copy } from "lucide-react";
+import { ArrowRight, CheckCircle, Mail } from "lucide-react";
 import toast from "react-hot-toast";
 
 export function QuickRegisterForm() {
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ tempPassword: string } | null>(null);
+  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,7 +20,7 @@ export function QuickRegisterForm() {
       });
       const data = await res.json();
       if (res.ok) {
-        setResult({ tempPassword: data.tempPassword });
+        setSuccess(true);
         toast.success("Compte créé !");
       } else {
         toast.error(data.error);
@@ -31,25 +31,16 @@ export function QuickRegisterForm() {
     setLoading(false);
   }
 
-  if (result) {
+  if (success) {
     return (
       <div className="text-center py-4">
         <CheckCircle className="h-10 w-10 text-green-500 mx-auto mb-3" />
         <h3 className="font-bold text-[#0C1B2A] mb-2">Compte créé !</h3>
-        <p className="text-sm text-gray-500 mb-3">Votre mot de passe temporaire :</p>
-        <div className="inline-flex items-center gap-2 bg-gray-50 rounded-lg px-4 py-2 mb-4">
-          <code className="font-mono font-bold text-[#0066FF]">{result.tempPassword}</code>
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(result.tempPassword);
-              toast.success("Copié !");
-            }}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <Copy className="h-4 w-4" />
-          </button>
+        <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-4">
+          <Mail className="h-4 w-4" />
+          <p>Vos identifiants ont été envoyés à <strong className="text-[#0C1B2A]">{form.email}</strong></p>
         </div>
-        <p className="text-xs text-gray-400 mb-4">Connectez-vous et complétez votre profil dans le dashboard.</p>
+        <p className="text-xs text-gray-400 mb-4">Consultez votre boîte mail (vérifiez les spams) puis connectez-vous.</p>
         <a
           href="/login"
           className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold rounded-xl bg-[#0066FF] text-white hover:bg-[#0052CC] transition-colors"

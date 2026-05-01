@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
 import { signupLimiter, formatRateLimitError } from "@/lib/ratelimit";
 import { quickRegisterSchema, zodFirstError } from "@/lib/validations";
+import { sendMerchantCredentials } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -66,10 +67,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Send credentials by email (not in JSON response)
+    sendMerchantCredentials(email, name, tempPassword).catch(() => {});
+
     return NextResponse.json({
       success: true,
-      tempPassword,
-      message: "Compte créé ! Utilisez ce mot de passe temporaire pour vous connecter, puis complétez votre profil.",
+      message: "Compte créé ! Vos identifiants de connexion ont été envoyés par email.",
     });
   } catch (error) {
     console.error("Quick register error:", error);

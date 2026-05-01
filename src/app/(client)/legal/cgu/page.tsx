@@ -21,7 +21,7 @@ export default function CGU() {
         immatriculée sous le N° TAHITI D11783 — RCS 26 270 A R.C.S. Papeete.
       </p>
       <p>
-        Contact : <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a> — Tél. : +689 89 70 03 05
+        Contact : <a href="mailto:bookeasy.pf@gmail.com">bookeasy.pf@gmail.com</a> — Tél. : +689 89 70 03 05
       </p>
 
       <h2>Article 2 — Définitions</h2>
@@ -68,7 +68,7 @@ export default function CGU() {
       </p>
       <p>
         L&apos;Utilisateur peut supprimer son compte à tout moment depuis la rubrique « Mon profil »
-        ou en envoyant un email à <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a>.
+        ou en envoyant un email à <a href="mailto:bookeasy.pf@gmail.com">bookeasy.pf@gmail.com</a>.
         Si un rendez-vous est réservé et n&apos;a pas encore eu lieu au moment de la suppression,
         celui-ci sera automatiquement annulé.
       </p>
@@ -257,7 +257,7 @@ export default function CGU() {
       <h3>10.3 Contestation</h3>
       <p>
         L&apos;Utilisateur peut contester la décision dans un délai de 30 jours à compter de
-        la notification en écrivant à <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a>.
+        la notification en écrivant à <a href="mailto:bookeasy.pf@gmail.com">bookeasy.pf@gmail.com</a>.
         BookEasy disposera d&apos;un délai de 90 jours pour reconsidérer sa décision et fournir
         une réponse motivée.
       </p>
@@ -321,7 +321,7 @@ export default function CGU() {
       <h3>15.2 Réclamation</h3>
       <p>
         En cas de réclamation, l&apos;Utilisateur peut contacter BookEasy par email
-        à <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a>.
+        à <a href="mailto:bookeasy.pf@gmail.com">bookeasy.pf@gmail.com</a>.
       </p>
 
       <h3>15.3 Médiation</h3>
@@ -357,7 +357,7 @@ export default function CGU() {
       <h2>Article 17 — Contact</h2>
       <p>
         Pour toute question relative aux présentes CGU :<br />
-        Email : <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a><br />
+        Email : <a href="mailto:bookeasy.pf@gmail.com">bookeasy.pf@gmail.com</a><br />
         Téléphone : +689 89 70 03 05<br />
         Adresse : Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française
       </p>

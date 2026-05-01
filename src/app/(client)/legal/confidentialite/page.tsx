@@ -31,7 +31,7 @@ export default function Confidentialite() {
         <strong>Maravai PARAU — Entreprise individuelle (EI)</strong><br />
         N° TAHITI : D11783 — RCS : 26 270 A R.C.S. Papeete<br />
         Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française<br />
-        Email : <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a><br />
+        Email : <a href="mailto:bookeasy.pf@gmail.com">bookeasy.pf@gmail.com</a><br />
         Téléphone : +689 89 70 03 05
       </p>
 
@@ -112,7 +112,7 @@ export default function Confidentialite() {
       </ul>
       <p>
         Pour exercer ces droits, contactez-nous à :{" "}
-        <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a>.
+        <a href="mailto:bookeasy.pf@gmail.com">bookeasy.pf@gmail.com</a>.
         Nous répondrons dans un délai de 30 jours. En cas de demande complexe, ce délai
         peut être prolongé de 60 jours, avec notification préalable.
       </p>
@@ -174,7 +174,7 @@ export default function Confidentialite() {
       <h2>14. Contact et réclamation</h2>
       <p>
         Pour toute question relative à la présente politique ou pour exercer vos droits :<br />
-        Email : <a href="mailto:contact@bookeasy.me">contact@bookeasy.me</a><br />
+        Email : <a href="mailto:bookeasy.pf@gmail.com">bookeasy.pf@gmail.com</a><br />
         Téléphone : +689 89 70 03 05<br />
         Adresse : Quartier Teissier Emile, PK 12.600, Côté Montagne 98717 PUNAAUIA, Polynésie française
       </p>
