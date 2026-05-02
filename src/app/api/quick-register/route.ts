@@ -27,7 +27,9 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
-    const { name, email, phone, plan } = parsed.data;
+    const { name, email, phone } = parsed.data;
+    // Always FREE — PRO plan requires Stripe checkout, no free upgrade
+    const merchantPlan = "FREE" as const;
 
     // Vérifier si l'email existe déjà
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -62,7 +64,7 @@ export async function POST(req: NextRequest) {
           businessName: name,
           phone: phone || null,
           sectorId: firstSector.id,
-          plan: plan === "pro" ? "PRO" : "FREE",
+          plan: merchantPlan,
         },
       });
     }

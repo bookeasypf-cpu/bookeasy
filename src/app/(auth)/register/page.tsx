@@ -9,8 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Card, CardContent } from "@/components/ui/Card";
 import { registerUser } from "@/actions/auth";
-import { User, Store, Gift } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Store, Gift } from "lucide-react";
 
 export default function RegisterPage() {
   return (
@@ -23,12 +22,10 @@ export default function RegisterPage() {
 function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const defaultRole = searchParams.get("role") || "CLIENT";
   const callbackUrl = searchParams.get("callbackUrl") || "";
   const refCodeFromUrl = searchParams.get("ref") || "";
-  const [role, setRole] = useState<"CLIENT" | "MERCHANT">(
-    defaultRole === "MERCHANT" ? "MERCHANT" : "CLIENT"
-  );
+  // /register only creates CLIENT accounts. Pros use /pricing → QuickRegisterForm.
+  const role = "CLIENT" as const;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [referrerName, setReferrerName] = useState<string | null>(null);
@@ -70,7 +67,6 @@ function RegisterForm() {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    formData.set("role", role);
     if (refCode) {
       formData.set("referralCode", refCode);
     }
@@ -101,8 +97,8 @@ function RegisterForm() {
     if (signInResult?.error) {
       router.push("/login");
     } else {
-      // Redirect to callbackUrl if available (e.g., booking page), otherwise role-based default
-      const redirectUrl = callbackUrl || (role === "MERCHANT" ? "/dashboard/profile" : "/");
+      // Redirect to callbackUrl if available (e.g., booking page), otherwise home
+      const redirectUrl = callbackUrl || "/";
       router.push(redirectUrl);
       router.refresh();
     }
@@ -170,64 +166,20 @@ function RegisterForm() {
           </div>
         )}
 
-        {/* Role selector */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <button
-            type="button"
-            onClick={() => setRole("CLIENT")}
-            className={cn(
-              "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
-              role === "CLIENT"
-                ? "border-[#0066FF] bg-[#0066FF]/5"
-                : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-            )}
+        {/* Pro link */}
+        <div className="mb-6 p-3 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Store className="h-5 w-5 text-gray-400" />
+            <span className="text-xs text-gray-600 dark:text-gray-400">
+              Vous êtes professionnel ?
+            </span>
+          </div>
+          <Link
+            href="/pricing"
+            className="text-xs font-medium text-[#0066FF] hover:text-[#0052CC]"
           >
-            <User
-              className={cn(
-                "h-6 w-6",
-                role === "CLIENT" ? "text-[#0066FF]" : "text-gray-400"
-              )}
-            />
-            <span
-              className={cn(
-                "text-sm font-medium",
-                role === "CLIENT" ? "text-[#0066FF]" : "text-gray-600 dark:text-gray-300"
-              )}
-            >
-              Client
-            </span>
-            <span className="text-xs text-gray-400 dark:text-gray-500">
-              Je veux réserver
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setRole("MERCHANT")}
-            className={cn(
-              "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
-              role === "MERCHANT"
-                ? "border-[#0066FF] bg-[#0066FF]/5"
-                : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-            )}
-          >
-            <Store
-              className={cn(
-                "h-6 w-6",
-                role === "MERCHANT" ? "text-[#0066FF]" : "text-gray-400"
-              )}
-            />
-            <span
-              className={cn(
-                "text-sm font-medium",
-                role === "MERCHANT" ? "text-[#0066FF]" : "text-gray-600 dark:text-gray-300"
-              )}
-            >
-              Professionnel
-            </span>
-            <span className="text-xs text-gray-400 dark:text-gray-500">
-              Je propose des services
-            </span>
-          </button>
+            Inscription Pro →
+          </Link>
         </div>
 
         {error && (
@@ -269,9 +221,7 @@ function RegisterForm() {
             required
           />
           <Button type="submit" className="w-full" loading={loading}>
-            {role === "MERCHANT"
-              ? "Créer mon compte pro"
-              : "Créer mon compte"}
+            Créer mon compte
           </Button>
         </form>
 

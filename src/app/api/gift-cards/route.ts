@@ -145,6 +145,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Fallback : pas de PayZen → carte active immédiatement (mode test)
+    // BLOQUÉ EN PRODUCTION : sans PayZen configuré, n'importe qui pourrait
+    // créer des cartes cadeaux gratuites en production. Mode test uniquement.
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { error: "Service de paiement temporairement indisponible. Veuillez réessayer plus tard." },
+        { status: 503 }
+      );
+    }
+
     const card = await prisma.giftCard.create({
       data: {
         code,

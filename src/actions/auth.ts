@@ -16,7 +16,6 @@ export async function registerUser(formData: FormData) {
     name: formData.get("name") as string,
     email: formData.get("email") as string,
     password: formData.get("password") as string,
-    role: formData.get("role") as string,
   };
 
   const referralCode = formData.get("referralCode") as string | null;
@@ -26,7 +25,9 @@ export async function registerUser(formData: FormData) {
     return { error: result.error.issues[0].message };
   }
 
-  const { name, email, password, role } = result.data;
+  const { name, email, password } = result.data;
+  // Always CLIENT — merchant accounts go through /api/quick-register or admin
+  const role = "CLIENT";
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
