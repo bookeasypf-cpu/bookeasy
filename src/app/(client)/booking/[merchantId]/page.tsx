@@ -322,6 +322,7 @@ export default function BookingPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
           <button
             onClick={() => router.back()}
+            aria-label="Retour à la page précédente"
             className="btn-press w-9 h-9 rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-[#0C1B2A] dark:hover:text-white transition-colors shrink-0"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -542,7 +543,7 @@ export default function BookingPage() {
               <div className="animate-fade-in">
                 <label className="flex items-center gap-1.5 text-sm font-semibold text-[#0C1B2A] dark:text-white mb-3">
                   <Clock className="h-4 w-4 text-[#00B4D8]" />
-                  Creneau horaire
+                  Créneau horaire
                 </label>
                 {state.loadingSlots ? (
                   <div className="flex flex-col items-center justify-center py-10 gap-2">

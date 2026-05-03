@@ -9,6 +9,7 @@ import {
   Activity,
 } from "lucide-react";
 import PatientList from "@/components/dashboard/PatientSearch";
+import { isMedicalSectorName } from "@/lib/medical";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +19,29 @@ export default async function PatientsPage() {
 
   const merchant = await prisma.merchant.findUnique({
     where: { userId: session.user.id },
+    include: { sector: { select: { name: true } } },
   });
   if (!merchant) redirect("/dashboard/profile");
+
+  // Gate: notes patients only for medical sector pros
+  if (!isMedicalSectorName(merchant.sector?.name)) {
+    return (
+      <div className="page-transition max-w-2xl mx-auto px-4 py-8">
+        <Card className="rounded-2xl border-0 shadow-sm">
+          <CardContent className="py-8 text-center">
+            <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <h1 className="text-xl font-bold text-[#0C1B2A] dark:text-white mb-2">
+              Fonctionnalité réservée
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+              La gestion des notes patients est réservée aux professionnels de santé
+              (médecins, kinés, dentistes, infirmiers, etc.).
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Récupérer les bookings récents (3 ans max — RGPD retention)
   const threeYearsAgo = new Date();

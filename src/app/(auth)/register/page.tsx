@@ -193,7 +193,7 @@ function RegisterForm() {
             id="name"
             name="name"
             label="Nom complet"
-            placeholder="Elon Musk"
+            placeholder="Maeva Tetuanui"
             required
           />
           <Input

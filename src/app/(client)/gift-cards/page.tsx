@@ -216,7 +216,7 @@ function GiftCardsContent() {
             Cartes Cadeaux
           </h1>
           <p className="text-white/60 max-w-xl mx-auto text-lg">
-            Offrez du bien-être à vos proches. Choisissez un commercant ou offrez une carte valable partout.
+            Offrez du bien-être à vos proches. Choisissez un commerçant ou offrez une carte valable partout.
           </p>
         </div>
       </div>
@@ -346,7 +346,7 @@ function GiftCardsContent() {
                         <div className="p-2 border-b border-gray-100 dark:border-gray-700">
                           <input
                             type="text"
-                            placeholder="Rechercher un commercant..."
+                            placeholder="Rechercher un commerçant..."
                             value={merchantSearch}
                             onChange={(e) => setMerchantSearch(e.target.value)}
                             className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#0066FF]"

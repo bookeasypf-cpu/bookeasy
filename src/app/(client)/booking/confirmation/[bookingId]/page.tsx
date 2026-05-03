@@ -182,7 +182,7 @@ export default async function BookingConfirmationPage({
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-sm text-gray-500">
                 <Clock className="h-3.5 w-3.5" />
-                Duree
+                Durée
               </span>
               <span className="font-semibold text-[#0C1B2A] dark:text-white text-sm">
                 {formatDuration(booking.service.duration)}
