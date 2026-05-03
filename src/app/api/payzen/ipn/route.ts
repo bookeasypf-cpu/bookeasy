@@ -53,28 +53,23 @@ async function handleProSubscription(ipnData: ReturnType<typeof parseIPNData>) {
     case "AUTHORISED":
     case "CAPTURED": {
       if (ipnData.merchantId) {
-        await prisma.merchant.update({
+        // Single update returns userId — eliminates redundant findUnique
+        const merchant = await prisma.merchant.update({
           where: { id: ipnData.merchantId },
           data: {
             plan: "PRO",
             planExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           },
-        });
-
-        const merchant = await prisma.merchant.findUnique({
-          where: { id: ipnData.merchantId },
           select: { userId: true },
         });
-        if (merchant) {
-          await prisma.notification.create({
-            data: {
-              userId: merchant.userId,
-              type: "SUBSCRIPTION",
-              title: "Abonnement Pro activé !",
-              message: "Votre abonnement Pro est maintenant actif. Profitez de tous les avantages !",
-            },
-          });
-        }
+        await prisma.notification.create({
+          data: {
+            userId: merchant.userId,
+            type: "SUBSCRIPTION",
+            title: "Abonnement Pro activé !",
+            message: "Votre abonnement Pro est maintenant actif. Profitez de tous les avantages !",
+          },
+        });
       }
       break;
     }

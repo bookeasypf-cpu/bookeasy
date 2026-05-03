@@ -21,9 +21,13 @@ export default async function PatientsPage() {
   });
   if (!merchant) redirect("/dashboard/profile");
 
-  // Récupérer tous les bookings avec les infos clients
+  // Récupérer les bookings récents (3 ans max — RGPD retention)
+  const threeYearsAgo = new Date();
+  threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+  const dateFloor = threeYearsAgo.toISOString().slice(0, 10);
+
   const allBookings = await prisma.booking.findMany({
-    where: { merchantId: merchant.id },
+    where: { merchantId: merchant.id, date: { gte: dateFloor } },
     include: {
       client: {
         select: { id: true, name: true, email: true, phone: true, image: true },
@@ -31,6 +35,7 @@ export default async function PatientsPage() {
       service: { select: { name: true } },
     },
     orderBy: { date: "desc" },
+    take: 5000,
   });
 
   // Grouper par patient

@@ -12,6 +12,7 @@ export async function GET() {
         sector: { select: { name: true } },
       },
       orderBy: { businessName: "asc" },
+      take: 200,
     });
 
     return NextResponse.json({

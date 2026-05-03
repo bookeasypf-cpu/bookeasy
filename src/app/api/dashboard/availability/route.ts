@@ -48,17 +48,15 @@ export async function PUT(request: Request) {
       });
 
       if (schedule && schedule.length > 0) {
-        for (const s of schedule) {
-          await tx.weeklySchedule.create({
-            data: {
-              merchantId: merchant.id,
-              dayOfWeek: s.dayOfWeek,
-              startTime: s.startTime,
-              endTime: s.endTime,
-              isActive: s.isActive,
-            },
-          });
-        }
+        await tx.weeklySchedule.createMany({
+          data: schedule.map((s) => ({
+            merchantId: merchant.id,
+            dayOfWeek: s.dayOfWeek,
+            startTime: s.startTime,
+            endTime: s.endTime,
+            isActive: s.isActive,
+          })),
+        });
       }
     });
 

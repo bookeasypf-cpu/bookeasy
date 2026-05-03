@@ -31,25 +31,21 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  // Calculate XP earned from referrals
-  const xpTransactions = await prisma.xpTransaction.findMany({
-    where: {
-      userId: user.id,
-      reason: { startsWith: "Parrainage" },
-    },
-  });
+  // Calculate XP earned from referrals + milestone bonuses (parallel)
+  const [xpTransactions, milestoneXp] = await Promise.all([
+    prisma.xpTransaction.findMany({
+      where: { userId: user.id, reason: { startsWith: "Parrainage" } },
+      select: { amount: true },
+    }),
+    prisma.xpTransaction.findMany({
+      where: { userId: user.id, reason: { startsWith: "Palier parrainage" } },
+      select: { amount: true },
+    }),
+  ]);
 
-  const xpFromReferrals = xpTransactions.reduce((sum, tx) => sum + tx.amount, 0);
-
-  // Also count milestone bonuses
-  const milestoneXp = await prisma.xpTransaction.findMany({
-    where: {
-      userId: user.id,
-      reason: { startsWith: "Palier parrainage" },
-    },
-  });
-
-  const totalXpFromReferrals = xpFromReferrals + milestoneXp.reduce((sum, tx) => sum + tx.amount, 0);
+  const totalXpFromReferrals =
+    xpTransactions.reduce((sum, tx) => sum + tx.amount, 0) +
+    milestoneXp.reduce((sum, tx) => sum + tx.amount, 0);
 
   const totalReferrals = referrals.length;
   const activeReferrals = referrals.filter(

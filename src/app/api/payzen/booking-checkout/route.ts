@@ -45,13 +45,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Le délai de paiement a expiré" }, { status: 400 });
   }
 
+  if (!session.user.email) {
+    return NextResponse.json({ error: "Email requis pour le paiement" }, { status: 400 });
+  }
+  if (!booking.payzenOrderId) {
+    return NextResponse.json({ error: "Identifiant de commande manquant" }, { status: 500 });
+  }
+
   const amountXPF = Math.round(booking.totalPrice - (booking.giftCardAmount || 0));
 
   const { actionUrl, fields } = createBookingPaymentForm({
     bookingId: booking.id,
-    clientEmail: session.user.email!,
+    clientEmail: session.user.email,
     amount: amountXPF,
-    orderId: booking.payzenOrderId!,
+    orderId: booking.payzenOrderId,
   });
 
   return NextResponse.json({ actionUrl, fields });

@@ -280,78 +280,79 @@ export async function cancelBooking(bookingId: string, reason?: string) {
   }
 
   const newStatus = isMerchant ? "CANCELLED_BY_MERCHANT" : "CANCELLED_BY_CLIENT";
-  const updated = await prisma.booking.updateMany({
-    where: {
-      id: bookingId,
-      status: { notIn: ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT", "COMPLETED"] },
-    },
-    data: {
-      status: newStatus,
-      cancelledAt: new Date(),
-      cancelReason: reason || null,
-    },
-  });
 
-  if (updated.count === 0) {
-    return { error: "Cette réservation ne peut plus être annulée" };
-  }
-
-  // Refund gift card balance if booking used a gift card
-  if (booking.giftCardCode) {
-    const giftCard = await prisma.giftCard.findUnique({
-      where: { code: booking.giftCardCode },
-    });
-    if (giftCard && booking.giftCardAmount) {
-      const refundEUR = booking.giftCardAmount / 119.33;
-      const newBalance = Math.min(giftCard.amount, giftCard.balance + refundEUR);
-      await prisma.giftCard.update({
-        where: { id: giftCard.id },
-        data: {
-          balance: newBalance,
-          status: "ACTIVE",
-          usedAt: null,
-        },
-      });
-    }
-  } else if (booking.notes) {
-    // Legacy: gift card stored in notes
-    const giftCardMatch = booking.notes.match(/\[Carte cadeau: ([A-Z0-9-]+)\]/);
-    if (giftCardMatch) {
-      const giftCardCode = giftCardMatch[1];
-      const giftCard = await prisma.giftCard.findUnique({
-        where: { code: giftCardCode },
-      });
-      if (giftCard && booking.service) {
-        const refundEUR = booking.service.price / 119.33;
-        const newBalance = Math.min(giftCard.amount, giftCard.balance + refundEUR);
-        await prisma.giftCard.update({
-          where: { id: giftCard.id },
-          data: {
-            balance: newBalance,
-            status: "ACTIVE",
-            usedAt: null,
-          },
-        });
-      }
-    }
-  }
-
-  // Revoke ALL XP earned for this booking
-  const earnedXpList = await prisma.xpTransaction.findMany({
-    where: { bookingId, type: "EARNED" },
-  });
-
-  for (const xp of earnedXpList) {
-    await prisma.xpTransaction.create({
+  // Cancel + refund gift card + revoke XP — all atomic to prevent
+  // race conditions (double-cancel double-refund or double-revoke).
+  const result = await prisma.$transaction(async (tx) => {
+    const updated = await tx.booking.updateMany({
+      where: {
+        id: bookingId,
+        status: { notIn: ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT", "COMPLETED"] },
+      },
       data: {
-        userId: xp.userId,
-        merchantId: xp.merchantId,
-        bookingId,
-        amount: -xp.amount,
-        type: "REVOKED",
-        reason: `Annulation : ${booking.service?.name || "Service"}`,
+        status: newStatus,
+        cancelledAt: new Date(),
+        cancelReason: reason || null,
       },
     });
+
+    if (updated.count === 0) {
+      return { ok: false as const };
+    }
+
+    // Refund gift card balance if booking used a gift card
+    if (booking.giftCardCode && booking.giftCardAmount) {
+      const giftCard = await tx.giftCard.findUnique({
+        where: { code: booking.giftCardCode },
+      });
+      if (giftCard) {
+        const refundEUR = booking.giftCardAmount / 119.33;
+        const newBalance = Math.min(giftCard.amount, giftCard.balance + refundEUR);
+        await tx.giftCard.update({
+          where: { id: giftCard.id },
+          data: { balance: newBalance, status: "ACTIVE", usedAt: null },
+        });
+      }
+    } else if (booking.notes) {
+      // Legacy: gift card stored in notes
+      const giftCardMatch = booking.notes.match(/\[Carte cadeau: ([A-Z0-9-]+)\]/);
+      if (giftCardMatch && booking.service) {
+        const giftCardCode = giftCardMatch[1];
+        const giftCard = await tx.giftCard.findUnique({ where: { code: giftCardCode } });
+        if (giftCard) {
+          const refundEUR = booking.service.price / 119.33;
+          const newBalance = Math.min(giftCard.amount, giftCard.balance + refundEUR);
+          await tx.giftCard.update({
+            where: { id: giftCard.id },
+            data: { balance: newBalance, status: "ACTIVE", usedAt: null },
+          });
+        }
+      }
+    }
+
+    // Revoke ALL XP earned for this booking — single createMany batch
+    const earnedXpList = await tx.xpTransaction.findMany({
+      where: { bookingId, type: "EARNED" },
+      select: { userId: true, merchantId: true, amount: true },
+    });
+    if (earnedXpList.length > 0) {
+      await tx.xpTransaction.createMany({
+        data: earnedXpList.map((xp) => ({
+          userId: xp.userId,
+          merchantId: xp.merchantId,
+          bookingId,
+          amount: -xp.amount,
+          type: "REVOKED",
+          reason: `Annulation : ${booking.service?.name || "Service"}`,
+        })),
+      });
+    }
+
+    return { ok: true as const };
+  });
+
+  if (!result.ok) {
+    return { error: "Cette réservation ne peut plus être annulée" };
   }
 
   // Push notification to the other party

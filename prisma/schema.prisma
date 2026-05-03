@@ -131,6 +131,9 @@ model Merchant {
 
   @@index([city])
   @@index([sectorId])
+  @@index([isActive])
+  @@index([isActive, sectorId])
+  @@index([plan, planExpiresAt])
   @@map("merchants")
 }
 

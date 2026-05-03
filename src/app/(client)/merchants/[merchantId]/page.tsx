@@ -1,8 +1,28 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+// Single cached fetcher — deduplicates between generateMetadata() and the page
+const getMerchant = cache(async (merchantId: string) => {
+  return prisma.merchant.findUnique({
+    where: { id: merchantId, isActive: true },
+    include: {
+      sector: true,
+      services: { where: { isActive: true }, orderBy: { sortOrder: "asc" } },
+      photos: { orderBy: { sortOrder: "asc" }, select: { id: true, url: true, caption: true } },
+      reviews: {
+        include: { client: { select: { name: true, image: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      },
+      availability: { where: { isActive: true }, orderBy: { dayOfWeek: "asc" } },
+      _count: { select: { reviews: true } },
+    },
+  });
+});
 import { MapPin, Phone, Star, Clock, ChevronRight, MessageSquare, Info, Briefcase, Calendar, Camera } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { ProBadge } from "@/components/ui/ProBadge";
@@ -21,17 +41,7 @@ interface MerchantPageProps {
 // ── SEO: Dynamic metadata ────────────────────────
 export async function generateMetadata({ params }: MerchantPageProps): Promise<Metadata> {
   const { merchantId } = await params;
-  const merchant = await prisma.merchant.findUnique({
-    where: { id: merchantId, isActive: true },
-    select: {
-      businessName: true,
-      description: true,
-      city: true,
-      coverImage: true,
-      sector: { select: { name: true } },
-      reviews: { select: { rating: true } },
-    },
-  });
+  const merchant = await getMerchant(merchantId);
 
   if (!merchant) return { title: "Professionnel introuvable - BookEasy" };
 
@@ -74,30 +84,7 @@ export async function generateMetadata({ params }: MerchantPageProps): Promise<M
 export default async function MerchantPage({ params }: MerchantPageProps) {
   const { merchantId } = await params;
 
-  const merchant = await prisma.merchant.findUnique({
-    where: { id: merchantId, isActive: true },
-    include: {
-      sector: true,
-      services: {
-        where: { isActive: true },
-        orderBy: { sortOrder: "asc" },
-      },
-      photos: {
-        orderBy: { sortOrder: "asc" },
-        select: { id: true, url: true, caption: true },
-      },
-      reviews: {
-        include: { client: { select: { name: true, image: true } } },
-        orderBy: { createdAt: "desc" },
-        take: 10,
-      },
-      availability: {
-        where: { isActive: true },
-        orderBy: { dayOfWeek: "asc" },
-      },
-      _count: { select: { reviews: true } },
-    },
-  });
+  const merchant = await getMerchant(merchantId);
 
   if (!merchant) notFound();
 

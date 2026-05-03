@@ -26,6 +26,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const andConditions: Record<string, unknown>[] = [];
 
+  // Fetch sector once if provided — reused for filter and label
+  const sectorRecord = sector
+    ? await prisma.sector.findUnique({ where: { slug: sector }, select: { name: true } })
+    : null;
+
   if (q) {
     andConditions.push({
       OR: [
@@ -37,8 +42,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   }
 
   if (sector) {
-    // Match merchants in this sector OR merchants with services matching the sector name
-    const sectorRecord = await prisma.sector.findUnique({ where: { slug: sector } });
     const sectorLabel = sectorRecord?.name || sector;
     andConditions.push({
       OR: [
@@ -83,9 +86,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       return 0;
     });
 
-  const sectorName = sector
-    ? (await prisma.sector.findUnique({ where: { slug: sector } }))?.name ?? null
-    : null;
+  const sectorName = sectorRecord?.name ?? null;
 
   // Build active filters for display
   const activeFilters: { label: string; param: string; value: string }[] = [];

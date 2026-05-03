@@ -29,13 +29,19 @@ export default async function DashboardAnalyticsPage() {
 
   const isMedical = isMedicalSectorName(merchant.sector?.name);
 
+  // Limit to last 12 months — analytics aggregations beyond that are noise
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  const dateFloor = oneYearAgo.toISOString().slice(0, 10);
+
   const allBookings = await prisma.booking.findMany({
-    where: { merchantId: merchant.id },
+    where: { merchantId: merchant.id, date: { gte: dateFloor } },
     include: {
       service: { select: { name: true } },
       client: { select: { id: true, name: true } },
     },
     orderBy: { date: "desc" },
+    take: 5000,
   });
 
   const nonCancelledBookings = allBookings.filter(
