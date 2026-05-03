@@ -107,8 +107,6 @@ model Merchant {
   longitude    Float?
   coverImage   String?
   plan                  String   @default("FREE") // FREE or PRO
-  stripeCustomerId      String?  @unique
-  stripeSubscriptionId  String?
   planExpiresAt         DateTime?
   paymentPolicy     String   @default("NONE") // NONE, FLEXIBLE, ONLINE_ONLY
   isActive     Boolean  @default(true)
