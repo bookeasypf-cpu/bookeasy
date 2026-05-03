@@ -53,11 +53,15 @@ export function computeSignature(fields: Record<string, string>): string {
 }
 
 /**
- * Vérifie la signature d'une notification IPN PayZen
+ * Vérifie la signature d'une notification IPN PayZen.
+ * Comparaison timing-safe pour empêcher les timing attacks.
  */
 export function verifySignature(fields: Record<string, string>, receivedSignature: string): boolean {
   const computed = computeSignature(fields);
-  return computed === receivedSignature;
+  const a = Buffer.from(computed);
+  const b = Buffer.from(receivedSignature);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
 }
 
 /**

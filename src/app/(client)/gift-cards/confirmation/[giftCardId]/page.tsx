@@ -1,5 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth";
 import { formatPrice } from "@/lib/utils";
 import { Gift, CreditCard, AlertTriangle, Home } from "lucide-react";
 import Link from "next/link";
@@ -16,12 +17,24 @@ export default async function GiftCardConfirmationPage({ params, searchParams }:
   const { giftCardId } = await params;
   const { payment } = await searchParams;
 
+  const session = await getSession();
+  if (!session?.user) {
+    redirect(`/login?callbackUrl=/gift-cards/confirmation/${giftCardId}`);
+  }
+
   const card = await prisma.giftCard.findUnique({
     where: { id: giftCardId },
     include: { merchant: { select: { businessName: true } } },
   });
 
   if (!card) notFound();
+
+  // Ownership: only sender (buyer) or recipient can view this confirmation page.
+  // Email comparison is case-insensitive to avoid false negatives.
+  const userEmail = session.user.email?.toLowerCase() ?? "";
+  const isSender = card.senderEmail.toLowerCase() === userEmail;
+  const isRecipient = card.recipientEmail.toLowerCase() === userEmail;
+  if (!isSender && !isRecipient) notFound();
 
   const isPending = card.status === "PENDING_PAYMENT";
   const isActive = card.status === "ACTIVE";

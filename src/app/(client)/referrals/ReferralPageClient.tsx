@@ -30,7 +30,6 @@ interface ReferralData {
   referrals: Array<{
     id: string;
     refereeName: string | null;
-    refereeEmail: string | null;
     status: string;
     createdAt: string;
   }>;

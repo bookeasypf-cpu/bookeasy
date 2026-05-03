@@ -189,7 +189,7 @@ export default function PricingPage() {
             Inscrivez-vous en 30 secondes
           </h2>
           <p className="text-white/60 text-sm mb-6">
-            Cr&eacute;ez votre compte professionnel et commencez &agrave; recevoir des r&eacute;servations.
+            Créez votre compte professionnel et commencez à recevoir des réservations.
           </p>
           <QuickRegisterForm />
         </div>

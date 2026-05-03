@@ -1,5 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth";
 import { formatPrice, formatDuration, formatDate, formatTime } from "@/lib/utils";
 import { isMedicalSector } from "@/lib/medical";
 import { Calendar, Clock, Briefcase, Home, CalendarCheck, Star, CreditCard, AlertTriangle } from "lucide-react";
@@ -20,8 +21,13 @@ export default async function BookingConfirmationPage({
   const { bookingId } = await params;
   const { payment } = await searchParams;
 
+  const session = await getSession();
+  if (!session?.user) {
+    redirect(`/login?callbackUrl=/booking/confirmation/${bookingId}`);
+  }
+
   const booking = await prisma.booking.findUnique({
-    where: { id: bookingId },
+    where: { id: bookingId, clientId: session.user.id },
     include: {
       merchant: { select: { businessName: true, xpPerBooking: true, sector: { select: { slug: true } } } },
       service: true,

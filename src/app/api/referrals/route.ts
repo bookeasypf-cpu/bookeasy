@@ -20,12 +20,12 @@ export async function GET() {
     referralCode = await generateReferralCode(user.id);
   }
 
-  // Get referrals sent by this user
+  // Get referrals sent by this user (no email — masked for RGPD)
   const referrals = await prisma.referral.findMany({
     where: { referrerId: user.id },
     include: {
       referee: {
-        select: { name: true, email: true, createdAt: true },
+        select: { name: true, createdAt: true },
       },
     },
     orderBy: { createdAt: "desc" },
@@ -76,7 +76,6 @@ export async function GET() {
     referrals: referrals.map((r) => ({
       id: r.id,
       refereeName: r.referee.name,
-      refereeEmail: r.referee.email,
       status: r.status,
       createdAt: r.createdAt,
     })),

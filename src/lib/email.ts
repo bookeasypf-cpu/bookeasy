@@ -7,6 +7,21 @@ const resend = process.env.RESEND_API_KEY
 const FROM = process.env.EMAIL_FROM || "BookEasy <noreply@bookeasy.me>";
 const BASE_URL = process.env.NEXTAUTH_URL || "https://bookeasy.me";
 
+/**
+ * Escape HTML to prevent XSS injection via user-controlled fields
+ * (clientName, merchantName, serviceName, message, subject, etc.)
+ * MUST be applied to every interpolated user value in email templates.
+ */
+function esc(s: string | null | undefined): string {
+  if (!s) return "";
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // ─────────────────────────────────────────────
 // SHARED LAYOUT
 // ─────────────────────────────────────────────
@@ -76,17 +91,17 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
       <p style="color:rgba(255,255,255,0.8);font-size:14px;margin:8px 0 0;">Votre rendez-vous est bien enregistré</p>
     </div>
     <div style="padding:24px;">
-      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${data.clientName}</strong>,</p>
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${esc(data.clientName)}</strong>,</p>
       <p style="margin:0 0 20px;color:#6b7280;font-size:14px;">Voici le récapitulatif de votre rendez-vous :</p>
       <div style="background:#f9fafb;border-radius:12px;padding:16px;margin-bottom:20px;">
         <table style="width:100%;border-collapse:collapse;font-size:14px;">
           <tr>
             <td style="padding:8px 0;color:#9ca3af;width:110px;">Service</td>
-            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${data.serviceName}</td>
+            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${esc(data.serviceName)}</td>
           </tr>
           <tr>
             <td style="padding:8px 0;color:#9ca3af;">Chez</td>
-            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${data.merchantName}</td>
+            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${esc(data.merchantName)}</td>
           </tr>
           <tr>
             <td style="padding:8px 0;color:#9ca3af;">Date</td>
@@ -117,7 +132,7 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
     await resend.emails.send({
       from: FROM,
       to: data.clientEmail,
-      subject: `✅ RDV confirmé – ${data.serviceName} chez ${data.merchantName}`,
+      subject: `✅ RDV confirmé – ${esc(data.serviceName)} chez ${esc(data.merchantName)}`,
       html,
     });
     console.log("[EMAIL] Confirmation sent to", data.clientEmail);
@@ -163,17 +178,17 @@ export async function sendBookingReminder(data: ReminderData) {
       <p style="color:rgba(255,255,255,0.7);font-size:14px;margin:8px 0 0;">N'oubliez pas votre rendez-vous</p>
     </div>
     <div style="padding:24px;">
-      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${data.clientName}</strong>,</p>
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${esc(data.clientName)}</strong>,</p>
       <p style="margin:0 0 20px;color:#6b7280;font-size:14px;">Nous vous rappelons que vous avez un rendez-vous demain :</p>
       <div style="background:#f9fafb;border-radius:12px;padding:16px;margin-bottom:20px;">
         <table style="width:100%;border-collapse:collapse;font-size:14px;">
           <tr>
             <td style="padding:8px 0;color:#9ca3af;width:110px;">Service</td>
-            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${data.serviceName}</td>
+            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${esc(data.serviceName)}</td>
           </tr>
           <tr>
             <td style="padding:8px 0;color:#9ca3af;">Chez</td>
-            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${data.merchantName}</td>
+            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${esc(data.merchantName)}</td>
           </tr>
           <tr>
             <td style="padding:8px 0;color:#9ca3af;">Date</td>
@@ -189,7 +204,7 @@ export async function sendBookingReminder(data: ReminderData) {
           </tr>` : ""}
           ${data.phone ? `<tr>
             <td style="padding:8px 0;color:#9ca3af;">Téléphone</td>
-            <td style="padding:8px 0;color:#0066FF;font-weight:600;">${data.phone}</td>
+            <td style="padding:8px 0;color:#0066FF;font-weight:600;">${esc(data.phone)}</td>
           </tr>` : ""}
         </table>
       </div>
@@ -204,7 +219,7 @@ export async function sendBookingReminder(data: ReminderData) {
     await resend.emails.send({
       from: FROM,
       to: data.clientEmail,
-      subject: `⏰ Rappel : ${data.serviceName} demain à ${data.startTime.replace(":", "h")}`,
+      subject: `⏰ Rappel : ${esc(data.serviceName)} demain à ${data.startTime.replace(":", "h")}`,
       html,
     });
     console.log("[EMAIL] Reminder sent to", data.clientEmail);
@@ -246,17 +261,17 @@ export async function sendBookingCancellation(data: CancellationData) {
       <h1 style="color:#991b1b;font-size:22px;margin:0;font-weight:700;">Rendez-vous annulé</h1>
     </div>
     <div style="padding:24px;">
-      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${data.recipientName}</strong>,</p>
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${esc(data.recipientName)}</strong>,</p>
       <p style="margin:0 0 20px;color:#6b7280;font-size:14px;">
         ${data.cancelledBy === "client"
-          ? `<strong>${data.otherPartyName}</strong> a annulé son rendez-vous.`
-          : `<strong>${data.otherPartyName}</strong> a dû annuler votre rendez-vous.`}
+          ? `<strong>${esc(data.otherPartyName)}</strong> a annulé son rendez-vous.`
+          : `<strong>${esc(data.otherPartyName)}</strong> a dû annuler votre rendez-vous.`}
       </p>
       <div style="background:#fef2f2;border-radius:12px;padding:16px;margin-bottom:20px;border:1px solid #fecaca;">
         <table style="width:100%;border-collapse:collapse;font-size:14px;">
           <tr>
             <td style="padding:6px 0;color:#9ca3af;width:100px;">Service</td>
-            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${data.serviceName}</td>
+            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${esc(data.serviceName)}</td>
           </tr>
           <tr>
             <td style="padding:6px 0;color:#9ca3af;">Date</td>
@@ -264,7 +279,7 @@ export async function sendBookingCancellation(data: CancellationData) {
           </tr>
           ${data.reason ? `<tr>
             <td style="padding:6px 0;color:#9ca3af;">Raison</td>
-            <td style="padding:6px 0;color:#6b7280;">${data.reason}</td>
+            <td style="padding:6px 0;color:#6b7280;">${esc(data.reason)}</td>
           </tr>` : ""}
         </table>
       </div>
@@ -278,7 +293,7 @@ export async function sendBookingCancellation(data: CancellationData) {
     await resend.emails.send({
       from: FROM,
       to: data.recipientEmail,
-      subject: `❌ RDV annulé – ${data.serviceName} le ${dateFormatted}`,
+      subject: `❌ RDV annulé – ${esc(data.serviceName)} le ${dateFormatted}`,
       html,
     });
     console.log("[EMAIL] Cancellation sent to", data.recipientEmail);
@@ -304,7 +319,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
       <p style="color:rgba(255,255,255,0.85);font-size:15px;margin:10px 0 0;">Votre compte a été créé avec succès</p>
     </div>
     <div style="padding:24px;">
-      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Ia ora na <strong>${name}</strong> 👋</p>
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Ia ora na <strong>${esc(name)}</strong> 👋</p>
       <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
         Merci de nous rejoindre ! Avec BookEasy, réservez vos rendez-vous en quelques clics auprès des meilleurs professionnels de Polynésie française.
       </p>
@@ -366,7 +381,7 @@ export async function sendMerchantCredentials(to: string, name: string, tempPass
       <p style="color:rgba(255,255,255,0.85);font-size:15px;margin:10px 0 0;">Vos identifiants de connexion</p>
     </div>
     <div style="padding:24px;">
-      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Ia ora na <strong>${name}</strong> 👋</p>
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Ia ora na <strong>${esc(name)}</strong> 👋</p>
       <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
         Votre compte professionnel BookEasy a été créé. Voici vos identifiants de connexion :
       </p>
@@ -374,7 +389,7 @@ export async function sendMerchantCredentials(to: string, name: string, tempPass
         <table style="width:100%;border-collapse:collapse;font-size:14px;">
           <tr>
             <td style="padding:8px 0;color:#9ca3af;width:120px;">Email</td>
-            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${to}</td>
+            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${esc(to)}</td>
           </tr>
           <tr>
             <td style="padding:8px 0;color:#9ca3af;">Mot de passe</td>
@@ -428,9 +443,9 @@ export async function sendReferralRewardEmail(
       <p style="color:rgba(255,255,255,0.85);font-size:14px;margin:8px 0 0;">Grâce à votre parrainage</p>
     </div>
     <div style="padding:24px;">
-      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${name}</strong>,</p>
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${esc(name)}</strong>,</p>
       <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
-        ${reason}. Vous avez reçu <strong style="color:#0066FF;">${xpEarned} XP</strong> en récompense !
+        ${esc(reason)}. Vous avez reçu <strong style="color:#0066FF;">${xpEarned} XP</strong> en récompense !
       </p>
       <div style="background:#f0f7ff;border-radius:12px;padding:20px;margin-bottom:20px;text-align:center;">
         <div style="font-size:36px;font-weight:800;color:#0066FF;">+${xpEarned} XP</div>
@@ -476,7 +491,7 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
       <h1 style="color:#fff;font-size:22px;margin:0;font-weight:700;">Réinitialisation du mot de passe</h1>
     </div>
     <div style="padding:24px;">
-      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${name}</strong>,</p>
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${esc(name)}</strong>,</p>
       <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
         Vous avez demandé la réinitialisation de votre mot de passe BookEasy.
         Cliquez sur le bouton ci-dessous pour définir un nouveau mot de passe.
@@ -538,24 +553,24 @@ export async function sendSupportMessage(data: SupportData) {
         <table style="width:100%;border-collapse:collapse;font-size:14px;">
           <tr>
             <td style="padding:6px 0;color:#9ca3af;width:100px;">Commerce</td>
-            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${data.merchantName}</td>
+            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${esc(data.merchantName)}</td>
           </tr>
           <tr>
             <td style="padding:6px 0;color:#9ca3af;">Email</td>
-            <td style="padding:6px 0;color:#0066FF;font-weight:600;">${data.merchantEmail}</td>
+            <td style="padding:6px 0;color:#0066FF;font-weight:600;">${esc(data.merchantEmail)}</td>
           </tr>
           <tr>
             <td style="padding:6px 0;color:#9ca3af;">Plan</td>
-            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${data.merchantPlan}</td>
+            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${esc(data.merchantPlan)}</td>
           </tr>
           <tr>
             <td style="padding:6px 0;color:#9ca3af;">Sujet</td>
-            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${data.subject}</td>
+            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${esc(data.subject)}</td>
           </tr>
         </table>
       </div>
       <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;">
-        <p style="margin:0;color:#374151;font-size:14px;line-height:1.6;white-space:pre-wrap;">${data.message}</p>
+        <p style="margin:0;color:#374151;font-size:14px;line-height:1.6;white-space:pre-wrap;">${esc(data.message)}</p>
       </div>
     </div>
   `);
@@ -565,7 +580,7 @@ export async function sendSupportMessage(data: SupportData) {
       from: FROM,
       to: process.env.SUPPORT_EMAIL || "bookeasy.pf@gmail.com",
       replyTo: data.merchantEmail,
-      subject: `${priority} ${data.subject} — ${data.merchantName}`,
+      subject: `${priority} ${esc(data.subject)} — ${esc(data.merchantName)}`,
       html,
     });
     console.log("[EMAIL] Support message sent from", data.merchantEmail);
