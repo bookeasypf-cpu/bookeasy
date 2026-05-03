@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { pushSubscribeSchema, zodFirstError } from "@/lib/validations";
+import { pushSubscribeSchema, pushUnsubscribeSchema, zodFirstError } from "@/lib/validations";
 
 export async function POST(req: NextRequest) {
   try {
@@ -46,13 +46,13 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { endpoint } = await req.json();
-    if (!endpoint) {
-      return NextResponse.json({ error: "Endpoint requis" }, { status: 400 });
+    const parsed = pushUnsubscribeSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
 
     await prisma.pushSubscription.deleteMany({
-      where: { endpoint, userId: session.user.id },
+      where: { endpoint: parsed.data.endpoint, userId: session.user.id },
     });
 
     return NextResponse.json({ success: true });

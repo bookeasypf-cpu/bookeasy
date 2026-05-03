@@ -27,7 +27,7 @@ export async function DELETE() {
     });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) { console.error("[profile] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -49,7 +49,7 @@ export async function GET() {
     }
 
     return NextResponse.json(user);
-  } catch {
+  } catch (error) { console.error("[profile] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -78,7 +78,7 @@ export async function PUT(request: Request) {
     });
 
     return NextResponse.json(updatedUser);
-  } catch {
+  } catch (error) { console.error("[profile] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

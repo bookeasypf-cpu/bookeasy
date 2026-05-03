@@ -36,7 +36,8 @@ export default function DashboardAvailabilityPage() {
       .then((data) => {
         setSchedule(data || []);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   function addSlot(dayOfWeek: number) {

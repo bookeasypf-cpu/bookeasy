@@ -96,6 +96,19 @@ export const passwordResetLimiter = new Ratelimit({
   analytics: true,
 });
 
+/**
+ * Public enumeration rate limit
+ * Used on public endpoints that confirm existence of codes/IDs
+ * (referrals/validate, merchants/availability) — prevents bulk
+ * scraping of valid codes/IDs.
+ * Limit: 30 requests per minute per IP
+ */
+export const publicEnumLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(30, "1 m"),
+  analytics: true,
+});
+
 // ────────────────────────────────────────
 // HELPER FUNCTIONS
 // ────────────────────────────────────────

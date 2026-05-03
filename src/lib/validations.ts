@@ -7,6 +7,24 @@ export function zodFirstError(error: ZodError): string {
 }
 
 // ─────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Email invalide").max(254),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(32).max(128),
+  // bcrypt truncates at 72 bytes — enforce that as max
+  password: z.string().min(6, "Min. 6 caractères").max(72),
+});
+
+export const pushUnsubscribeSchema = z.object({
+  endpoint: z.string().url().max(2048),
+});
+
+// ─────────────────────────────────────────────
 // DASHBOARD — SERVICES
 // ─────────────────────────────────────────────
 

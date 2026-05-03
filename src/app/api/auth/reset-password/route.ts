@@ -1,24 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { resetPasswordSchema, zodFirstError } from "@/lib/validations";
 
 export async function POST(req: Request) {
   try {
-    const { token, password } = await req.json();
-
-    if (!token || typeof token !== "string") {
-      return NextResponse.json(
-        { error: "Token manquant" },
-        { status: 400 }
-      );
+    const parsed = resetPasswordSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
-
-    if (!password || typeof password !== "string" || password.length < 6) {
-      return NextResponse.json(
-        { error: "Le mot de passe doit contenir au moins 6 caractères" },
-        { status: 400 }
-      );
-    }
+    const { token, password } = parsed.data;
 
     // Find token
     const verificationToken = await prisma.verificationToken.findUnique({

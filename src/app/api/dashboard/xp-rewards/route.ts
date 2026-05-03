@@ -27,7 +27,7 @@ export async function GET() {
     });
 
     return NextResponse.json(rewards);
-  } catch {
+  } catch (error) { console.error("[dashboard/xp-rewards] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(reward);
-  } catch {
+  } catch (error) { console.error("[dashboard/xp-rewards] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -93,7 +93,7 @@ export async function PUT(request: NextRequest) {
     });
 
     return NextResponse.json(reward);
-  } catch {
+  } catch (error) { console.error("[dashboard/xp-rewards] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -118,7 +118,7 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) { console.error("[dashboard/xp-rewards] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

@@ -2,20 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { passwordResetLimiter } from "@/lib/ratelimit";
+import { forgotPasswordSchema, zodFirstError } from "@/lib/validations";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json();
-
-    if (!email || typeof email !== "string") {
-      return NextResponse.json(
-        { error: "Email requis" },
-        { status: 400 }
-      );
+    const parsed = forgotPasswordSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
-
-    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedEmail = parsed.data.email.toLowerCase().trim();
 
     // Rate limit: 3 reset requests per hour per email
     try {

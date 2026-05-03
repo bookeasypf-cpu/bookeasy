@@ -12,7 +12,6 @@ export async function GET(
       where: { id: merchantId, isActive: true },
       select: {
         id: true,
-        userId: true,
         businessName: true,
         description: true,
         phone: true,
@@ -22,12 +21,9 @@ export async function GET(
         latitude: true,
         longitude: true,
         coverImage: true,
-        isActive: true,
         xpPerBooking: true,
         paymentPolicy: true,
-        createdAt: true,
-        updatedAt: true,
-        sector: true,
+        sector: { select: { id: true, name: true, slug: true } },
         services: {
           where: { isActive: true },
           orderBy: { sortOrder: "asc" },
@@ -40,7 +36,7 @@ export async function GET(
     }
 
     return NextResponse.json(merchant);
-  } catch {
+  } catch (error) { console.error("[merchants] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

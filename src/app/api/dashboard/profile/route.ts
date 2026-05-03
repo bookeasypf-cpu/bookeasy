@@ -20,7 +20,7 @@ export async function GET() {
 
     const medical = isMedicalSectorName(merchant.sector?.name);
     return NextResponse.json({ ...merchant, isMedical: medical });
-  } catch {
+  } catch (error) { console.error("[dashboard/profile] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -103,7 +103,7 @@ export async function PUT(request: Request) {
       });
       return NextResponse.json(created);
     }
-  } catch {
+  } catch (error) { console.error("[dashboard/profile] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

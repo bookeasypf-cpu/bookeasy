@@ -18,7 +18,7 @@ export async function GET() {
       orderBy: { sortOrder: "asc" },
     });
     return NextResponse.json(services);
-  } catch {
+  } catch (error) { console.error("[dashboard/services] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       },
     });
     return NextResponse.json(service);
-  } catch {
+  } catch (error) { console.error("[dashboard/services] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -94,7 +94,7 @@ export async function PUT(request: NextRequest) {
       data: parsed.data,
     });
     return NextResponse.json(service);
-  } catch {
+  } catch (error) { console.error("[dashboard/services] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -120,7 +120,7 @@ export async function DELETE(request: NextRequest) {
 
     await prisma.service.delete({ where: { id } });
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) { console.error("[dashboard/services] Error:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

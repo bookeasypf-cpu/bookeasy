@@ -98,9 +98,11 @@ export async function registerUser(formData: FormData) {
           `${name} s'est inscrit(e) grâce à votre invitation`
         ).catch(() => {});
       }
-    } catch {
-      // Don't fail registration if referral processing fails
-      console.error("[REFERRAL] Error processing referral code:", referralCode);
+    } catch (error) {
+      // Don't fail registration if referral processing fails.
+      // Do not log the actual referralCode (RGPD: avoid logging
+      // potentially user-identifying values).
+      console.error("[REFERRAL] Error processing referral:", error instanceof Error ? error.message : "unknown");
     }
   }
 
