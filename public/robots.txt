@@ -2,4 +2,31 @@ User-agent: *
 Allow: /
 Disallow: /dashboard/
 Disallow: /api/
+Disallow: /my-bookings
+Disallow: /my-rewards
+Disallow: /profile
+Disallow: /favorites
+Disallow: /referrals
+Disallow: /booking/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+# AI crawlers (allowed for GEO visibility)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
 Sitemap: https://bookeasy.me/sitemap.xml

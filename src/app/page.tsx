@@ -1,4 +1,22 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = {
+  title: "BookEasy — Réservation en ligne en Polynésie française | Tahiti",
+  description:
+    "Réservez en ligne 24h/24 vos rendez-vous beauté, bien-être, santé et services partout en Polynésie française. Coiffeurs, spas, médecins, kinés, garages : tout réserver en quelques clics.",
+  alternates: { canonical: "https://bookeasy.me" },
+  openGraph: {
+    title: "BookEasy — Réservation en ligne en Polynésie française",
+    description:
+      "Réservez en ligne 24h/24 vos rendez-vous partout en Polynésie française.",
+    url: "https://bookeasy.me",
+    siteName: "BookEasy",
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
+};
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SearchBar } from "@/components/search/SearchBar";

@@ -64,15 +64,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const cityLabel = city ? formatCity(city) : "Polynésie française";
   const title = `${sector.name} à ${cityLabel} - Réservation en ligne | BookEasy`;
   const description = `Trouvez et réservez votre ${sector.name.toLowerCase()} à ${cityLabel}. Comparez les avis, consultez les disponibilités et réservez en ligne 24h/24 sur BookEasy.`;
+  const url = `https://bookeasy.me/reservation/${slug}`;
 
   return {
     title,
     description,
+    alternates: { canonical: url },
     openGraph: {
       title,
       description,
       type: "website",
+      siteName: "BookEasy",
+      locale: "fr_FR",
+      url,
     },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

@@ -47,9 +47,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: "https://bookeasy.me/map", lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: "https://bookeasy.me/pricing", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: "https://bookeasy.me/gift-cards", lastModified: now, changeFrequency: "monthly", priority: 0.6 },
-    { url: "https://bookeasy.me/register", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: "https://bookeasy.me/register?role=MERCHANT", lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: "https://bookeasy.me/login", lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: "https://bookeasy.me/legal/mentions-legales", lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: "https://bookeasy.me/legal/cgu", lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: "https://bookeasy.me/legal/confidentialite", lastModified: now, changeFrequency: "yearly", priority: 0.3 },
@@ -81,19 +78,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
-  // 5. City search pages
-  const cityPages: MetadataRoute.Sitemap = VILLES_PF.map((city) => ({
-    url: `https://bookeasy.me/search?city=${encodeURIComponent(city)}`,
-    lastModified: now,
-    changeFrequency: "daily",
-    priority: 0.6,
-  }));
-
   return [
     ...staticPages,
     ...merchantPages,
     ...sectorPages,
     ...sectorCityPages,
-    ...cityPages,
   ];
 }

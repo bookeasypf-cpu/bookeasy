@@ -23,7 +23,11 @@ export async function generateMetadata({ params }: MerchantPageProps): Promise<M
   const { merchantId } = await params;
   const merchant = await prisma.merchant.findUnique({
     where: { id: merchantId, isActive: true },
-    include: {
+    select: {
+      businessName: true,
+      description: true,
+      city: true,
+      coverImage: true,
       sector: { select: { name: true } },
       reviews: { select: { rating: true } },
     },
@@ -40,21 +44,29 @@ export async function generateMetadata({ params }: MerchantPageProps): Promise<M
     ? merchant.description.substring(0, 160)
     : `Réservez en ligne chez ${merchant.businessName}${merchant.city ? ` à ${merchant.city}` : ""}. ${merchant.sector?.name || ""}${avgRating ? ` · ${avgRating}★` : ""}`;
 
+  const url = `https://bookeasy.me/merchants/${merchantId}`;
+  const ogImage = merchant.coverImage
+    ? [{ url: merchant.coverImage, width: 1200, height: 630, alt: merchant.businessName }]
+    : undefined;
+
   return {
     title,
     description,
+    alternates: { canonical: url },
     openGraph: {
       title,
       description,
       type: "website",
       siteName: "BookEasy",
       locale: "fr_FR",
-      url: `https://bookeasy.me/merchants/${merchantId}`,
+      url,
+      images: ogImage,
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: merchant.coverImage ? [merchant.coverImage] : undefined,
     },
   };
 }

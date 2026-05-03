@@ -16,6 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://bookeasy.me"),
   title: "BookEasy - Réservez vos rendez-vous en ligne",
   description:
     "Réservez vos rendez-vous beauté, bien-être et services en Polynésie française.",
