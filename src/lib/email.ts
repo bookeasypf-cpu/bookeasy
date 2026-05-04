@@ -4,8 +4,9 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
-const FROM = process.env.EMAIL_FROM || "BookEasy <noreply@bookeasy.me>";
+const FROM = process.env.EMAIL_FROM || "BookEasy <noreply@bookeasy.pf>";
 const BASE_URL = process.env.NEXTAUTH_URL || "https://bookeasy.me";
+const REPLY_TO = process.env.SUPPORT_EMAIL || "bookeasy.pf@gmail.com";
 
 /**
  * Escape HTML to prevent XSS injection via user-controlled fields
@@ -131,6 +132,7 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
   try {
     await resend.emails.send({
       from: FROM,
+      replyTo: REPLY_TO,
       to: data.clientEmail,
       subject: `✅ RDV confirmé – ${esc(data.serviceName)} chez ${esc(data.merchantName)}`,
       html,
@@ -218,6 +220,7 @@ export async function sendBookingReminder(data: ReminderData) {
   try {
     await resend.emails.send({
       from: FROM,
+      replyTo: REPLY_TO,
       to: data.clientEmail,
       subject: `⏰ Rappel : ${esc(data.serviceName)} demain à ${data.startTime.replace(":", "h")}`,
       html,
@@ -292,6 +295,7 @@ export async function sendBookingCancellation(data: CancellationData) {
   try {
     await resend.emails.send({
       from: FROM,
+      replyTo: REPLY_TO,
       to: data.recipientEmail,
       subject: `❌ RDV annulé – ${esc(data.serviceName)} le ${dateFormatted}`,
       html,
@@ -354,9 +358,14 @@ export async function sendWelcomeEmail(to: string, name: string) {
   try {
     await resend.emails.send({
       from: FROM,
+      replyTo: REPLY_TO,
       to,
       subject: "🎉 Bienvenue sur BookEasy !",
       html,
+      headers: {
+        "List-Unsubscribe": `<mailto:${REPLY_TO}?subject=Unsubscribe>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
     console.log("[EMAIL] Welcome email sent");
   } catch (err) {
@@ -411,6 +420,7 @@ export async function sendMerchantCredentials(to: string, name: string, tempPass
   try {
     await resend.emails.send({
       from: FROM,
+      replyTo: REPLY_TO,
       to,
       subject: "🔐 Vos identifiants BookEasy Pro",
       html,
@@ -463,9 +473,14 @@ export async function sendReferralRewardEmail(
   try {
     await resend.emails.send({
       from: FROM,
+      replyTo: REPLY_TO,
       to,
       subject: `🎁 +${xpEarned} XP – Parrainage BookEasy`,
       html,
+      headers: {
+        "List-Unsubscribe": `<mailto:${REPLY_TO}?subject=Unsubscribe>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
     console.log("[EMAIL] Referral reward email sent");
   } catch (err) {
@@ -514,6 +529,7 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
   try {
     await resend.emails.send({
       from: FROM,
+      replyTo: REPLY_TO,
       to,
       subject: "🔐 Réinitialisation de votre mot de passe BookEasy",
       html,
@@ -588,5 +604,152 @@ export async function sendSupportMessage(data: SupportData) {
   } catch (err) {
     console.error("[EMAIL] Failed to send support message:", err);
     return { success: false, error: "Erreur d'envoi" };
+  }
+}
+
+// ─────────────────────────────────────────────
+// NEW BOOKING — sent to MERCHANT (in addition to push/in-app)
+// ─────────────────────────────────────────────
+
+interface NewBookingMerchantData {
+  merchantEmail: string;
+  merchantName: string;
+  clientName: string;
+  serviceName: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  price: number;
+}
+
+export async function sendNewBookingMerchant(data: NewBookingMerchantData) {
+  if (!resend) {
+    console.log("[EMAIL] Resend not configured – skipping merchant new-booking");
+    return;
+  }
+
+  const dateFormatted = new Date(data.date).toLocaleDateString("fr-FR", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
+  });
+  const priceFormatted = data.price.toLocaleString("fr-FR") + " F CFP";
+
+  const html = layout(`
+    <div style="background:linear-gradient(135deg,#0066FF,#00B4D8);padding:32px 24px;text-align:center;">
+      <div style="font-size:40px;margin-bottom:8px;">📅</div>
+      <h1 style="color:#fff;font-size:22px;margin:0;font-weight:700;">Nouveau rendez-vous</h1>
+      <p style="color:rgba(255,255,255,0.85);font-size:14px;margin:6px 0 0;">${esc(data.clientName)} vient de réserver</p>
+    </div>
+    <div style="padding:24px;">
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${esc(data.merchantName)}</strong>,</p>
+      <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
+        Une nouvelle réservation a été confirmée :
+      </p>
+      <div style="background:#f9fafb;border-radius:12px;padding:16px;margin-bottom:20px;">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr>
+            <td style="padding:6px 0;color:#9ca3af;width:100px;">Client</td>
+            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${esc(data.clientName)}</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;color:#9ca3af;">Service</td>
+            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${esc(data.serviceName)}</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;color:#9ca3af;">Date</td>
+            <td style="padding:6px 0;color:#0C1B2A;font-weight:600;">${dateFormatted}</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;color:#9ca3af;">Horaire</td>
+            <td style="padding:6px 0;color:#0C1B2A;font-weight:700;">${data.startTime.replace(":", "h")} – ${data.endTime.replace(":", "h")}</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;color:#9ca3af;">Prix</td>
+            <td style="padding:6px 0;color:#0066FF;font-weight:700;">${priceFormatted}</td>
+          </tr>
+        </table>
+      </div>
+      <div style="text-align:center;margin-top:8px;">
+        <a href="${BASE_URL}/dashboard/bookings" style="display:inline-block;background:linear-gradient(135deg,#0066FF,#00B4D8);color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:600;font-size:15px;">Voir mes réservations</a>
+      </div>
+    </div>
+  `);
+
+  try {
+    await resend.emails.send({
+      from: FROM,
+      replyTo: REPLY_TO,
+      to: data.merchantEmail,
+      subject: `📅 Nouveau RDV — ${esc(data.serviceName)} le ${dateFormatted}`,
+      html,
+    });
+    console.log("[EMAIL] New booking notification sent to merchant");
+  } catch (err) {
+    console.error("[EMAIL] Failed to send merchant new-booking:", err);
+  }
+}
+
+// ─────────────────────────────────────────────
+// GIFT CARD (delivered after PayZen confirmation)
+// ─────────────────────────────────────────────
+
+interface GiftCardEmailData {
+  recipientEmail: string;
+  recipientName: string;
+  senderName: string;
+  code: string;
+  amountXPF: number;
+  message?: string | null;
+  expiresAt: Date;
+  merchantName?: string | null;
+}
+
+export async function sendGiftCardEmail(data: GiftCardEmailData) {
+  if (!resend) {
+    console.log("[EMAIL] Resend not configured – skipping gift card");
+    return;
+  }
+
+  const expiresFormatted = data.expiresAt.toLocaleDateString("fr-FR", {
+    day: "numeric", month: "long", year: "numeric",
+  });
+  const amountFormatted = data.amountXPF.toLocaleString("fr-FR") + " F CFP";
+
+  const html = layout(`
+    <div style="background:linear-gradient(135deg,#0066FF,#00B4D8);padding:40px 24px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:12px;">🎁</div>
+      <h1 style="color:#fff;font-size:24px;margin:0;font-weight:700;">${esc(data.senderName)} vous offre une carte cadeau !</h1>
+      <p style="color:rgba(255,255,255,0.85);font-size:15px;margin:10px 0 0;">${amountFormatted} à utiliser sur BookEasy</p>
+    </div>
+    <div style="padding:24px;">
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Bonjour <strong>${esc(data.recipientName)}</strong>,</p>
+      <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
+        ${esc(data.senderName)} vous a offert une carte cadeau d&apos;une valeur de <strong>${amountFormatted}</strong>${data.merchantName ? ` à utiliser chez <strong>${esc(data.merchantName)}</strong>` : " à utiliser chez tous les partenaires BookEasy"}.
+      </p>
+      ${data.message ? `<div style="background:#f0f7ff;border-radius:12px;padding:16px;margin-bottom:20px;border-left:3px solid #0066FF;">
+        <p style="margin:0;color:#374151;font-size:13px;font-style:italic;">"${esc(data.message)}"</p>
+      </div>` : ""}
+      <div style="background:#f9fafb;border-radius:12px;padding:20px;margin-bottom:20px;text-align:center;">
+        <p style="margin:0 0 8px;color:#9ca3af;font-size:12px;">Code de la carte</p>
+        <p style="margin:0;color:#0066FF;font-size:24px;font-weight:700;font-family:monospace;letter-spacing:3px;">${esc(data.code)}</p>
+        <p style="margin:12px 0 0;color:#9ca3af;font-size:11px;">Valable jusqu&apos;au ${expiresFormatted}</p>
+      </div>
+      <div style="text-align:center;margin-top:8px;">
+        <a href="${BASE_URL}/search" style="display:inline-block;background:linear-gradient(135deg,#0066FF,#00B4D8);color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:600;font-size:15px;">Utiliser ma carte cadeau</a>
+      </div>
+      <p style="margin:20px 0 0;color:#9ca3af;font-size:11px;text-align:center;">Présentez le code lors de votre réservation.</p>
+    </div>
+  `);
+
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: data.recipientEmail,
+      replyTo: REPLY_TO,
+      subject: `🎁 ${data.senderName} vous offre une carte cadeau BookEasy`,
+      html,
+    });
+    console.log("[EMAIL] Gift card sent");
+  } catch (err) {
+    console.error("[EMAIL] Failed to send gift card:", err);
   }
 }

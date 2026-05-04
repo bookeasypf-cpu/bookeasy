@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifySignature, parseIPNData } from "@/lib/payzen";
 import { onBookingConfirmed } from "@/lib/booking-confirm";
+import { sendGiftCardEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -187,8 +188,15 @@ async function handleGiftCardPayment(ipnData: ReturnType<typeof parseIPNData>) {
       id: true,
       status: true,
       amount: true,
+      code: true,
+      senderName: true,
       senderEmail: true,
+      recipientName: true,
+      recipientEmail: true,
+      message: true,
+      expiresAt: true,
       merchantId: true,
+      merchant: { select: { businessName: true } },
     },
   });
 
@@ -233,6 +241,18 @@ async function handleGiftCardPayment(ipnData: ReturnType<typeof parseIPNData>) {
           }
         }
       });
+
+      // Send gift card email to recipient (async, non-blocking) — CGU promise
+      sendGiftCardEmail({
+        recipientEmail: card.recipientEmail,
+        recipientName: card.recipientName,
+        senderName: card.senderName,
+        code: card.code,
+        amountXPF: Math.round(card.amount * 119.33),
+        message: card.message,
+        expiresAt: card.expiresAt,
+        merchantName: card.merchant?.businessName,
+      }).catch(() => {});
       break;
     }
 

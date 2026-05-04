@@ -238,6 +238,9 @@ model Booking {
   giftCardAmount   Float?    // Gift card deduction (XPF)
   paymentExpiresAt DateTime?
 
+  // Reminder idempotency — set by cron to prevent double-sends
+  reminderSentAt   DateTime?
+
   client         User            @relation("ClientBookings", fields: [clientId], references: [id])
   merchant       Merchant        @relation("MerchantBookings", fields: [merchantId], references: [id])
   service        Service         @relation(fields: [serviceId], references: [id])

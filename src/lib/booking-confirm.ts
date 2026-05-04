@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { sendBookingConfirmation } from "@/lib/email";
+import { sendBookingConfirmation, sendNewBookingMerchant } from "@/lib/email";
 import { sendPushNotification } from "@/lib/push";
 import { sendReferralRewardEmail } from "@/lib/email";
 import { REFERRAL_XP_FIRST_BOOKING, checkAndAwardMilestoneBonus } from "@/lib/referral";
@@ -25,6 +25,7 @@ export async function onBookingConfirmed(bookingId: string) {
           address: true,
           city: true,
           sector: { select: { slug: true } },
+          user: { select: { email: true } },
         },
       },
       service: true,
@@ -90,6 +91,20 @@ export async function onBookingConfirmed(bookingId: string) {
       price: booking.totalPrice,
       address: booking.merchant.address,
       city: booking.merchant.city,
+    }).catch(() => {});
+  }
+
+  // Notification email to merchant (in addition to push/in-app)
+  if (booking.merchant.user?.email) {
+    sendNewBookingMerchant({
+      merchantEmail: booking.merchant.user.email,
+      merchantName: booking.merchant.businessName,
+      clientName: booking.client.name || "Un client",
+      serviceName: booking.service.name,
+      date: booking.date,
+      startTime: booking.startTime,
+      endTime: booking.endTime,
+      price: booking.totalPrice,
     }).catch(() => {});
   }
 
