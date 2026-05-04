@@ -1,4 +1,5 @@
 import { cache } from "react";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -236,11 +237,13 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
       {/* Hero Section */}
       <div className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
         {merchant.coverImage ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
+          <Image
             src={merchant.coverImage}
             alt={merchant.businessName}
-            className="w-full h-full object-cover"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#0066FF] via-[#0052CC] to-[#00B4D8]">

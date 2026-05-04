@@ -129,9 +129,10 @@ export default function DashboardCalendarPage() {
   }, [fetchBookings]);
 
   useEffect(() => {
+    // Poll every 60s — was 15s which spammed mobile 3G connections
     const interval = setInterval(() => {
       if (document.visibilityState === "visible") fetchBookings(true);
-    }, 15000);
+    }, 60000);
     const onVisibility = () => {
       if (document.visibilityState === "visible") fetchBookings(true);
     };

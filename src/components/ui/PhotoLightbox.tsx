@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Photo {
@@ -54,11 +55,12 @@ export function PhotoLightbox({ photos, businessName }: PhotoLightboxProps) {
             onClick={() => setOpenIndex(index)}
             className="relative aspect-square rounded-2xl overflow-hidden group cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0066FF]/50 focus:ring-offset-2"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={photo.url}
               alt={photo.caption || businessName}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              fill
+              sizes="(max-width: 640px) 50vw, 33vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
             {photo.caption && (
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -105,11 +107,14 @@ export function PhotoLightbox({ photos, businessName }: PhotoLightboxProps) {
             className="max-w-[90vw] max-h-[85vh] relative"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={photos[openIndex].url}
               alt={photos[openIndex].caption || businessName}
-              className="max-w-full max-h-[85vh] object-contain rounded-lg"
+              width={1600}
+              height={1200}
+              sizes="90vw"
+              priority
+              className="max-w-[90vw] max-h-[85vh] w-auto h-auto object-contain rounded-lg"
             />
             {photos[openIndex].caption && (
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 rounded-b-lg">

@@ -179,7 +179,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         {merchantsWithRating.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-12">
             {merchantsWithRating.map((merchant, index) => (
-              <ScrollReveal key={merchant.id} delay={index * 80}>
+              <ScrollReveal key={merchant.id} delay={Math.min(index * 80, 400)}>
                 <MerchantCard merchant={merchant} />
               </ScrollReveal>
             ))}

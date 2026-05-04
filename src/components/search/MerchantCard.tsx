@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useCallback, useRef } from "react";
 import { MapPin, Star, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
@@ -80,11 +81,12 @@ export function MerchantCard({ merchant }: MerchantCardProps) {
         {/* Image area with parallax effect */}
         <div className="relative h-44 overflow-hidden">
           {merchant.coverImage ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
+            <Image
               src={merchant.coverImage}
               alt={merchant.businessName}
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center relative overflow-hidden">
