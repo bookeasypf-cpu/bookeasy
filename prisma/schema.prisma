@@ -22,6 +22,11 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // Email deliverability — set by Resend webhook on bounce/complaint
+  emailBounced     Boolean   @default(false)
+  emailComplained  Boolean   @default(false)
+  emailLastEvent   DateTime?
+
   accounts      Account[]
   sessions      Session[]
   merchant      Merchant?
@@ -450,7 +455,7 @@ model PatientNote {
 
 model WebhookEvent {
   id        String   @id
-  source    String   // "stripe" or "payzen"
+  source    String   // "payzen" or "resend"
   createdAt DateTime @default(now())
 
   @@index([source])
