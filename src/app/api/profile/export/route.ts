@@ -4,13 +4,18 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const session = await getSession();
-  if (!session?.user) {
+  if (!session?.user || !session.user.email) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
   const userId = session.user.id;
+  const userEmail = session.user.email;
 
-  const [user, bookings, reviews, xpTransactions, giftCards, favorites, referrals, notifications] =
+  // Strip gift card codes from booking.notes (legacy storage of secret codes)
+  const stripGiftCardCodes = (notes: string | null) =>
+    notes ? notes.replace(/\[Carte cadeau:\s*[A-Z0-9-]+\]/g, "[Carte cadeau utilisée]") : notes;
+
+  const [user, bookings, reviews, xpTransactions, giftCards, favorites, referrals, notifications, patientNotes] =
     await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -36,7 +41,7 @@ export async function GET() {
         orderBy: { createdAt: "desc" },
       }),
       prisma.giftCard.findMany({
-        where: { senderEmail: session.user.email! },
+        where: { senderEmail: userEmail },
         select: { code: true, amount: true, balance: true, status: true, recipientName: true, createdAt: true },
       }),
       prisma.favorite.findMany({
@@ -53,6 +58,17 @@ export async function GET() {
         orderBy: { createdAt: "desc" },
         take: 100,
       }),
+      // RGPD: notes médicales dont l'utilisateur est le sujet (droit d'accès)
+      prisma.patientNote.findMany({
+        where: { clientId: userId },
+        select: {
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          merchant: { select: { businessName: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
     ]);
 
   const exportData = {
@@ -60,6 +76,7 @@ export async function GET() {
     user,
     bookings: bookings.map((b) => ({
       ...b,
+      notes: stripGiftCardCodes(b.notes),
       service: b.service.name,
       merchant: b.merchant.businessName,
     })),
@@ -75,6 +92,12 @@ export async function GET() {
     })),
     referrals,
     notifications,
+    patientNotes: patientNotes.map((p) => ({
+      content: p.content,
+      merchant: p.merchant.businessName,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
+    })),
   };
 
   return new NextResponse(JSON.stringify(exportData, null, 2), {

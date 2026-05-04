@@ -77,14 +77,17 @@ export default function Confidentialite() {
         <li><strong>Obligation légale :</strong> conservation des données de facturation, réponse aux demandes judiciaires</li>
       </ul>
 
-      <h2>6. Partage des données</h2>
-      <p>Vos données ne sont <strong>jamais vendues</strong>. Elles peuvent être partagées avec :</p>
+      <h2>6. Partage des données — Sous-traitants</h2>
+      <p>Vos données ne sont <strong>jamais vendues</strong>. Elles sont traitées par les sous-traitants suivants, agissant sous notre responsabilité (art. 28 RGPD) :</p>
       <ul>
-        <li><strong>Les Prestataires :</strong> nom et coordonnées du client pour les rendez-vous confirmés uniquement</li>
-        <li><strong>Prestataires de paiement :</strong> données nécessaires au traitement des paiements (Cartes Cadeaux, abonnements Pro)</li>
-        <li><strong>Hébergeur :</strong> Vercel Inc. (données techniques de serveur)</li>
-        <li><strong>Services d&apos;authentification :</strong> Google (si connexion via OAuth)</li>
-        <li><strong>Service d&apos;emails :</strong> pour l&apos;envoi de confirmations et notifications</li>
+        <li><strong>Les Prestataires (commerçants partenaires) :</strong> nom et coordonnées du client pour les rendez-vous confirmés uniquement (Polynésie française)</li>
+        <li><strong>PayZen by OSB :</strong> traitement des paiements clients et abonnements Pro en XPF (Polynésie française)</li>
+        <li><strong>Vercel Inc. :</strong> hébergement de l&apos;application et stockage des images (États-Unis — clauses contractuelles types décision UE 2021/914)</li>
+        <li><strong>Neon Inc. :</strong> base de données PostgreSQL (États-Unis / UE — CCT)</li>
+        <li><strong>Resend Inc. :</strong> envoi des emails transactionnels (États-Unis — CCT)</li>
+        <li><strong>Upstash Inc. :</strong> cache Redis et limitation de débit (États-Unis — CCT)</li>
+        <li><strong>Google LLC :</strong> authentification OAuth si connexion via Google (États-Unis — CCT)</li>
+        <li><strong>Notes médicales (PatientNote) :</strong> hébergées sur BookEasy, accessibles uniquement au professionnel de santé qui les a saisies. Vous pouvez en demander une copie ou la suppression (voir section 8). Base légale : intérêt légitime du professionnel de santé pour assurer la continuité des soins (art. 6.1.f) combiné à l&apos;art. 9.2.h RGPD pour les données de santé.</li>
         <li><strong>Autorités compétentes :</strong> sur demande judiciaire légitime</li>
       </ul>
 
@@ -118,21 +121,51 @@ export default function Confidentialite() {
       </p>
 
       <h2>9. Cookies</h2>
-      <h3>9.1 Cookies essentiels</h3>
       <p>
-        Nécessaires au fonctionnement du Site (session, authentification, préférences).
-        Ils ne nécessitent pas votre consentement.
+        BookEasy n&apos;utilise <strong>que des cookies strictement nécessaires</strong> au
+        fonctionnement du service. Aucun cookie publicitaire ni de mesure d&apos;audience
+        tiers n&apos;est déposé. Le consentement préalable n&apos;est donc pas requis (art. 82 LIL).
       </p>
-      <h3>9.2 Cookies analytiques</h3>
-      <p>
-        Utilisés pour comprendre comment les visiteurs interagissent avec le Site.
-        Déposés uniquement avec votre consentement.
-      </p>
-      <h3>9.3 Gestion des cookies</h3>
-      <p>
-        Vous pouvez à tout moment modifier vos préférences de cookies via les paramètres
-        de votre navigateur. La désactivation de certains cookies peut limiter votre
-        expérience sur la Plateforme.
+      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1em", fontSize: "0.9em" }}>
+        <thead>
+          <tr style={{ borderBottom: "1px solid #ccc" }}>
+            <th style={{ textAlign: "left", padding: "8px" }}>Nom</th>
+            <th style={{ textAlign: "left", padding: "8px" }}>Émetteur</th>
+            <th style={{ textAlign: "left", padding: "8px" }}>Finalité</th>
+            <th style={{ textAlign: "left", padding: "8px" }}>Durée</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style={{ borderBottom: "1px solid #eee" }}>
+            <td style={{ padding: "8px" }}>next-auth.session-token</td>
+            <td style={{ padding: "8px" }}>BookEasy</td>
+            <td style={{ padding: "8px" }}>Authentification</td>
+            <td style={{ padding: "8px" }}>30 jours</td>
+          </tr>
+          <tr style={{ borderBottom: "1px solid #eee" }}>
+            <td style={{ padding: "8px" }}>next-auth.csrf-token</td>
+            <td style={{ padding: "8px" }}>BookEasy</td>
+            <td style={{ padding: "8px" }}>Protection CSRF</td>
+            <td style={{ padding: "8px" }}>Session</td>
+          </tr>
+          <tr style={{ borderBottom: "1px solid #eee" }}>
+            <td style={{ padding: "8px" }}>cookie-consent (localStorage)</td>
+            <td style={{ padding: "8px" }}>BookEasy</td>
+            <td style={{ padding: "8px" }}>Mémoriser le choix sur le bandeau cookies</td>
+            <td style={{ padding: "8px" }}>1 an</td>
+          </tr>
+          <tr>
+            <td style={{ padding: "8px" }}>theme (localStorage)</td>
+            <td style={{ padding: "8px" }}>BookEasy</td>
+            <td style={{ padding: "8px" }}>Préférence dark/light mode</td>
+            <td style={{ padding: "8px" }}>Permanent</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style={{ marginTop: "1em" }}>
+        Vous pouvez à tout moment supprimer ces cookies via les paramètres de votre
+        navigateur. La désactivation de certains cookies peut limiter votre expérience
+        sur la Plateforme (notamment l&apos;authentification).
       </p>
 
       <h2>10. Sécurité</h2>
@@ -148,12 +181,14 @@ export default function Confidentialite() {
         <li>Surveillance des accès non autorisés</li>
       </ul>
 
-      <h2>11. Transfert de données</h2>
+      <h2>11. Transfert de données hors UE</h2>
       <p>
         Vos données peuvent être hébergées sur des serveurs situés en dehors de la
-        Polynésie française (serveurs Vercel, principalement aux États-Unis et en Europe).
-        Ces transferts sont encadrés par des garanties adéquates (clauses contractuelles
-        types de la Commission européenne, certifications Privacy Shield le cas échéant).
+        Polynésie française et de l&apos;Union européenne (Vercel, Neon, Resend, Upstash —
+        principalement aux États-Unis). Ces transferts sont encadrés par les
+        <strong> clauses contractuelles types (CCT)</strong> adoptées par la Commission
+        européenne (décision UE 2021/914 du 4 juin 2021), conformément aux exigences
+        post-arrêt Schrems II (CJUE, juillet 2020).
       </p>
 
       <h2>12. Protection des mineurs</h2>

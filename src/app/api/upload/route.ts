@@ -46,8 +46,8 @@ export async function POST(request: Request) {
           }),
         };
       },
-      onUploadCompleted: async ({ blob }) => {
-        console.log("Upload completed:", blob.url);
+      onUploadCompleted: async () => {
+        // Upload completed — URL is in the response, no need to log it
       },
     });
 

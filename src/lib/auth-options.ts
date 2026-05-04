@@ -116,7 +116,9 @@ export const authOptions: NextAuthOptions = {
 
           return true;
         } catch (error) {
-          console.error("OAuth signIn error:", error);
+          // Log only the error message (RGPD: avoid logging full error object
+          // which may contain user email via Prisma constraint violations)
+          console.error("OAuth signIn error:", error instanceof Error ? error.message : "unknown");
           return false;
         }
       }

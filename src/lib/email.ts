@@ -70,7 +70,7 @@ interface BookingConfirmationData {
 
 export async function sendBookingConfirmation(data: BookingConfirmationData) {
   if (!resend) {
-    console.log("[EMAIL] Resend not configured – skipping booking confirmation to", data.clientEmail);
+    console.log("[EMAIL] Resend not configured – skipping booking confirmation");
     return;
   }
 
@@ -135,7 +135,7 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
       subject: `✅ RDV confirmé – ${esc(data.serviceName)} chez ${esc(data.merchantName)}`,
       html,
     });
-    console.log("[EMAIL] Confirmation sent to", data.clientEmail);
+    console.log("[EMAIL] Confirmation sent");
   } catch (err) {
     console.error("[EMAIL] Failed to send confirmation:", err);
   }
@@ -159,7 +159,7 @@ interface ReminderData {
 
 export async function sendBookingReminder(data: ReminderData) {
   if (!resend) {
-    console.log("[EMAIL] Resend not configured – skipping reminder to", data.clientEmail);
+    console.log("[EMAIL] Resend not configured – skipping reminder");
     return;
   }
 
@@ -222,7 +222,7 @@ export async function sendBookingReminder(data: ReminderData) {
       subject: `⏰ Rappel : ${esc(data.serviceName)} demain à ${data.startTime.replace(":", "h")}`,
       html,
     });
-    console.log("[EMAIL] Reminder sent to", data.clientEmail);
+    console.log("[EMAIL] Reminder sent");
   } catch (err) {
     console.error("[EMAIL] Failed to send reminder:", err);
   }
@@ -245,7 +245,7 @@ interface CancellationData {
 
 export async function sendBookingCancellation(data: CancellationData) {
   if (!resend) {
-    console.log("[EMAIL] Resend not configured – skipping cancellation to", data.recipientEmail);
+    console.log("[EMAIL] Resend not configured – skipping cancellation");
     return;
   }
 
@@ -296,7 +296,7 @@ export async function sendBookingCancellation(data: CancellationData) {
       subject: `❌ RDV annulé – ${esc(data.serviceName)} le ${dateFormatted}`,
       html,
     });
-    console.log("[EMAIL] Cancellation sent to", data.recipientEmail);
+    console.log("[EMAIL] Cancellation sent");
   } catch (err) {
     console.error("[EMAIL] Failed to send cancellation:", err);
   }
@@ -308,7 +308,7 @@ export async function sendBookingCancellation(data: CancellationData) {
 
 export async function sendWelcomeEmail(to: string, name: string) {
   if (!resend) {
-    console.log("[EMAIL] Resend not configured – skipping welcome email to", to);
+    console.log("[EMAIL] Resend not configured – skipping welcome email");
     return;
   }
 
@@ -358,7 +358,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
       subject: "🎉 Bienvenue sur BookEasy !",
       html,
     });
-    console.log("[EMAIL] Welcome email sent to", to);
+    console.log("[EMAIL] Welcome email sent");
   } catch (err) {
     console.error("[EMAIL] Failed to send welcome email:", err);
   }
@@ -370,7 +370,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
 
 export async function sendMerchantCredentials(to: string, name: string, tempPassword: string) {
   if (!resend) {
-    console.log("[EMAIL] Resend not configured – skipping credentials email to", to);
+    console.log("[EMAIL] Resend not configured – skipping credentials email");
     return;
   }
 
@@ -415,7 +415,7 @@ export async function sendMerchantCredentials(to: string, name: string, tempPass
       subject: "🔐 Vos identifiants BookEasy Pro",
       html,
     });
-    console.log("[EMAIL] Merchant credentials sent to", to);
+    console.log("[EMAIL] Merchant credentials sent");
   } catch (err) {
     console.error("[EMAIL] Failed to send credentials:", err);
   }
@@ -432,7 +432,7 @@ export async function sendReferralRewardEmail(
   reason: string
 ) {
   if (!resend) {
-    console.log("[EMAIL] Resend not configured – skipping referral reward to", to);
+    console.log("[EMAIL] Resend not configured – skipping referral reward");
     return;
   }
 
@@ -467,7 +467,7 @@ export async function sendReferralRewardEmail(
       subject: `🎁 +${xpEarned} XP – Parrainage BookEasy`,
       html,
     });
-    console.log("[EMAIL] Referral reward email sent to", to);
+    console.log("[EMAIL] Referral reward email sent");
   } catch (err) {
     console.error("[EMAIL] Failed to send referral reward:", err);
   }
@@ -479,7 +479,7 @@ export async function sendReferralRewardEmail(
 
 export async function sendPasswordResetEmail(to: string, name: string, token: string) {
   if (!resend) {
-    console.log("[EMAIL] Resend not configured – skipping password reset to", to);
+    console.log("[EMAIL] Resend not configured – skipping password reset");
     return;
   }
 
@@ -518,7 +518,7 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
       subject: "🔐 Réinitialisation de votre mot de passe BookEasy",
       html,
     });
-    console.log("[EMAIL] Password reset email sent to", to);
+    console.log("[EMAIL] Password reset email sent");
   } catch (err) {
     console.error("[EMAIL] Failed to send password reset:", err);
   }
@@ -538,7 +538,7 @@ interface SupportData {
 
 export async function sendSupportMessage(data: SupportData) {
   if (!resend) {
-    console.log("[EMAIL] Resend not configured – skipping support message from", data.merchantEmail);
+    console.log("[EMAIL] Resend not configured – skipping support message");
     return { success: false, error: "Email non configuré" };
   }
 
@@ -583,7 +583,7 @@ export async function sendSupportMessage(data: SupportData) {
       subject: `${priority} ${esc(data.subject)} — ${esc(data.merchantName)}`,
       html,
     });
-    console.log("[EMAIL] Support message sent from", data.merchantEmail);
+    console.log("[EMAIL] Support message sent");
     return { success: true };
   } catch (err) {
     console.error("[EMAIL] Failed to send support message:", err);
