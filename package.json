@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && node -e \"require('fs').writeFileSync('public/sw-version.json',JSON.stringify({version:Date.now().toString(36)}))\" && next build",
+    "build": "prisma migrate deploy && prisma generate && node -e \"require('fs').writeFileSync('public/sw-version.json',JSON.stringify({version:Date.now().toString(36)}))\" && next build",
     "start": "next start",
     "lint": "eslint"
   },
