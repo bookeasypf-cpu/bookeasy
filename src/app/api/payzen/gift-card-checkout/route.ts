@@ -40,13 +40,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Cette carte cadeau n'est pas en attente de paiement" }, { status: 400 });
   }
 
-  const amountXPF = Math.round(card.amount * 119.33);
+  if (!session.user.email) {
+    return NextResponse.json({ error: "Email requis pour le paiement" }, { status: 400 });
+  }
+  if (!card.payzenOrderId) {
+    return NextResponse.json({ error: "Identifiant de commande manquant" }, { status: 500 });
+  }
 
   const { actionUrl, fields } = createGiftCardPaymentForm({
     giftCardId: card.id,
-    buyerEmail: session.user.email!,
-    amount: amountXPF,
-    orderId: card.payzenOrderId!,
+    buyerEmail: session.user.email,
+    amount: card.amount,
+    orderId: card.payzenOrderId,
   });
 
   return NextResponse.json({ actionUrl, fields });

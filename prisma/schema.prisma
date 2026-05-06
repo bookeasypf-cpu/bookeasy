@@ -370,8 +370,8 @@ model XpRedemption {
 model GiftCard {
   id            String    @id @default(cuid())
   code          String    @unique
-  amount        Float     // Montant en EUR
-  balance       Float     // Solde restant
+  amount        Int       // Montant en XPF (entier, pas de centimes)
+  balance       Int       // Solde restant en XPF
   currency      String    @default("XPF")
   senderName    String    // Nom de l'acheteur
   senderEmail   String    // Email de l'acheteur

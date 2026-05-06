@@ -115,14 +115,14 @@ async function handleBookingPayment(ipnData: ReturnType<typeof parseIPNData>) {
       if (booking.status !== "PENDING_PAYMENT") return;
 
       await prisma.$transaction(async (tx) => {
-        // Deduct gift card now that payment is confirmed
+        // Deduct gift card now that payment is confirmed (both XPF integers)
         if (booking.giftCardCode && booking.giftCardAmount && booking.giftCardAmount > 0) {
           const card = await tx.giftCard.findUnique({
             where: { code: booking.giftCardCode },
           });
           if (card) {
-            const deductionEUR = booking.giftCardAmount / 119.33;
-            const newBalance = Math.max(0, card.balance - deductionEUR);
+            const deductionXPF = Math.round(booking.giftCardAmount);
+            const newBalance = Math.max(0, card.balance - deductionXPF);
             await tx.giftCard.update({
               where: { id: card.id },
               data: {
@@ -219,8 +219,7 @@ async function handleGiftCardPayment(ipnData: ReturnType<typeof parseIPNData>) {
         });
 
         // Award XP to buyer: 1 XP per 1000 XPF
-        const amountXPF = Math.round(card.amount * 119.33);
-        const xpEarned = Math.floor(amountXPF / 1000);
+        const xpEarned = Math.floor(card.amount / 1000);
 
         if (xpEarned > 0 && card.merchantId) {
           const buyer = await tx.user.findFirst({
@@ -235,7 +234,7 @@ async function handleGiftCardPayment(ipnData: ReturnType<typeof parseIPNData>) {
                 merchantId: card.merchantId,
                 amount: xpEarned,
                 type: "EARNED",
-                reason: `Carte cadeau offerte (${amountXPF.toLocaleString()} F)`,
+                reason: `Carte cadeau offerte (${card.amount.toLocaleString()} F)`,
               },
             });
           }
@@ -248,7 +247,7 @@ async function handleGiftCardPayment(ipnData: ReturnType<typeof parseIPNData>) {
         recipientName: card.recipientName,
         senderName: card.senderName,
         code: card.code,
-        amountXPF: Math.round(card.amount * 119.33),
+        amountXPF: card.amount,
         message: card.message,
         expiresAt: card.expiresAt,
         merchantName: card.merchant?.businessName,

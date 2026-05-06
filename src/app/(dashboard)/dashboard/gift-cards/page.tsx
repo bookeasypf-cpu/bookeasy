@@ -74,7 +74,7 @@ export default async function DashboardGiftCardsPage() {
         <Card className="rounded-2xl border-0 shadow-sm">
           <CardContent className="py-4 text-center">
             <p className="text-2xl font-bold text-[#0C1B2A] dark:text-white">
-              {formatPrice(Math.round(totalRevenue * 119.33))}
+              {formatPrice(totalRevenue)}
             </p>
             <p className="text-xs text-gray-500 mt-1">Valeur totale</p>
           </CardContent>
@@ -120,10 +120,10 @@ export default async function DashboardGiftCardsPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold text-[#0C1B2A] dark:text-white">
-                        {formatPrice(Math.round(card.balance * 119.33))}
+                        {formatPrice(card.balance)}
                       </p>
                       <p className="text-xs text-gray-400">
-                        sur {formatPrice(Math.round(card.amount * 119.33))}
+                        sur {formatPrice(card.amount)}
                       </p>
                     </div>
                   </div>
@@ -175,7 +175,7 @@ export default async function DashboardGiftCardsPage() {
                         </p>
                       </div>
                       <p className="text-sm font-medium text-gray-500">
-                        {formatPrice(Math.round(card.amount * 119.33))}
+                        {formatPrice(card.amount)}
                       </p>
                     </div>
                   </CardContent>

@@ -96,7 +96,8 @@ export async function createBooking(data: {
         // ONLINE PAYMENT PATH: create as PENDING_PAYMENT, no gift card deduction, no XP
         const payzenOrderId = nanoid(12);
 
-        // Calculate gift card deduction to store (but don't deduct yet)
+        // Calculate gift card deduction to store (but don't deduct yet).
+        // Both service.price and card.balance are in XPF (integers).
         let giftCardAmount: number | null = null;
         if (data.giftCardCode) {
           const card = await tx.giftCard.findUnique({
@@ -104,8 +105,7 @@ export async function createBooking(data: {
           });
           if (card && card.status === "ACTIVE" && card.expiresAt > new Date() &&
               (!card.merchantId || card.merchantId === data.merchantId)) {
-            const priceEUR = service.price / 119.33;
-            giftCardAmount = Math.min(card.balance, priceEUR) * 119.33;
+            giftCardAmount = Math.min(card.balance, service.price);
           }
         }
 
@@ -191,9 +191,9 @@ async function createConfirmedBooking(
     });
     if (card && card.status === "ACTIVE" && card.expiresAt > new Date() &&
         (!card.merchantId || card.merchantId === data.merchantId)) {
-      const priceEUR = service.price / 119.33;
-      if (card.balance >= priceEUR) {
-        const newBalance = card.balance - priceEUR;
+      // Both card.balance and service.price are in XPF (integers).
+      if (card.balance >= service.price) {
+        const newBalance = card.balance - service.price;
         await tx.giftCard.update({
           where: { id: card.id },
           data: {
@@ -300,14 +300,14 @@ export async function cancelBooking(bookingId: string, reason?: string) {
       return { ok: false as const };
     }
 
-    // Refund gift card balance if booking used a gift card
+    // Refund gift card balance if booking used a gift card (XPF integers)
     if (booking.giftCardCode && booking.giftCardAmount) {
       const giftCard = await tx.giftCard.findUnique({
         where: { code: booking.giftCardCode },
       });
       if (giftCard) {
-        const refundEUR = booking.giftCardAmount / 119.33;
-        const newBalance = Math.min(giftCard.amount, giftCard.balance + refundEUR);
+        const refundXPF = Math.round(booking.giftCardAmount);
+        const newBalance = Math.min(giftCard.amount, giftCard.balance + refundXPF);
         await tx.giftCard.update({
           where: { id: giftCard.id },
           data: { balance: newBalance, status: "ACTIVE", usedAt: null },
@@ -320,8 +320,8 @@ export async function cancelBooking(bookingId: string, reason?: string) {
         const giftCardCode = giftCardMatch[1];
         const giftCard = await tx.giftCard.findUnique({ where: { code: giftCardCode } });
         if (giftCard) {
-          const refundEUR = booking.service.price / 119.33;
-          const newBalance = Math.min(giftCard.amount, giftCard.balance + refundEUR);
+          const refundXPF = Math.round(booking.service.price);
+          const newBalance = Math.min(giftCard.amount, giftCard.balance + refundXPF);
           await tx.giftCard.update({
             where: { id: giftCard.id },
             data: { balance: newBalance, status: "ACTIVE", usedAt: null },

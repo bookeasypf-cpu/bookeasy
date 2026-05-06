@@ -68,14 +68,10 @@ export async function GET(req: NextRequest) {
     }, { status: 400 });
   }
 
-  // Convertir EUR en XPF pour l'affichage
-  const amountXPF = Math.round(card.amount * 119.33);
-  const balanceXPF = Math.round(card.balance * 119.33);
-
   return NextResponse.json({
     code: card.code,
-    amountXPF,
-    balanceXPF,
+    amountXPF: card.amount,
+    balanceXPF: card.balance,
     status: card.status,
     merchantName: card.merchant?.businessName || "Tous les partenaires",
     expiresAt: card.expiresAt,
@@ -110,9 +106,6 @@ export async function POST(req: NextRequest) {
     }
     const { amountXPF, senderName, senderEmail, recipientName, recipientEmail, message, merchantId } = parsed.data;
 
-    // Convertir XPF en EUR (1 EUR = 119.33 XPF)
-    const amountEUR = amountXPF / 119.33;
-
     const code = generateGiftCardCode();
     const payzenOrderId = `GC-${nanoid(12)}`;
 
@@ -121,7 +114,7 @@ export async function POST(req: NextRequest) {
       const card = await prisma.giftCard.create({
         data: {
           code,
-          amount: amountEUR,
+          amount: amountXPF,
           balance: 0, // Solde activé après paiement
           currency: "XPF",
           senderName,
@@ -157,8 +150,8 @@ export async function POST(req: NextRequest) {
     const card = await prisma.giftCard.create({
       data: {
         code,
-        amount: amountEUR,
-        balance: amountEUR,
+        amount: amountXPF,
+        balance: amountXPF,
         currency: "XPF",
         senderName,
         senderEmail,
@@ -170,7 +163,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const balanceXPF = Math.round(card.balance * 119.33);
+    const balanceXPF = card.balance;
 
     // Award XP to buyer: 1 XP per 1000 XPF
     const xpEarned = Math.floor(amountXPF / 1000);

@@ -39,7 +39,7 @@ export default async function GiftCardConfirmationPage({ params, searchParams }:
   const isPending = card.status === "PENDING_PAYMENT";
   const isActive = card.status === "ACTIVE";
   const isFailed = payment === "failed" || payment === "cancelled";
-  const amountXPF = Math.round(card.amount * 119.33);
+  const amountXPF = card.amount;
 
   return (
     <div className="page-transition min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex flex-col items-center justify-center px-4 sm:px-6 py-12">
