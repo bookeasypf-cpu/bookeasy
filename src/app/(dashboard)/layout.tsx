@@ -30,7 +30,10 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
-  // Single fetch — shared via context to all dashboard sub-pages
+  // Single fetch — shared via context to all dashboard sub-pages.
+  // Tolerates null merchant: a brand-new MERCHANT user must be able
+  // to reach /dashboard/profile to create their profile. Each page
+  // decides what to render when merchantId is null.
   const merchant = await prisma.merchant.findUnique({
     where: { userId: session.user.id },
     select: {
@@ -41,19 +44,15 @@ export default async function DashboardLayout({
     },
   });
 
-  if (!merchant) {
-    redirect("/dashboard/profile");
-  }
-
-  const isMedical = isMedicalSectorName(merchant.sector?.name);
+  const isMedical = merchant ? isMedicalSectorName(merchant.sector?.name) : false;
 
   return (
     <MerchantProfileProvider
       value={{
-        merchantId: merchant.id,
+        merchantId: merchant?.id ?? null,
         isMedical,
-        plan: (merchant.plan as "FREE" | "PRO") ?? "FREE",
-        businessName: merchant.businessName,
+        plan: (merchant?.plan as "FREE" | "PRO") ?? "FREE",
+        businessName: merchant?.businessName ?? "",
       }}
     >
       <div className="min-h-screen flex flex-col bg-gray-50/50">
