@@ -12,6 +12,7 @@ import {
   DashboardMobileNav,
 } from "@/components/layout/DashboardSidebar";
 import MerchantOnboarding from "@/components/onboarding/MerchantOnboarding";
+import { MerchantProfileProvider } from "@/components/providers/MerchantProfileProvider";
 import { isMedicalSectorName } from "@/lib/medical";
 
 export default async function DashboardLayout({
@@ -29,23 +30,41 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
-  // Déterminer si c'est un professionnel de santé
+  // Single fetch — shared via context to all dashboard sub-pages
   const merchant = await prisma.merchant.findUnique({
     where: { userId: session.user.id },
-    include: { sector: { select: { name: true, slug: true } } },
+    select: {
+      id: true,
+      businessName: true,
+      plan: true,
+      sector: { select: { name: true, slug: true } },
+    },
   });
 
-  const isMedical = merchant ? isMedicalSectorName(merchant.sector?.name) : false;
+  if (!merchant) {
+    redirect("/dashboard/profile");
+  }
+
+  const isMedical = isMedicalSectorName(merchant.sector?.name);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50/50">
-      <Header />
-      <DashboardMobileNav isMedical={isMedical} />
-      <MerchantOnboarding isMedical={isMedical} />
-      <div className="flex flex-1">
-        <DashboardSidebar isMedical={isMedical} />
-        <main className="flex-1 p-4 lg:p-8 page-transition">{children}</main>
+    <MerchantProfileProvider
+      value={{
+        merchantId: merchant.id,
+        isMedical,
+        plan: (merchant.plan as "FREE" | "PRO") ?? "FREE",
+        businessName: merchant.businessName,
+      }}
+    >
+      <div className="min-h-screen flex flex-col bg-gray-50/50">
+        <Header />
+        <DashboardMobileNav isMedical={isMedical} />
+        <MerchantOnboarding isMedical={isMedical} />
+        <div className="flex flex-1">
+          <DashboardSidebar isMedical={isMedical} />
+          <main className="flex-1 p-4 lg:p-8 page-transition">{children}</main>
+        </div>
       </div>
-    </div>
+    </MerchantProfileProvider>
   );
 }

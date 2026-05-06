@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   cancelBooking,
   confirmBooking,
@@ -8,6 +8,7 @@ import {
 } from "@/actions/booking";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useMerchantProfile } from "@/components/providers/MerchantProfileProvider";
 
 export function BookingActions({
   bookingId,
@@ -16,18 +17,9 @@ export function BookingActions({
   bookingId: string;
   status: string;
 }) {
+  const { isMedical } = useMerchantProfile();
   const [loading, setLoading] = useState(false);
-  const [isMedical, setIsMedical] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    fetch("/api/dashboard/profile")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.isMedical) setIsMedical(true);
-      })
-      .catch(() => {});
-  }, []);
 
   async function handleAction(action: "confirm" | "cancel" | "complete") {
     if (action === "cancel") {

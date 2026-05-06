@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { formatTime, cn } from "@/lib/utils";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { useMerchantProfile } from "@/components/providers/MerchantProfileProvider";
 
 // ── Types ──────────────────────────────────────────────
 
@@ -60,9 +61,9 @@ export default function DashboardCalendarPage() {
   const today = new Date();
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth()); // 0-indexed
+  const { isMedical } = useMerchantProfile();
   const [bookings, setBookings] = useState<CalendarBooking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isMedical, setIsMedical] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
 
@@ -95,16 +96,6 @@ export default function DashboardCalendarPage() {
       spinnerTop: "border-t-[#0066FF]",
     };
   }, [isMedical]);
-
-  // ── Fetch profile (isMedical) ────────────────────────
-  useEffect(() => {
-    fetch("/api/dashboard/profile")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.isMedical) setIsMedical(true);
-      })
-      .catch(() => {});
-  }, []);
 
   // ── Fetch bookings ──────────────────────────────────
   const fetchBookings = useCallback(async (silent = false) => {

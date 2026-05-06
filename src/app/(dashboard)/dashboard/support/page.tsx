@@ -1,32 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { ProBadge } from "@/components/ui/ProBadge";
 import { Headphones, Send, CheckCircle, Zap, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { useMerchantProfile } from "@/components/providers/MerchantProfileProvider";
 
 export default function DashboardSupportPage() {
-  const [plan, setPlan] = useState<string>("FREE");
-  const [isMedical, setIsMedical] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { isMedical, plan } = useMerchantProfile();
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [form, setForm] = useState({ subject: "", message: "" });
-
-  useEffect(() => {
-    fetch("/api/dashboard/profile")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data && !data.error) {
-          setPlan(data.plan || "FREE");
-          if (data.isMedical) setIsMedical(true);
-        }
-        setLoading(false);
-      });
-  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -65,13 +52,6 @@ export default function DashboardSupportPage() {
     ? "bg-gradient-to-br from-emerald-500 to-teal-500"
     : "bg-gradient-to-br from-[#0066FF] to-[#00B4D8]";
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className={`h-8 w-8 border-2 ${isMedical ? "border-emerald-500" : "border-[#0066FF]"} border-t-transparent rounded-full animate-spin`} />
-      </div>
-    );
-  }
 
   return (
     <div className="page-transition">

@@ -24,6 +24,39 @@ export const pushUnsubscribeSchema = z.object({
   endpoint: z.string().url().max(2048),
 });
 
+export const registerSchema = z.object({
+  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères").max(100),
+  email: z.string().email("Email invalide").max(254),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères").max(72),
+});
+
+export const loginSchema = z.object({
+  email: z.string().email("Email invalide").max(254),
+  password: z.string().min(1, "Mot de passe requis").max(72),
+});
+
+export const reviewSchema = z.object({
+  bookingId: z.string().min(1).max(40),
+  rating: z.coerce.number().int().min(1).max(5),
+  comment: z.string().max(1000).optional(),
+});
+
+export const bookingSchema = z.object({
+  merchantId: z.string().min(1).max(40),
+  serviceId: z.string().min(1).max(40),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format de date invalide"),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/, "Format d'heure invalide"),
+  endTime: z.string().regex(/^\d{2}:\d{2}$/, "Format d'heure invalide"),
+  notes: z.string().max(1000).optional(),
+  giftCardCode: z.string().max(20).optional(),
+  paymentMethod: z.enum(["online", "on_site"]).optional(),
+});
+
+export type RegisterInput = z.infer<typeof registerSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
+export type BookingInput = z.infer<typeof bookingSchema>;
+export type ReviewInput = z.infer<typeof reviewSchema>;
+
 // ─────────────────────────────────────────────
 // DASHBOARD — SERVICES
 // ─────────────────────────────────────────────

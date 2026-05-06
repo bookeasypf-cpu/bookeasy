@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
-import { reviewSchema } from "@/lib/validators";
+import { reviewSchema } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { sendPushNotification } from "@/lib/push";
 

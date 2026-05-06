@@ -6,6 +6,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { DAYS_OF_WEEK } from "@/lib/constants";
 import { Plus, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useMerchantProfile } from "@/components/providers/MerchantProfileProvider";
 
 interface ScheduleSlot {
   id?: string;
@@ -16,19 +17,10 @@ interface ScheduleSlot {
 }
 
 export default function DashboardAvailabilityPage() {
+  const { isMedical } = useMerchantProfile();
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isMedical, setIsMedical] = useState(false);
-
-  useEffect(() => {
-    fetch("/api/dashboard/profile")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.isMedical) setIsMedical(true);
-      })
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     fetch("/api/dashboard/availability")

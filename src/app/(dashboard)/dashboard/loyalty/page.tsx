@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useMerchantProfile } from "@/components/providers/MerchantProfileProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -87,10 +88,10 @@ function NeonField({ children, delay = 0 }: { children: React.ReactNode; delay?:
 }
 
 export default function DashboardLoyaltyPage() {
+  const { isMedical } = useMerchantProfile();
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [settings, setSettings] = useState<XpSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isMedical, setIsMedical] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -107,16 +108,6 @@ export default function DashboardLoyaltyPage() {
     type: "DISCOUNT",
     value: "10",
   });
-
-  // Check if medical — XP not available for medical professionals
-  useEffect(() => {
-    fetch("/api/dashboard/profile")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.isMedical) setIsMedical(true);
-      })
-      .catch(() => {});
-  }, []);
 
   async function fetchData() {
     const [rewardsRes, settingsRes, pendingRes] = await Promise.all([

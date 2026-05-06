@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { formatPrice, formatDuration } from "@/lib/utils";
 import { Plus, Pencil, Trash2, Clock, Star } from "lucide-react";
 import toast from "react-hot-toast";
+import { useMerchantProfile } from "@/components/providers/MerchantProfileProvider";
 
 interface Service {
   id: string;
@@ -20,9 +21,9 @@ interface Service {
 }
 
 export default function DashboardServicesPage() {
+  const { isMedical } = useMerchantProfile();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isMedical, setIsMedical] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -33,15 +34,6 @@ export default function DashboardServicesPage() {
     price: "0",
     xpAmount: "",
   });
-
-  useEffect(() => {
-    fetch("/api/dashboard/profile")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.isMedical) setIsMedical(true);
-      })
-      .catch(() => {});
-  }, []);
 
   async function fetchServices() {
     const res = await fetch("/api/dashboard/services");

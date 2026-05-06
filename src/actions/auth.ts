@@ -2,7 +2,7 @@
 
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { registerSchema } from "@/lib/validators";
+import { registerSchema } from "@/lib/validations";
 import { sendWelcomeEmail } from "@/lib/email";
 import {
   generateReferralCode,
