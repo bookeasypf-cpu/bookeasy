@@ -11,7 +11,7 @@ export function Card({ children, className, hover = false, glass = false }: Card
   return (
     <div
       className={cn(
-        "rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm dark:shadow-gray-900/50 transition-all duration-300",
+        "rounded-2xl border border-gray-200 dark:border-gray-800 shadow-md shadow-gray-200/40 dark:shadow-gray-900/50 transition-all duration-300",
         glass
           ? "glass"
           : "bg-white dark:bg-gray-900",
@@ -32,7 +32,7 @@ export function CardHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("px-6 py-4 border-b border-gray-100 dark:border-gray-800", className)}>
+    <div className={cn("px-6 py-4 border-b border-gray-200 dark:border-gray-800", className)}>
       {children}
     </div>
   );

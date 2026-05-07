@@ -116,7 +116,7 @@ export function NeonSteps({ steps }: { steps: Step[] }) {
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
               {item.title}
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-xs mx-auto">
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-xs mx-auto">
               {item.description}
             </p>
           </div>

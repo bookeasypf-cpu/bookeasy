@@ -101,10 +101,10 @@ export default function PricingPage() {
             return (
               <div
                 key={plan.name}
-                className={`relative rounded-2xl bg-white p-6 sm:p-8 flex flex-col ${
+                className={`relative rounded-2xl bg-white dark:bg-gray-900 p-6 sm:p-8 flex flex-col ${
                   plan.popular
                     ? "border-2 border-[#0066FF] shadow-xl shadow-[#0066FF]/10 scale-[1.02] md:scale-105"
-                    : "border border-gray-200 shadow-sm"
+                    : "border border-gray-200 dark:border-gray-800 shadow-md shadow-gray-200/40 dark:shadow-gray-900/50"
                 }`}
               >
                 {plan.popular && (
@@ -127,20 +127,20 @@ export default function PricingPage() {
                       style={{ color: plan.color }}
                     />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                     {plan.name}
                   </h3>
                 </div>
 
                 <div className="mb-2">
-                  <span className="text-4xl font-bold text-gray-900">
+                  <span className="text-4xl font-bold text-gray-900 dark:text-white">
                     {plan.price}
                   </span>
-                  <span className="text-gray-500 ml-1 text-sm">
+                  <span className="text-gray-500 dark:text-gray-400 ml-1 text-sm">
                     {plan.period}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                   {plan.description}
                 </p>
 
@@ -148,7 +148,7 @@ export default function PricingPage() {
                   {plan.features.map((feature) => (
                     <li
                       key={feature}
-                      className="flex items-start gap-2.5 text-sm text-gray-600"
+                      className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300"
                     >
                       <Check
                         className="h-4 w-4 shrink-0 mt-0.5"
@@ -164,7 +164,7 @@ export default function PricingPage() {
                 ) : (
                   <Link
                     href={plan.href}
-                    className="w-full py-3 px-4 rounded-xl text-center font-semibold text-sm transition-all duration-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    className="w-full py-3 px-4 rounded-xl text-center font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
                   >
                     {plan.cta}
                   </Link>
@@ -196,10 +196,10 @@ export default function PricingPage() {
       </div>
 
       {/* FAQ */}
-      <div className="bg-gray-50 border-t border-gray-100">
+      <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
           <FAQPageJsonLd items={faqs.map((f) => ({ question: f.q, answer: f.a }))} />
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-10">
             Questions fréquentes
           </h2>
           <FAQ
@@ -210,7 +210,7 @@ export default function PricingPage() {
           />
 
           <div className="mt-12 text-center">
-            <p className="text-gray-500 mb-4">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               Vous avez d&apos;autres questions ?
             </p>
             <Link

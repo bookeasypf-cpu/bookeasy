@@ -114,7 +114,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans antialiased bg-gray-50 dark:bg-gray-950`}>
+      <body className={`${inter.variable} font-sans antialiased bg-slate-100 dark:bg-gray-950 text-[#0C1B2A] dark:text-slate-100`}>
         <SessionProvider>
           <ThemeProvider>
           <SmoothScrollProvider />

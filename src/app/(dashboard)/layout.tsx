@@ -55,7 +55,7 @@ export default async function DashboardLayout({
         businessName: merchant?.businessName ?? "",
       }}
     >
-      <div className="min-h-screen flex flex-col bg-gray-50/50">
+      <div className="min-h-screen flex flex-col bg-slate-100 dark:bg-gray-950">
         <Header />
         <DashboardMobileNav isMedical={isMedical} />
         <MerchantOnboarding isMedical={isMedical} />
