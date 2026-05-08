@@ -328,7 +328,7 @@ function GiftCardsContent() {
                     <button
                       type="button"
                       onClick={() => setShowMerchantDropdown(!showMerchantDropdown)}
-                      className="w-full flex items-center justify-between gap-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 text-sm transition-colors focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                      className="w-full flex items-center justify-between gap-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm transition-colors focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <Store className="h-4 w-4 text-gray-400 shrink-0" />
@@ -410,7 +410,7 @@ function GiftCardsContent() {
                     placeholder="Un petit mot pour accompagner votre cadeau..."
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm resize-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                    className="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm resize-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
                     rows={3}
                     maxLength={500}
                   />
@@ -504,7 +504,7 @@ function GiftCardsContent() {
                   placeholder="Ex: BE-ABCD-1234-EFGH"
                   value={checkCode}
                   onChange={(e) => setCheckCode(e.target.value.toUpperCase())}
-                  className="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white px-4 py-2.5 text-sm font-mono tracking-wider focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+                  className="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-white px-4 py-2.5 text-sm font-mono tracking-wider focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
                 />
                 <button
                   onClick={handleCheck}
