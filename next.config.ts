@@ -6,9 +6,9 @@ const csp = [
   // Vercel Live for preview comments
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://lh3.googleusercontent.com https://*.tile.openstreetmap.org",
+  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://lh3.googleusercontent.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://api.upstash.com https://*.upstash.io https://api.resend.com https://secure.osb.pf wss://ws.pusherapp.com https://vercel.live wss://*.pusher.com https://*.tile.openstreetmap.org",
+  "connect-src 'self' https://api.upstash.com https://*.upstash.io https://api.resend.com https://secure.osb.pf wss://ws.pusherapp.com https://vercel.live wss://*.pusher.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com",
   "frame-src 'self' https://secure.osb.pf https://vercel.live",
   "object-src 'none'",
   "base-uri 'self'",
