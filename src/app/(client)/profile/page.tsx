@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { upload } from "@vercel/blob/client";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Mail, Phone, Pencil, Check, X, Upload, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -140,31 +141,23 @@ export default function ProfilePage() {
       });
 
       setUploadStep("Upload en cours...");
-      const formData = new FormData();
-      formData.append("file", compressedFile);
 
-      // Upload to Vercel Blob
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      let data;
+      // Client-direct upload to Vercel Blob (bypasses Next.js 4.5MB limit)
+      let imageUrl: string;
       try {
-        data = await res.json();
-      } catch {
-        data = { error: `Erreur serveur (${res.status})` };
-      }
-
-      if (!res.ok) {
-        toast.error(data.error || `Erreur d'upload (${res.status})`);
+        const blob = await upload(compressedFile.name, compressedFile, {
+          access: "public",
+          handleUploadUrl: "/api/upload",
+        });
+        imageUrl = blob.url;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Erreur inconnue";
+        toast.error(`Erreur d'upload : ${message}`);
         setLocalImagePreview(null);
         setUploading(false);
         setUploadStep("");
         return;
       }
-
-      const imageUrl = data.url;
 
       // Auto-save to profile
       setUploadStep("Sauvegarde en cours...");
