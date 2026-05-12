@@ -83,3 +83,8 @@ export const DAYS_OF_WEEK = [
 ] as const;
 
 export const MAX_BOOKING_DAYS_AHEAD = 60;
+
+// Maximum number of services a FREE-plan merchant can create.
+// PRO plan = unlimited. Used by the API guard, the dashboard UI,
+// and the pricing/CGU copy — keep these in sync.
+export const FREE_PLAN_MAX_SERVICES = 3;

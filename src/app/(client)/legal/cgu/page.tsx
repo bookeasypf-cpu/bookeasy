@@ -106,9 +106,9 @@ export default function CGU() {
         nécessaires à l&apos;exercice de leur profession.
       </p>
       <p>
-        BookEasy propose un plan gratuit (1 service) et un plan Pro (services illimités, avis clients,
-        analytics avancés). Les conditions du plan Pro font l&apos;objet d&apos;un contrat spécifique
-        entre le Prestataire et BookEasy.
+        BookEasy propose un plan gratuit (jusqu&apos;à 3 services) et un plan Pro (services illimités,
+        avis clients, analytics avancés). Les conditions du plan Pro font l&apos;objet d&apos;un contrat
+        spécifique entre le Prestataire et BookEasy.
       </p>
 
       <h2>Article 6 — Réservations</h2>

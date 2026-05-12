@@ -508,8 +508,8 @@ export default function DashboardProfilePage() {
                       ? "Consultations illimitees, badge Pro verifie, mise en avant dans les recherches"
                       : "Services illimites, badge Pro verifie, mise en avant dans les recherches"
                     : isMedical
-                    ? "1 type de consultation, fonctionnalites de base"
-                    : "1 service, fonctionnalites de base"}
+                    ? "Jusqu'à 3 types de consultation, fonctionnalités de base"
+                    : "Jusqu'à 3 services, fonctionnalités de base"}
                 </p>
               </div>
             </div>

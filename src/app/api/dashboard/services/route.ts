@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createServiceSchema, updateServiceSchema, zodFirstError } from "@/lib/validations";
+import { FREE_PLAN_MAX_SERVICES } from "@/lib/constants";
 
 async function getMerchant(userId: string) {
   return prisma.merchant.findUnique({ where: { userId } });
@@ -38,12 +39,14 @@ export async function POST(request: Request) {
     }
     const { name, duration, price, description, xpAmount } = parsed.data;
 
-    // Enforce 1-service limit for FREE plan
+    // Enforce service limit for FREE plan
     if (merchant.plan !== "PRO") {
       const serviceCount = await prisma.service.count({ where: { merchantId: merchant.id } });
-      if (serviceCount >= 1) {
+      if (serviceCount >= FREE_PLAN_MAX_SERVICES) {
         return NextResponse.json(
-          { error: "Limite de 1 service atteinte. Passez au plan Pro pour des services illimités !" },
+          {
+            error: `Limite de ${FREE_PLAN_MAX_SERVICES} services atteinte. Passez au plan Pro pour des services illimités !`,
+          },
           { status: 403 }
         );
       }

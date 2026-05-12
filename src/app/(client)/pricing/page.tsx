@@ -23,7 +23,7 @@ const plans = [
     color: "#0066FF",
     features: [
       "Profil professionnel complet",
-      "1 service",
+      "Jusqu'à 3 services",
       "Gestion des réservations",
       "Calendrier intégré",
       "Notifications email",
