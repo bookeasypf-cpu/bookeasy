@@ -8,42 +8,59 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { Mail, Phone, Pencil, Check, X, Upload, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
-// Compress image before upload
+// Compress image before upload. Always resolves (never hangs):
+// returns the original file on any failure so the upload still goes through.
 async function compressImage(file: File): Promise<Blob> {
   return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = document.createElement("img") as HTMLImageElement;
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        let width = img.width;
-        let height = img.height;
+    // Skip compression for small files (<800KB) and unsupported formats
+    // that the canvas API can't decode (e.g. HEIC from iPhone).
+    const isCanvasFriendly = /image\/(jpeg|jpg|png|webp|gif)/i.test(file.type);
+    if (!isCanvasFriendly || file.size < 800 * 1024) {
+      resolve(file);
+      return;
+    }
 
-        // Resize if too large (max 2000px)
-        if (width > 2000 || height > 2000) {
-          const ratio = Math.min(2000 / width, 2000 / height);
-          width = Math.floor(width * ratio);
-          height = Math.floor(height * ratio);
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext("2d");
-        ctx?.drawImage(img, 0, 0, width, height);
-
-        // Compress to JPEG with 0.7 quality
-        canvas.toBlob(
-          (blob) => {
-            resolve(blob || file);
-          },
-          "image/jpeg",
-          0.7
-        );
-      };
+    // Hard timeout: never hang the upload flow more than 10s on compression.
+    const timeoutId = setTimeout(() => resolve(file), 10000);
+    const done = (blob: Blob) => {
+      clearTimeout(timeoutId);
+      resolve(blob);
     };
+
+    const reader = new FileReader();
+    reader.onerror = () => done(file);
+    reader.onload = (event) => {
+      const src = event.target?.result as string | undefined;
+      if (!src) return done(file);
+
+      const img = document.createElement("img") as HTMLImageElement;
+      img.onerror = () => done(file);
+      img.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          let { width, height } = img;
+          if (width > 2000 || height > 2000) {
+            const ratio = Math.min(2000 / width, 2000 / height);
+            width = Math.floor(width * ratio);
+            height = Math.floor(height * ratio);
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return done(file);
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => done(blob || file),
+            "image/jpeg",
+            0.7
+          );
+        } catch {
+          done(file);
+        }
+      };
+      img.src = src;
+    };
+    reader.readAsDataURL(file);
   });
 }
 
