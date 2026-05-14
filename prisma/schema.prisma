@@ -324,6 +324,10 @@ model XpTransaction {
 
   @@index([userId, merchantId])
   @@index([bookingId])
+  // Prevent double-award races (e.g. two concurrent IPN retries both passing
+  // the findFirst guard in onBookingConfirmed). PostgreSQL allows multiple
+  // rows where bookingId IS NULL, so referral/gift-card XP are unaffected.
+  @@unique([bookingId, userId, type])
   @@map("xp_transactions")
 }
 

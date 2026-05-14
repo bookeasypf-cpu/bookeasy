@@ -87,12 +87,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // Idempotency via email_id event
+    // Atomic idempotency via WebhookEvent.id unique constraint.
+    // findUnique+create was non-atomic — two concurrent webhook retries could
+    // both pass the check and both update emailBounced.
     if (event.data?.email_id) {
       const eventId = `resend-${event.data.email_id}-${event.type}`;
-      const existing = await prisma.webhookEvent.findUnique({ where: { id: eventId } });
-      if (existing) return NextResponse.json({ ok: true });
-      await prisma.webhookEvent.create({ data: { id: eventId, source: "resend" } });
+      try {
+        await prisma.webhookEvent.create({ data: { id: eventId, source: "resend" } });
+      } catch (e) {
+        if (typeof e === "object" && e !== null && "code" in e && (e as { code: string }).code === "P2002") {
+          return NextResponse.json({ ok: true });
+        }
+        throw e;
+      }
     }
 
     if (event.type === "email.bounced") {

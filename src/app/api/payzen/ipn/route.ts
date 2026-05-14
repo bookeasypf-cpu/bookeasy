@@ -21,17 +21,22 @@ export async function POST(req: NextRequest) {
     const ipnData = parseIPNData(body);
     console.log("PayZen IPN:", JSON.stringify({ type: ipnData.type, status: ipnData.transactionStatus, orderId: ipnData.orderId }));
 
-    // Idempotency
+    // Atomic idempotency: rely on the WebhookEvent.id unique constraint instead
+    // of findUnique+create (non-atomic — two concurrent IPN retries could both
+    // pass the check and both run business logic, causing double XP / double
+    // subscription activation). The single create+catch P2002 is race-safe.
     const eventId = `payzen-${ipnData.orderId}-${ipnData.transId}-${ipnData.transactionStatus}`;
-    const existing = await prisma.webhookEvent.findUnique({
-      where: { id: eventId },
-    });
-    if (existing) {
-      return new NextResponse("OK", { status: 200 });
+    try {
+      await prisma.webhookEvent.create({
+        data: { id: eventId, source: "payzen" },
+      });
+    } catch (e) {
+      if (typeof e === "object" && e !== null && "code" in e && (e as { code: string }).code === "P2002") {
+        // Event already processed — idempotent return.
+        return new NextResponse("OK", { status: 200 });
+      }
+      throw e;
     }
-    await prisma.webhookEvent.create({
-      data: { id: eventId, source: "payzen" },
-    });
 
     if (ipnData.type === "PRO_SUBSCRIPTION") {
       await handleProSubscription(ipnData);

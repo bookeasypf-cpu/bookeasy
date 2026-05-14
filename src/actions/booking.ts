@@ -38,8 +38,11 @@ export async function createBooking(data: {
     return { error: result.error.issues[0].message };
   }
 
-  const service = await prisma.service.findUnique({
-    where: { id: data.serviceId },
+  // Cross-tenant guard: a serviceId from merchant B must not be bookable on merchant A.
+  // Without this filter, an attacker can craft a request to book at merchant A's slot
+  // using a service from merchant B (potentially priced at 0 F or below market).
+  const service = await prisma.service.findFirst({
+    where: { id: data.serviceId, merchantId: data.merchantId, isActive: true },
   });
   if (!service) return { error: "Service introuvable" };
 
@@ -66,6 +69,9 @@ export async function createBooking(data: {
   const isMedical = merchant.sector ? isMedicalSector(merchant.sector.slug) : false;
 
   try {
+    // Serializable isolation prevents two concurrent bookings on the same slot
+    // from both passing the conflict-check and both inserting (rare but real
+    // under high load — common at launch when an offer drops on social media).
     const booking = await prisma.$transaction(async (tx) => {
       // Check for conflicts (exclude expired PENDING_PAYMENT)
       const conflicting = await tx.booking.findFirst({
@@ -144,7 +150,7 @@ export async function createBooking(data: {
       return await createConfirmedBooking(tx, {
         user, data, service, merchant, isMedical,
       });
-    });
+    }, { isolationLevel: "Serializable" });
 
     if ("_requiresPayment" in booking && booking._requiresPayment) {
       revalidatePath("/dashboard/bookings");
@@ -166,6 +172,11 @@ export async function createBooking(data: {
     return { success: true, bookingId: booking.id };
   } catch (e) {
     if (e instanceof Error && e.message === "TIME_SLOT_UNAVAILABLE") {
+      return { error: "Ce créneau n'est plus disponible. Veuillez en choisir un autre." };
+    }
+    // Prisma P2034 = serialization failure under "Serializable" isolation.
+    // Translate to the same message — the cause is the same: a concurrent booking won.
+    if (typeof e === "object" && e !== null && "code" in e && (e as { code: string }).code === "P2034") {
       return { error: "Ce créneau n'est plus disponible. Veuillez en choisir un autre." };
     }
     return { error: "Erreur lors de la réservation. Veuillez réessayer." };

@@ -38,14 +38,13 @@ export async function onBookingConfirmed(bookingId: string) {
     ? isMedicalSector(booking.merchant.sector.slug)
     : false;
 
-  // Award XP (non-medical only) — guard against duplicate awards
+  // Award XP (non-medical only). The @@unique([bookingId, userId, type]) on
+  // XpTransaction guarantees atomicity — two concurrent IPN retries can't both
+  // succeed even without a findFirst guard. We just catch P2002.
   if (!isMedical) {
     const xpToAward = booking.service.xpAmount ?? booking.merchant.xpPerBooking;
     if (xpToAward > 0) {
-      const alreadyAwarded = await prisma.xpTransaction.findFirst({
-        where: { bookingId: booking.id, type: "EARNED", userId: booking.clientId },
-      });
-      if (!alreadyAwarded) {
+      try {
         await prisma.xpTransaction.create({
           data: {
             userId: booking.clientId,
@@ -56,6 +55,11 @@ export async function onBookingConfirmed(bookingId: string) {
             reason: `Réservation : ${booking.service.name}`,
           },
         });
+      } catch (e) {
+        // P2002 = already awarded. Idempotent — silently skip.
+        if (!(typeof e === "object" && e !== null && "code" in e && (e as { code: string }).code === "P2002")) {
+          throw e;
+        }
       }
     }
   }
@@ -116,23 +120,29 @@ export async function onBookingConfirmed(bookingId: string) {
     });
 
     if (referral && referral.status === "REGISTERED") {
-      const alreadyRewarded = await prisma.xpTransaction.findFirst({
-        where: { userId: referral.referrerId, type: "EARNED", reason: { startsWith: `Parrainage : ` }, bookingId: booking.id },
-      });
-      if (alreadyRewarded) return;
+      // Set bookingId on the referral XP so the @@unique constraint also
+      // protects this path from double-award under concurrent IPN retries.
+      try {
+        await prisma.xpTransaction.create({
+          data: {
+            userId: referral.referrerId,
+            bookingId: booking.id,
+            amount: REFERRAL_XP_FIRST_BOOKING,
+            type: "EARNED",
+            reason: `Parrainage : ${booking.client.name || "Filleul"} a fait sa 1ère réservation`,
+          },
+        });
+      } catch (e) {
+        // Already rewarded — idempotent return, don't mutate referral status either.
+        if (typeof e === "object" && e !== null && "code" in e && (e as { code: string }).code === "P2002") {
+          return;
+        }
+        throw e;
+      }
 
       await prisma.referral.update({
         where: { id: referral.id },
         data: { status: "FIRST_BOOKING" },
-      });
-
-      await prisma.xpTransaction.create({
-        data: {
-          userId: referral.referrerId,
-          amount: REFERRAL_XP_FIRST_BOOKING,
-          type: "EARNED",
-          reason: `Parrainage : ${booking.client.name || "Filleul"} a fait sa 1ère réservation`,
-        },
       });
 
       await checkAndAwardMilestoneBonus(referral.referrerId);

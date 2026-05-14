@@ -1,8 +1,33 @@
 import { Resend } from "resend";
+import { prisma } from "@/lib/prisma";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
+
+/**
+ * Guard: refuse to send to any address that has hard-bounced or complained
+ * (set by the Resend webhook). Without this guard, the system keeps emailing
+ * dead addresses on every cron + every booking, dragging the bounce rate up
+ * until Resend suspends the account at 5%.
+ *
+ * Fail-open if the DB query throws — never block transactional emails on
+ * an infrastructure hiccup.
+ */
+async function canSendTo(email: string): Promise<boolean> {
+  try {
+    const blocked = await prisma.user.findFirst({
+      where: {
+        email: email.toLowerCase(),
+        OR: [{ emailBounced: true }, { emailComplained: true }],
+      },
+      select: { id: true },
+    });
+    return !blocked;
+  } catch {
+    return true;
+  }
+}
 
 // IMPORTANT: the domain in EMAIL_FROM must be verified in Resend Dashboard
 // (DKIM + SPF + DMARC). The fallback below matches the canonical production
@@ -77,6 +102,10 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
     console.log("[EMAIL] Resend not configured – skipping booking confirmation");
     return;
   }
+  if (!(await canSendTo(data.clientEmail))) {
+    console.log("[EMAIL] Skipped confirmation — recipient bounced or complained");
+    return;
+  }
 
   const dateFormatted = new Date(data.date + "T00:00:00").toLocaleDateString("fr-FR", {
     weekday: "long",
@@ -85,7 +114,11 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
     year: "numeric",
   });
 
-  const location = [data.address, data.city].filter(Boolean).join(", ");
+  // Escape each part — address/city are merchant-controlled, must not inject HTML.
+  const location = [data.address, data.city]
+    .filter((s): s is string => Boolean(s))
+    .map(esc)
+    .join(", ");
   const priceFormatted = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(data.price) + " F";
 
   const html = layout(`
@@ -167,6 +200,10 @@ export async function sendBookingReminder(data: ReminderData) {
     console.log("[EMAIL] Resend not configured – skipping reminder");
     return;
   }
+  if (!(await canSendTo(data.clientEmail))) {
+    console.log("[EMAIL] Skipped reminder — recipient bounced or complained");
+    return;
+  }
 
   const dateFormatted = new Date(data.date + "T00:00:00").toLocaleDateString("fr-FR", {
     weekday: "long",
@@ -174,7 +211,11 @@ export async function sendBookingReminder(data: ReminderData) {
     month: "long",
   });
 
-  const location = [data.address, data.city].filter(Boolean).join(", ");
+  // Escape each part — merchant-controlled values must not inject HTML.
+  const location = [data.address, data.city]
+    .filter((s): s is string => Boolean(s))
+    .map(esc)
+    .join(", ");
 
   const html = layout(`
     <div style="background:linear-gradient(135deg,#0C1B2A,#132D46);padding:32px 24px;text-align:center;">
@@ -254,6 +295,10 @@ export async function sendBookingCancellation(data: CancellationData) {
     console.log("[EMAIL] Resend not configured – skipping cancellation");
     return;
   }
+  if (!(await canSendTo(data.recipientEmail))) {
+    console.log("[EMAIL] Skipped cancellation — recipient bounced or complained");
+    return;
+  }
 
   const dateFormatted = new Date(data.date + "T00:00:00").toLocaleDateString("fr-FR", {
     weekday: "long",
@@ -316,6 +361,10 @@ export async function sendBookingCancellation(data: CancellationData) {
 export async function sendWelcomeEmail(to: string, name: string) {
   if (!resend) {
     console.log("[EMAIL] Resend not configured – skipping welcome email");
+    return;
+  }
+  if (!(await canSendTo(to))) {
+    console.log("[EMAIL] Skipped welcome — recipient bounced or complained");
     return;
   }
 
@@ -385,6 +434,10 @@ export async function sendMerchantCredentials(to: string, name: string, tempPass
     console.log("[EMAIL] Resend not configured – skipping credentials email");
     return;
   }
+  if (!(await canSendTo(to))) {
+    console.log("[EMAIL] Skipped credentials — recipient bounced or complained");
+    return;
+  }
 
   const html = layout(`
     <div style="background:linear-gradient(135deg,#0066FF,#00B4D8);padding:40px 24px;text-align:center;">
@@ -405,7 +458,7 @@ export async function sendMerchantCredentials(to: string, name: string, tempPass
           </tr>
           <tr>
             <td style="padding:8px 0;color:#9ca3af;">Mot de passe</td>
-            <td style="padding:8px 0;color:#0C1B2A;font-weight:700;font-family:monospace;font-size:16px;letter-spacing:1px;">${tempPassword}</td>
+            <td style="padding:8px 0;color:#0C1B2A;font-weight:700;font-family:monospace;font-size:16px;letter-spacing:1px;">${esc(tempPassword)}</td>
           </tr>
         </table>
       </div>
@@ -446,6 +499,10 @@ export async function sendReferralRewardEmail(
 ) {
   if (!resend) {
     console.log("[EMAIL] Resend not configured – skipping referral reward");
+    return;
+  }
+  if (!(await canSendTo(to))) {
+    console.log("[EMAIL] Skipped referral reward — recipient bounced or complained");
     return;
   }
 
@@ -498,6 +555,10 @@ export async function sendReferralRewardEmail(
 export async function sendPasswordResetEmail(to: string, name: string, token: string) {
   if (!resend) {
     console.log("[EMAIL] Resend not configured – skipping password reset");
+    return;
+  }
+  if (!(await canSendTo(to))) {
+    console.log("[EMAIL] Skipped password reset — recipient bounced or complained");
     return;
   }
 
@@ -630,6 +691,10 @@ export async function sendNewBookingMerchant(data: NewBookingMerchantData) {
     console.log("[EMAIL] Resend not configured – skipping merchant new-booking");
     return;
   }
+  if (!(await canSendTo(data.merchantEmail))) {
+    console.log("[EMAIL] Skipped merchant new-booking — recipient bounced or complained");
+    return;
+  }
 
   const dateFormatted = new Date(data.date).toLocaleDateString("fr-FR", {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
@@ -709,6 +774,10 @@ interface GiftCardEmailData {
 export async function sendGiftCardEmail(data: GiftCardEmailData) {
   if (!resend) {
     console.log("[EMAIL] Resend not configured – skipping gift card");
+    return;
+  }
+  if (!(await canSendTo(data.recipientEmail))) {
+    console.log("[EMAIL] Skipped gift card — recipient bounced or complained");
     return;
   }
 

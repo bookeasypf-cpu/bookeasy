@@ -44,22 +44,28 @@ export async function POST(request: Request) {
       );
     }
 
-    // Vérifier si le max d'utilisations est atteint
-    if (reward.maxUses && reward.usedCount >= reward.maxUses) {
-      return NextResponse.json(
-        { error: "Cette récompense n'est plus disponible (quota atteint)" },
-        { status: 400 }
-      );
-    }
-
     // Générer un code unique pour la récompense
     const code = `BE-${randomBytes(4).toString("hex").toUpperCase()}`;
 
-    // Transaction : vérifier solde + déduire les XP + créer le redemption (atomique)
+    // Transaction : re-vérifier maxUses + solde + déduire XP + créer le redemption
+    // (atomique sous Serializable pour empêcher le double-échange concurrent
+    // de la dernière récompense disponible quand maxUses = 1).
     let balance: number;
     let redemption: { code: string; expiresAt: Date | null };
     try {
       const result = await prisma.$transaction(async (tx) => {
+        // maxUses check INSIDE the transaction — outside check is race-prone.
+        const current = await tx.xpReward.findUnique({
+          where: { id: reward.id },
+          select: { maxUses: true, usedCount: true, isActive: true },
+        });
+        if (!current || !current.isActive) {
+          throw new Error("REWARD_UNAVAILABLE");
+        }
+        if (current.maxUses && current.usedCount >= current.maxUses) {
+          throw new Error("REWARD_QUOTA_REACHED");
+        }
+
         // Balance check INSIDE transaction to prevent race condition
         const balanceResult = await tx.xpTransaction.aggregate({
           where: { userId: session.user.id, merchantId: reward.merchantId },
@@ -96,7 +102,7 @@ export async function POST(request: Request) {
         });
 
         return { balance: bal, redemption: red };
-      });
+      }, { isolationLevel: "Serializable" });
 
       balance = result.balance;
       redemption = result.redemption;
@@ -106,6 +112,18 @@ export async function POST(request: Request) {
         return NextResponse.json(
           { error: `XP insuffisants. Vous avez ${bal} XP, il en faut ${reward.xpCost}.` },
           { status: 400 }
+        );
+      }
+      if (e instanceof Error && e.message === "REWARD_QUOTA_REACHED") {
+        return NextResponse.json(
+          { error: "Cette récompense n'est plus disponible (quota atteint)" },
+          { status: 400 }
+        );
+      }
+      if (e instanceof Error && e.message === "REWARD_UNAVAILABLE") {
+        return NextResponse.json(
+          { error: "Récompense non disponible" },
+          { status: 404 }
         );
       }
       throw e;
