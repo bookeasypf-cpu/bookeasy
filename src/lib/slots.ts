@@ -78,6 +78,7 @@ export async function getAvailableSlots(
 
   const dayOfWeek = new Date(date + "T00:00:00").getDay();
 
+  const now = new Date();
   const [schedules, existingBookings, blockedSlots] = await Promise.all([
     prisma.weeklySchedule.findMany({
       where: { merchantId, dayOfWeek },
@@ -88,6 +89,14 @@ export async function getAvailableSlots(
         date,
         status: {
           notIn: ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT"],
+        },
+        // Real-time self-healing: a PENDING_PAYMENT past its expiry no longer
+        // blocks the slot, even if the daily cron hasn't cleaned it up yet.
+        NOT: {
+          AND: [
+            { status: "PENDING_PAYMENT" },
+            { paymentExpiresAt: { lt: now } },
+          ],
         },
       },
       select: { startTime: true, endTime: true },
@@ -123,6 +132,13 @@ export async function checkSlotAvailable(
         notIn: ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT"],
       },
       AND: [{ startTime: { lt: endTime } }, { endTime: { gt: startTime } }],
+      // Real-time self-healing: expired PENDING_PAYMENT no longer blocks.
+      NOT: {
+        AND: [
+          { status: "PENDING_PAYMENT" },
+          { paymentExpiresAt: { lt: new Date() } },
+        ],
+      },
     },
   });
 
