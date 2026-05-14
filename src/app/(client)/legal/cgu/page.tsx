@@ -89,9 +89,19 @@ export default function CGU() {
 
       <h3>5.2 Inscription</h3>
       <p>
-        L&apos;inscription est gratuite et ouverte à toute personne physique majeure.
+        L&apos;inscription est gratuite. La Plateforme est accessible aux personnes âgées d&apos;au moins
+        <strong> 15 ans</strong> (seuil RGPD art. 8 pour le consentement numérique en France).
+        Entre <strong>15 et 18 ans</strong>, l&apos;Utilisateur doit avoir obtenu l&apos;autorisation préalable
+        de son représentant légal pour utiliser la Plateforme. <strong>L&apos;utilisation est strictement
+        interdite aux personnes de moins de 15 ans</strong> ; tout compte créé en violation de cette règle
+        sera supprimé dès découverte, conformément à l&apos;article 8 du RGPD.
+      </p>
+      <p>
         Lors de la création de compte, l&apos;Utilisateur renseigne : nom, prénom, adresse email et mot de passe.
-        L&apos;inscription peut également être réalisée via le service tiers Google.
+        L&apos;inscription peut également être réalisée via le service tiers Google. En cochant la case prévue
+        à cet effet lors de l&apos;inscription, l&apos;Utilisateur atteste avoir au moins 15 ans, accepte
+        sans réserve les présentes CGU et la politique de confidentialité, et — s&apos;il est mineur —
+        confirme détenir l&apos;autorisation de son représentant légal.
       </p>
       <p>
         L&apos;Utilisateur certifie que les informations fournies sont exactes et s&apos;engage à les maintenir à jour.
@@ -109,6 +119,30 @@ export default function CGU() {
         BookEasy propose un plan gratuit (jusqu&apos;à 3 services) et un plan Pro (services illimités,
         avis clients, analytics avancés). Les conditions du plan Pro font l&apos;objet d&apos;un contrat
         spécifique entre le Prestataire et BookEasy.
+      </p>
+
+      <h3>5.4 Notes de suivi client (fonctionnalité « Notes »)</h3>
+      <p>
+        La Plateforme propose aux Prestataires une fonctionnalité de prise de notes privées
+        rattachées à un Client (ci-après « Notes »). Ces Notes sont conçues exclusivement pour des
+        <strong> informations de suivi commercial</strong> (préférences du Client, historique des
+        prestations rendues, allergies cosmétiques, etc.) <strong>et non pour héberger des données
+        de santé au sens de l&apos;article L.1111-8 du Code de la santé publique</strong> (diagnostics,
+        prescriptions, comptes-rendus médicaux, antécédents pathologiques, examens cliniques, etc.).
+      </p>
+      <p>
+        <strong>BookEasy n&apos;est pas certifié Hébergeur de Données de Santé (HDS).</strong> En
+        utilisant la fonctionnalité « Notes », le Prestataire s&apos;engage à ne saisir aucune donnée
+        de santé protégée. Tout professionnel de santé (médecin, infirmier, kinésithérapeute, etc.)
+        qui souhaiterait stocker des données de santé doit le faire en dehors de la Plateforme, via
+        un hébergeur HDS certifié, et engage <strong>sa seule et entière responsabilité</strong>
+        en cas de manquement à cette obligation.
+      </p>
+      <p>
+        Le Prestataire est seul responsable du contenu des Notes qu&apos;il saisit. En cas de saisie
+        de données de santé en violation de la présente clause, BookEasy se réserve le droit de
+        supprimer immédiatement les Notes concernées et de suspendre ou clôturer le compte du
+        Prestataire, sans préjudice de l&apos;action en réparation des dommages subis.
       </p>
 
       <h2>Article 6 — Réservations</h2>
@@ -168,6 +202,32 @@ export default function CGU() {
         L&apos;achat d&apos;une Carte Cadeau par un Utilisateur connecté génère des points XP
         (1 XP pour 1 000 F CFP dépensés). Les XP sont soumis aux conditions du programme de fidélité
         BookEasy, consultables sur la Plateforme.
+      </p>
+
+      <h3>7.4 Droit de rétractation — Renonciation expresse</h3>
+      <p>
+        Conformément à l&apos;article L.221-18 du Code de la consommation, l&apos;Utilisateur dispose
+        en principe d&apos;un délai de <strong>14 jours</strong> pour exercer son droit de
+        rétractation à compter de la conclusion du contrat à distance.
+      </p>
+      <p>
+        Toutefois, conformément à l&apos;article <strong>L.221-28 13°</strong> du Code de la consommation,
+        la fourniture d&apos;un contenu numérique (Carte Cadeau dématérialisée envoyée par email avec
+        code unique et QR code) dont l&apos;exécution a commencé après accord exprès et renonciation
+        expresse au droit de rétractation, n&apos;ouvre pas droit à rétractation.
+      </p>
+      <p>
+        En cochant la case « <em>Je reconnais que ma Carte Cadeau sera envoyée immédiatement
+        après paiement et je renonce expressément à mon droit de rétractation de 14 jours</em> » lors
+        du paiement, l&apos;Utilisateur :
+      </p>
+      <ul>
+        <li>donne son accord exprès au commencement immédiat de l&apos;exécution du contrat (envoi du code),</li>
+        <li>renonce expressément à son droit de rétractation pour la Carte Cadeau achetée.</li>
+      </ul>
+      <p>
+        À défaut d&apos;accord exprès, la Carte Cadeau ne sera ni générée ni envoyée. Aucune Carte
+        Cadeau n&apos;est remboursable une fois le code transmis au bénéficiaire (cf. 7.1.4).
       </p>
 
       <h2>Article 8 — Avis clients</h2>

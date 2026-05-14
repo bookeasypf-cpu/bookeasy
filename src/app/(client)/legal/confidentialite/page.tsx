@@ -87,7 +87,7 @@ export default function Confidentialite() {
         <li><strong>Resend Inc. :</strong> envoi des emails transactionnels (États-Unis — CCT)</li>
         <li><strong>Upstash Inc. :</strong> cache Redis et limitation de débit (États-Unis — CCT)</li>
         <li><strong>Google LLC :</strong> authentification OAuth si connexion via Google (États-Unis — CCT)</li>
-        <li><strong>Notes médicales (PatientNote) :</strong> hébergées sur BookEasy, accessibles uniquement au professionnel de santé qui les a saisies. Vous pouvez en demander une copie ou la suppression (voir section 8). Base légale : intérêt légitime du professionnel de santé pour assurer la continuité des soins (art. 6.1.f) combiné à l&apos;art. 9.2.h RGPD pour les données de santé.</li>
+        <li><strong>Notes de suivi client :</strong> hébergées sur BookEasy, accessibles uniquement au Prestataire qui les a saisies. Cette fonctionnalité est réservée à des informations de <strong>suivi commercial</strong> (préférences, historique des prestations). BookEasy n&apos;est pas certifié Hébergeur de Données de Santé (HDS) et la saisie de données de santé y est interdite (cf. CGU art. 5.4). Vous pouvez demander une copie ou la suppression de vos Notes (voir section 8). Base légale : intérêt légitime du Prestataire pour assurer la qualité de la prestation (art. 6.1.f RGPD).</li>
         <li><strong>Autorités compétentes :</strong> sur demande judiciaire légitime</li>
       </ul>
 
@@ -193,9 +193,17 @@ export default function Confidentialite() {
 
       <h2>12. Protection des mineurs</h2>
       <p>
-        La Plateforme est destinée aux personnes majeures. Nous ne collectons pas
-        sciemment de données personnelles de mineurs. Si nous découvrons que des données
-        de mineurs ont été collectées, nous les supprimerons dans les meilleurs délais.
+        Conformément à l&apos;article 8 du RGPD applicable en France, la Plateforme est accessible
+        aux personnes âgées d&apos;au moins <strong>15 ans</strong>. Entre 15 et 18 ans, l&apos;utilisation
+        est conditionnée à l&apos;autorisation préalable du représentant légal. L&apos;utilisation
+        est strictement interdite aux personnes de moins de 15 ans.
+      </p>
+      <p>
+        Si nous découvrons qu&apos;un compte a été créé par un mineur de moins de 15 ans, ou par
+        un mineur entre 15 et 18 ans sans autorisation parentale vérifiable, nous procédons à
+        la suppression du compte et de l&apos;ensemble des données associées dans les meilleurs délais.
+        Tout représentant légal peut nous contacter à <a href="mailto:bookeasy.pf@gmail.com">bookeasy.pf@gmail.com</a>
+        pour demander la suppression du compte d&apos;un mineur.
       </p>
 
       <h2>13. Modification de la politique</h2>

@@ -51,6 +51,7 @@ function GiftCardsContent() {
   const [merchantSearch, setMerchantSearch] = useState("");
   const [showMerchantDropdown, setShowMerchantDropdown] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [waiveRefund, setWaiveRefund] = useState(false);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
   const merchantDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -127,6 +128,10 @@ function GiftCardsContent() {
 
   async function handleBuy(e: React.FormEvent) {
     e.preventDefault();
+    if (!waiveRefund) {
+      toast.error("Vous devez accepter la renonciation au droit de rétractation pour acheter une Carte Cadeau.");
+      return;
+    }
     setSending(true);
     try {
       const merchantName = selectedMerchant
@@ -416,9 +421,32 @@ function GiftCardsContent() {
                   />
                 </div>
 
+                <label className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={waiveRefund}
+                    onChange={(e) => setWaiveRefund(e.target.checked)}
+                    required
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/40 cursor-pointer"
+                  />
+                  <span>
+                    Je reconnais que ma Carte Cadeau sera envoyée immédiatement après paiement
+                    et je renonce expressément à mon droit de rétractation de 14 jours
+                    (art. L.221-28 13° du Code de la consommation).{" "}
+                    <a
+                      href="/legal/cgu#article-7"
+                      target="_blank"
+                      rel="noopener"
+                      className="text-[#0066FF] hover:underline"
+                    >
+                      En savoir plus
+                    </a>
+                  </span>
+                </label>
+
                 <button
                   type="submit"
-                  disabled={sending}
+                  disabled={sending || !waiveRefund}
                   className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {sending ? (
