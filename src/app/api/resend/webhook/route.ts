@@ -63,12 +63,16 @@ export async function POST(req: NextRequest) {
     const body = await req.text();
     const secret = process.env.RESEND_WEBHOOK_SECRET;
 
-    if (secret) {
-      const valid = await verifySvixSignature(body, req.headers, secret);
-      if (!valid) {
-        console.error("[RESEND-WEBHOOK] Invalid signature");
-        return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-      }
+    // Reject ALL unsigned requests. Without the secret, any attacker
+    // could mark users as emailBounced=true and cut their email delivery.
+    if (!secret) {
+      console.error("[RESEND-WEBHOOK] RESEND_WEBHOOK_SECRET not configured");
+      return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
+    }
+    const valid = await verifySvixSignature(body, req.headers, secret);
+    if (!valid) {
+      console.error("[RESEND-WEBHOOK] Invalid signature");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
     let event: ResendEvent;

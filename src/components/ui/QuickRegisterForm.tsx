@@ -6,17 +6,22 @@ import toast from "react-hot-toast";
 
 export function QuickRegisterForm() {
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [acceptCgu, setAcceptCgu] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!acceptCgu) {
+      toast.error("Vous devez accepter les CGU et la politique de confidentialité");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/quick-register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, plan: "free" }),
+        body: JSON.stringify({ ...form, plan: "free", acceptCgu: true }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -76,9 +81,34 @@ export function QuickRegisterForm() {
         onChange={(e) => setForm({ ...form, phone: e.target.value })}
         className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
       />
+      <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={acceptCgu}
+          onChange={(e) => setAcceptCgu(e.target.checked)}
+          required
+          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/40 cursor-pointer"
+        />
+        <span>
+          J&apos;accepte les{" "}
+          <a href="/legal/cgu" target="_blank" rel="noopener" className="text-[#0066FF] hover:underline">
+            CGU
+          </a>{" "}
+          et la{" "}
+          <a
+            href="/legal/confidentialite"
+            target="_blank"
+            rel="noopener"
+            className="text-[#0066FF] hover:underline"
+          >
+            politique de confidentialité
+          </a>
+          .
+        </span>
+      </label>
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !acceptCgu}
         className="w-full py-2.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? "Création..." : (

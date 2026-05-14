@@ -27,6 +27,9 @@ model User {
   emailComplained  Boolean   @default(false)
   emailLastEvent   DateTime?
 
+  // RGPD — explicit CGU acceptance timestamp (Art. 7 RGPD, Art. L.221-11 Code conso)
+  acceptedCguAt    DateTime?
+
   accounts      Account[]
   sessions      Session[]
   merchant      Merchant?

@@ -65,13 +65,13 @@ export function verifySignature(fields: Record<string, string>, receivedSignatur
 }
 
 /**
- * Génère un identifiant de transaction unique (6 chiffres)
+ * Génère un identifiant de transaction unique (6 chiffres aléatoires).
+ * 6 chiffres aléatoires (100000-999999) = 900 000 valeurs possibles par jour.
+ * L'ancienne version basée sur les secondes depuis minuit causait des collisions
+ * entre deux paiements générés la même seconde — PayZen rejetait alors le second.
  */
 function generateTransId(): string {
-  const now = new Date();
-  const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const secondsSinceMidnight = Math.floor((now.getTime() - dayStart.getTime()) / 1000);
-  return String(secondsSinceMidnight).padStart(6, "0");
+  return crypto.randomInt(100000, 1000000).toString();
 }
 
 interface PaymentFormParams {

@@ -16,6 +16,7 @@ export async function registerUser(formData: FormData) {
     name: formData.get("name") as string,
     email: formData.get("email") as string,
     password: formData.get("password") as string,
+    acceptCgu: formData.get("acceptCgu") as string,
   };
 
   const referralCode = formData.get("referralCode") as string | null;
@@ -42,6 +43,7 @@ export async function registerUser(formData: FormData) {
       email,
       passwordHash,
       role,
+      acceptedCguAt: new Date(),
     },
   });
 

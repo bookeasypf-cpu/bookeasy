@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
     const { name, email, phone } = parsed.data;
+    const acceptedCguAt = new Date();
     // Always FREE — PRO plan requires PayZen checkout, no free upgrade
     const merchantPlan = "FREE" as const;
 
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
         phone: phone || null,
         passwordHash,
         role: "MERCHANT",
+        acceptedCguAt,
       },
     });
 

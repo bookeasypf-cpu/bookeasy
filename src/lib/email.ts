@@ -4,7 +4,10 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
-const FROM = process.env.EMAIL_FROM || "BookEasy <noreply@bookeasy.pf>";
+// IMPORTANT: the domain in EMAIL_FROM must be verified in Resend Dashboard
+// (DKIM + SPF + DMARC). The fallback below matches the canonical production
+// domain (bookeasy.me). Update both here and in .env.example if it changes.
+const FROM = process.env.EMAIL_FROM || "BookEasy <noreply@bookeasy.me>";
 const BASE_URL = process.env.NEXTAUTH_URL || "https://bookeasy.me";
 const REPLY_TO = process.env.SUPPORT_EMAIL || "bookeasy.pf@gmail.com";
 

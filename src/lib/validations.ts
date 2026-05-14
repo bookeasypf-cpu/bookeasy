@@ -28,6 +28,7 @@ export const registerSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères").max(100),
   email: z.string().email("Email invalide").max(254),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères").max(72),
+  acceptCgu: z.literal("true", { message: "Vous devez accepter les CGU et la politique de confidentialité" }),
 });
 
 export const loginSchema = z.object({
@@ -240,6 +241,7 @@ export const quickRegisterSchema = z.object({
   email: z.string().email("Email invalide"),
   phone: z.string().max(30).optional().default(""),
   plan: z.enum(["free", "pro"]).optional().default("free"),
+  acceptCgu: z.literal(true, { message: "Vous devez accepter les CGU et la politique de confidentialité" }),
 });
 
 // ─────────────────────────────────────────────

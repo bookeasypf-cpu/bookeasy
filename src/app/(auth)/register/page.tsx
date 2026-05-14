@@ -28,6 +28,7 @@ function RegisterForm() {
   const role = "CLIENT" as const;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [acceptCgu, setAcceptCgu] = useState(false);
   const [referrerName, setReferrerName] = useState<string | null>(null);
   const [refCode, setRefCode] = useState(refCodeFromUrl);
   const [showRefInput] = useState(!refCodeFromUrl);
@@ -70,6 +71,13 @@ function RegisterForm() {
     if (refCode) {
       formData.set("referralCode", refCode);
     }
+
+    if (!acceptCgu) {
+      setError("Vous devez accepter les CGU et la politique de confidentialité");
+      setLoading(false);
+      return;
+    }
+    formData.set("acceptCgu", "true");
 
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
@@ -220,7 +228,31 @@ function RegisterForm() {
             minLength={6}
             required
           />
-          <Button type="submit" className="w-full" loading={loading}>
+          <label className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={acceptCgu}
+              onChange={(e) => setAcceptCgu(e.target.checked)}
+              required
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/40 cursor-pointer"
+            />
+            <span>
+              J&apos;accepte les{" "}
+              <Link href="/legal/cgu" target="_blank" className="text-[#0066FF] hover:underline">
+                CGU
+              </Link>{" "}
+              et la{" "}
+              <Link
+                href="/legal/confidentialite"
+                target="_blank"
+                className="text-[#0066FF] hover:underline"
+              >
+                politique de confidentialité
+              </Link>
+              .
+            </span>
+          </label>
+          <Button type="submit" className="w-full" loading={loading} disabled={!acceptCgu}>
             Créer mon compte
           </Button>
         </form>
