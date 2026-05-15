@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { Gift, Send, CheckCircle, Search, Download, Store, ChevronDown } from "lucide-react";
 import { FAQ } from "@/components/ui/FAQ";
@@ -126,8 +128,16 @@ function GiftCardsContent() {
     }
   }, [sent]);
 
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
   async function handleBuy(e: React.FormEvent) {
     e.preventDefault();
+    if (status === "unauthenticated") {
+      toast.error("Connectez-vous pour offrir une Carte Cadeau.");
+      router.push("/login?callbackUrl=/gift-cards");
+      return;
+    }
     if (!waiveRefund) {
       toast.error("Vous devez accepter la renonciation au droit de rétractation pour acheter une Carte Cadeau.");
       return;

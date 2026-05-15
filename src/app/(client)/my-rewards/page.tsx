@@ -49,6 +49,7 @@ export default function MyRewardsPage() {
   const [balances, setBalances] = useState<XpBalance[]>([]);
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [redeeming, setRedeeming] = useState<string | null>(null);
   const [showCode, setShowCode] = useState<{
     code: string;
@@ -57,12 +58,20 @@ export default function MyRewardsPage() {
   } | null>(null);
 
   async function fetchBalances() {
-    const res = await fetch("/api/xp/balance");
-    if (res.ok) {
-      const data = await res.json();
-      setBalances(data);
+    try {
+      const res = await fetch("/api/xp/balance");
+      if (res.ok) {
+        const data = await res.json();
+        setBalances(data);
+        setLoadError(false);
+      } else {
+        setLoadError(true);
+      }
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   async function fetchHistory() {
@@ -212,7 +221,23 @@ export default function MyRewardsPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
         {tab === "rewards" ? (
           /* REWARDS TAB */
-          nonMedicalBalances.length === 0 ? (
+          loadError ? (
+            <div className="text-center py-16">
+              <Star className="h-16 w-16 text-red-200 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Impossible de charger vos points
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
+                Un problème de connexion empêche l&apos;affichage de vos XP. Vos points sont en sécurité — réessayez dans un instant.
+              </p>
+              <button
+                onClick={() => { setLoading(true); fetchBalances(); }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0066FF] text-white text-sm font-semibold hover:bg-[#0052CC] transition-colors"
+              >
+                Réessayer
+              </button>
+            </div>
+          ) : nonMedicalBalances.length === 0 ? (
             <div className="text-center py-16">
               <Star className="h-16 w-16 text-gray-200 mx-auto mb-4" />
               <h2 className="text-xl font-semibold text-gray-400 mb-2">

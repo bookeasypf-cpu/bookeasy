@@ -393,6 +393,16 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
             <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#0066FF] to-[#00B4D8]" />
             <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white">Services</h2>
           </div>
+          {merchant.services.length === 0 ? (
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 p-8 text-center">
+              <p className="text-sm font-medium text-[#0C1B2A] dark:text-white mb-1">
+                Ce professionnel n&apos;a pas encore publié ses services
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Contactez-le directement pour prendre rendez-vous, ou revenez plus tard.
+              </p>
+            </div>
+          ) : (
           <div className="stagger-children space-y-3">
             {merchant.services.map((service) => (
               <div
@@ -428,6 +438,7 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
               </div>
             ))}
           </div>
+          )}
         </section>
 
         {/* Photos Gallery */}
