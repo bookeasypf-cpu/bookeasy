@@ -128,7 +128,7 @@ function GiftCardsContent() {
     }
   }, [sent]);
 
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   async function handleBuy(e: React.FormEvent) {
