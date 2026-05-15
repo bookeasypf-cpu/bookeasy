@@ -105,6 +105,13 @@ function RegisterForm() {
     if (signInResult?.error) {
       router.push("/login");
     } else {
+      // Reset the onboarding flag so a fresh signup always sees the tutorial,
+      // even if the same browser previously dismissed it for another account.
+      try {
+        localStorage.removeItem("bookeasy-client-onboarding-seen");
+      } catch {
+        // Private browsing / storage disabled — ignore.
+      }
       // Redirect to callbackUrl if available (e.g., booking page), otherwise home
       const redirectUrl = callbackUrl || "/";
       router.push(redirectUrl);

@@ -30,7 +30,9 @@ const plans = [
       "Visibilité sur la carte",
     ],
     cta: "Commencer gratuitement",
-    href: "/register?role=MERCHANT",
+    // /register only creates CLIENT accounts. Anchor jumps to the
+    // QuickRegisterForm below, which calls /api/quick-register (MERCHANT path).
+    href: "#inscription-pro",
     popular: false,
   },
   {
@@ -183,7 +185,7 @@ export default function PricingPage() {
       </div>
 
       {/* Quick Registration */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+      <div id="inscription-pro" className="max-w-7xl mx-auto px-4 sm:px-6 pb-16 scroll-mt-24">
         <div className="max-w-md mx-auto bg-gradient-to-br from-[#0C1B2A] to-[#132D46] rounded-2xl p-8 text-center">
           <h2 className="text-xl font-bold text-white mb-2">
             Inscrivez-vous en 30 secondes

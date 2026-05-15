@@ -474,16 +474,16 @@ export async function sendMerchantCredentials(to: string, name: string, tempPass
   `);
 
   try {
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: FROM,
       replyTo: REPLY_TO,
       to,
-      subject: "🔐 Vos identifiants BookEasy Pro",
+      subject: "🎉 Bienvenue sur BookEasy Pro — vos identifiants",
       html,
     });
-    console.log("[EMAIL] Merchant credentials sent");
+    console.log("[EMAIL] Merchant welcome+credentials sent:", JSON.stringify({ to, id: result.data?.id, error: result.error?.message }));
   } catch (err) {
-    console.error("[EMAIL] Failed to send credentials:", err);
+    console.error("[EMAIL] Failed to send credentials:", err instanceof Error ? err.message : err);
   }
 }
 
