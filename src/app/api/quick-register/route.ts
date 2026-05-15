@@ -71,8 +71,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Send credentials by email (not in JSON response)
-    sendMerchantCredentials(email, name, tempPassword).catch(() => {});
+    // AWAIT the email — serverless kills dangling promises after the response.
+    // The 1-2s delay is acceptable for a one-time signup; reliable delivery is
+    // critical because tempPassword is the ONLY way the pro can log in.
+    try {
+      await sendMerchantCredentials(email, name, tempPassword);
+    } catch (err) {
+      console.error("[QUICK-REGISTER] Email failed but account was created:", err instanceof Error ? err.message : err);
+      // Don't fail the request — the account exists, user can use password reset.
+    }
 
     return NextResponse.json({
       success: true,

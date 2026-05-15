@@ -108,8 +108,14 @@ export async function registerUser(formData: FormData) {
     }
   }
 
-  // Send welcome email (async, non-blocking)
-  sendWelcomeEmail(email, name).catch(() => {});
+  // AWAIT the welcome email — server actions running under serverless may
+  // kill dangling promises before they reach Resend. Worth the small delay
+  // for a one-time signup, no-op compared to user perception.
+  try {
+    await sendWelcomeEmail(email, name);
+  } catch (err) {
+    console.error("[REGISTER] Welcome email failed but account was created:", err instanceof Error ? err.message : err);
+  }
 
   return { success: true };
 }
