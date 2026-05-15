@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { nanoid } from "nanoid";
 import { signupLimiter, formatRateLimitError } from "@/lib/ratelimit";
 import { quickRegisterSchema, zodFirstError } from "@/lib/validations";
-import { sendMerchantCredentials } from "@/lib/email";
+import { sendMerchantWelcome } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,7 +26,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
-    const { name, email, phone } = parsed.data;
+    const { name, email, phone, password } = parsed.data;
     const acceptedCguAt = new Date();
     // Always FREE — PRO plan requires PayZen checkout, no free upgrade
     const merchantPlan = "FREE" as const;
@@ -41,9 +40,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Générer un mot de passe temporaire
-    const tempPassword = nanoid(10);
-    const passwordHash = await bcrypt.hash(tempPassword, 10);
+    // User chose their own password during signup — no random temp password,
+    // no fragile email-only-credential flow.
+    const passwordHash = await bcrypt.hash(password, 10);
 
     // Créer l'utilisateur merchant
     const user = await prisma.user.create({
@@ -71,19 +70,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // AWAIT the email — serverless kills dangling promises after the response.
-    // The 1-2s delay is acceptable for a one-time signup; reliable delivery is
-    // critical because tempPassword is the ONLY way the pro can log in.
-    try {
-      await sendMerchantCredentials(email, name, tempPassword);
-    } catch (err) {
-      console.error("[QUICK-REGISTER] Email failed but account was created:", err instanceof Error ? err.message : err);
-      // Don't fail the request — the account exists, user can use password reset.
-    }
+    // Welcome email — no longer contains a password. If it fails, the user
+    // still has their account and can log in immediately with their own
+    // chosen password. Sent fire-and-forget AFTER unawaited because the
+    // signup must not block on email delivery (we now know the user has
+    // their credentials).
+    sendMerchantWelcome(email, name).catch((err) => {
+      console.error("[QUICK-REGISTER] Welcome email failed:", err instanceof Error ? err.message : err);
+    });
 
     return NextResponse.json({
       success: true,
-      message: "Compte créé ! Vos identifiants de connexion ont été envoyés par email.",
+      userId: user.id,
+      message: "Compte créé ! Vous pouvez vous connecter maintenant.",
     });
   } catch (error) {
     console.error("Quick register error:", error);

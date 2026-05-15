@@ -238,8 +238,9 @@ export const pushSubscribeSchema = z.object({
 
 export const quickRegisterSchema = z.object({
   name: z.string().min(1, "Nom requis").max(100),
-  email: z.string().email("Email invalide"),
+  email: z.string().email("Email invalide").max(254),
   phone: z.string().max(30).optional().default(""),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères").max(72),
   plan: z.enum(["free", "pro"]).optional().default("free"),
   acceptCgu: z.literal(true, { message: "Vous devez accepter les CGU et la politique de confidentialité" }),
 });

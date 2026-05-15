@@ -164,12 +164,15 @@ export default function PricingPage() {
                 {plan.popular ? (
                   <UpgradeButton />
                 ) : (
-                  <Link
+                  // Native <a> for hash hrefs — Next.js <Link> on Next 16 does
+                  // not always trigger browser scroll-to-anchor when the path
+                  // is unchanged. <a href="#..."> reliably scrolls.
+                  <a
                     href={plan.href}
-                    className="w-full py-3 px-4 rounded-xl text-center font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    className="w-full py-3 px-4 rounded-xl text-center font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 block"
                   >
                     {plan.cta}
-                  </Link>
+                  </a>
                 )}
               </div>
             );

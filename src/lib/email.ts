@@ -429,6 +429,72 @@ export async function sendWelcomeEmail(to: string, name: string) {
 // MERCHANT CREDENTIALS (quick-register)
 // ─────────────────────────────────────────────
 
+/**
+ * Welcome email for a merchant who just signed up via QuickRegisterForm.
+ * The pro picks their own password during signup, so this email no longer
+ * carries credentials — it's a pure welcome / next-steps email.
+ */
+export async function sendMerchantWelcome(to: string, name: string) {
+  if (!resend) {
+    console.log("[EMAIL] Resend not configured – skipping merchant welcome");
+    return;
+  }
+  if (!(await canSendTo(to))) {
+    console.log("[EMAIL] Skipped merchant welcome — recipient bounced or complained");
+    return;
+  }
+
+  const html = layout(`
+    <div style="background:linear-gradient(135deg,#0066FF,#00B4D8);padding:40px 24px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+      <h1 style="color:#fff;font-size:24px;margin:0;font-weight:700;">Bienvenue sur BookEasy Pro</h1>
+      <p style="color:rgba(255,255,255,0.85);font-size:15px;margin:10px 0 0;">Votre compte professionnel est prêt</p>
+    </div>
+    <div style="padding:24px;">
+      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Ia ora na <strong>${esc(name)}</strong> 👋</p>
+      <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
+        Votre compte professionnel BookEasy est actif. Connectez-vous dès maintenant avec le mot de passe que vous avez choisi pour configurer votre profil et commencer à recevoir des réservations.
+      </p>
+      <div style="background:#f0f7ff;border-radius:12px;padding:20px;margin-bottom:20px;">
+        <p style="margin:0 0 12px;color:#0C1B2A;font-weight:600;font-size:14px;">Vos prochaines étapes :</p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr><td style="padding:6px 0;color:#0066FF;width:28px;vertical-align:top;font-size:16px;">1️⃣</td>
+              <td style="padding:6px 0;color:#374151;">Complétez votre profil (photo de couverture, description, horaires)</td></tr>
+          <tr><td style="padding:6px 0;color:#0066FF;width:28px;vertical-align:top;font-size:16px;">2️⃣</td>
+              <td style="padding:6px 0;color:#374151;">Ajoutez vos services (jusqu&apos;à 3 en plan Gratuit)</td></tr>
+          <tr><td style="padding:6px 0;color:#0066FF;width:28px;vertical-align:top;font-size:16px;">3️⃣</td>
+              <td style="padding:6px 0;color:#374151;">Définissez vos disponibilités hebdomadaires</td></tr>
+          <tr><td style="padding:6px 0;color:#0066FF;width:28px;vertical-align:top;font-size:16px;">4️⃣</td>
+              <td style="padding:6px 0;color:#374151;">Partagez votre lien BookEasy à vos clients</td></tr>
+        </table>
+      </div>
+      <div style="text-align:center;margin-top:8px;">
+        <a href="${BASE_URL}/login" style="display:inline-block;background:linear-gradient(135deg,#0066FF,#00B4D8);color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:600;font-size:15px;">Accéder à mon dashboard</a>
+      </div>
+      <p style="margin:20px 0 0;color:#9ca3af;font-size:12px;text-align:center;">
+        Besoin d&apos;aide ? Répondez à cet email, on est là pour vous accompagner.
+      </p>
+    </div>
+  `);
+
+  try {
+    const result = await resend.emails.send({
+      from: FROM,
+      replyTo: REPLY_TO,
+      to,
+      subject: "🎉 Bienvenue sur BookEasy Pro",
+      html,
+    });
+    console.log("[EMAIL] Merchant welcome sent:", JSON.stringify({ to, id: result.data?.id, error: result.error?.message }));
+  } catch (err) {
+    console.error("[EMAIL] Failed to send merchant welcome:", err instanceof Error ? err.message : err);
+  }
+}
+
+/**
+ * @deprecated Replaced by sendMerchantWelcome (no credentials in email).
+ * Kept for any legacy code path; will be removed once verified unused.
+ */
 export async function sendMerchantCredentials(to: string, name: string, tempPassword: string) {
   if (!resend) {
     console.log("[EMAIL] Resend not configured – skipping credentials email");
