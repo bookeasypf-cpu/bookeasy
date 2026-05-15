@@ -23,42 +23,40 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Rate limit: 3 login attempts per hour per email
-        try {
-          const { success } = await loginLimiter.limit(
-            `login-${credentials.email.toLowerCase()}`
-          );
-          if (!success) {
-            throw new Error("Trop de tentatives de connexion. Réessayez dans quelques minutes.");
-          }
-        } catch (e) {
-          if (e instanceof Error && e.message.includes("Trop de tentatives")) throw e;
-          // Fail open if Redis is unavailable
-        }
-
+        const emailKey = credentials.email.toLowerCase();
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
-        if (!user || !user.passwordHash) {
-          return null;
-        }
+        const isValid =
+          !!user?.passwordHash &&
+          (await bcrypt.compare(credentials.password, user.passwordHash));
 
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.passwordHash
-        );
-
+        // Only failed attempts consume the rate-limit counter. Successful
+        // logins (e.g. the auto sign-in right after QuickRegisterForm)
+        // never get throttled by a previous failed-test history on the
+        // same email.
         if (!isValid) {
+          try {
+            const { success } = await loginLimiter.limit(`login-${emailKey}`);
+            if (!success) {
+              throw new Error(
+                "Trop de tentatives de connexion. Réessayez dans quelques minutes."
+              );
+            }
+          } catch (e) {
+            if (e instanceof Error && e.message.includes("Trop de tentatives")) throw e;
+            // Fail open if Redis is unavailable.
+          }
           return null;
         }
 
         return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-          role: user.role,
+          id: user!.id,
+          email: user!.email,
+          name: user!.name,
+          image: user!.image,
+          role: user!.role,
         };
       },
     }),

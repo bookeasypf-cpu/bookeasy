@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 
 export function QuickRegisterForm() {
@@ -17,6 +17,8 @@ export function QuickRegisterForm() {
   });
   const [acceptCgu, setAcceptCgu] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,17 +58,28 @@ export function QuickRegisterForm() {
         return;
       }
 
-      // Auto sign-in with the password the user just chose, then push to
-      // the merchant dashboard. No email check, no "forgot password" detour.
-      const signInResult = await signIn("credentials", {
+      // Auto sign-in. We retry once after a short pause because the user
+      // row was just committed and a serverless Prisma client on another
+      // pod could miss it on the very first read. If both attempts fail,
+      // we pre-fill /login so the pro doesn't lose their email.
+      let signInResult = await signIn("credentials", {
         email: form.email,
         password: form.password,
         redirect: false,
       });
 
       if (signInResult?.error) {
-        toast.error("Compte créé mais connexion automatique impossible. Connectez-vous manuellement.");
-        router.push("/login");
+        await new Promise((r) => setTimeout(r, 600));
+        signInResult = await signIn("credentials", {
+          email: form.email,
+          password: form.password,
+          redirect: false,
+        });
+      }
+
+      if (signInResult?.error) {
+        toast.error("Compte créé. Connectez-vous pour accéder à votre dashboard.");
+        router.push(`/login?callbackUrl=${encodeURIComponent("/dashboard/profile")}&email=${encodeURIComponent(form.email)}`);
         return;
       }
 
@@ -104,26 +117,48 @@ export function QuickRegisterForm() {
         onChange={(e) => setForm({ ...form, phone: e.target.value })}
         className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
       />
-      <input
-        type="password"
-        placeholder="Mot de passe (min. 6 caractères)"
-        value={form.password}
-        onChange={(e) => setForm({ ...form, password: e.target.value })}
-        required
-        minLength={6}
-        autoComplete="new-password"
-        className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
-      />
-      <input
-        type="password"
-        placeholder="Confirmer le mot de passe"
-        value={form.confirmPassword}
-        onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-        required
-        minLength={6}
-        autoComplete="new-password"
-        className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
-      />
+      <div className="relative">
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="Mot de passe (min. 6 caractères)"
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          required
+          minLength={6}
+          autoComplete="new-password"
+          className="w-full rounded-xl border border-gray-300 px-4 py-2.5 pr-10 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword((v) => !v)}
+          tabIndex={-1}
+          aria-label={showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
+      <div className="relative">
+        <input
+          type={showConfirm ? "text" : "password"}
+          placeholder="Confirmer le mot de passe"
+          value={form.confirmPassword}
+          onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+          required
+          minLength={6}
+          autoComplete="new-password"
+          className="w-full rounded-xl border border-gray-300 px-4 py-2.5 pr-10 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
+        />
+        <button
+          type="button"
+          onClick={() => setShowConfirm((v) => !v)}
+          tabIndex={-1}
+          aria-label={showConfirm ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
       <label className="flex items-start gap-2 text-xs text-gray-300 cursor-pointer select-none">
         <input
           type="checkbox"
