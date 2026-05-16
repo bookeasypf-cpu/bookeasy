@@ -20,6 +20,7 @@ import { upload } from "@vercel/blob/client";
 import { PushNotificationToggle } from "@/components/ui/PushNotificationToggle";
 import { UpgradeButton } from "@/components/ui/UpgradeButton";
 import Image from "next/image";
+import { compressImage, isUnsupportedImageFormat } from "@/lib/image-compress";
 
 interface Sector {
   id: string;
@@ -111,14 +112,38 @@ export default function DashboardProfilePage() {
       .catch(() => {});
   }, []);
 
-  // Upload helper — client-direct upload to Vercel Blob (no 4.5MB server limit)
+  // Upload helper — client-direct upload to Vercel Blob (no 4.5MB server limit).
+  // The server only accepts jpeg/png/webp; HEIC/HEIF from iPhone Live Photos
+  // get rejected silently and the spinner would hang forever without the
+  // pre-check + compressImage pipeline.
   async function uploadFile(file: File): Promise<string | null> {
+    if (isUnsupportedImageFormat(file)) {
+      toast.error(
+        "Format non supporté (HEIC / AVIF). Sur iPhone : Réglages → Appareil photo → Formats → Le plus compatible. Ou exportez en JPG/PNG."
+      );
+      return null;
+    }
+
     try {
-      const blob = await upload(file.name, file, {
+      // Canvas-compress large JPEG/PNG/WebP, returns the original File on any
+      // failure with a 10s hard timeout — guarantees no infinite spinner.
+      const blob = await compressImage(file);
+      const fileToUpload =
+        blob instanceof File
+          ? blob
+          : new File([blob], file.name, { type: blob.type || file.type });
+
+      // 60s hard timeout on the upload itself (slow PF mobile network safety net).
+      const uploadPromise = upload(fileToUpload.name, fileToUpload, {
         access: "public",
         handleUploadUrl: "/api/upload",
       });
-      return blob.url;
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Upload trop long — vérifiez votre connexion")), 60000)
+      );
+
+      const result = await Promise.race([uploadPromise, timeoutPromise]);
+      return result.url;
     } catch (err) {
       console.error("Upload failed:", err);
       const message = err instanceof Error ? err.message : "Erreur inconnue";
