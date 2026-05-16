@@ -26,10 +26,24 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
-    const { name, email, phone, password } = parsed.data;
+    const { name, email, phone, password, sectorId } = parsed.data;
     const acceptedCguAt = new Date();
     // Always FREE — PRO plan requires PayZen checkout, no free upgrade
     const merchantPlan = "FREE" as const;
+
+    // Vérifier que le secteur choisi existe avant de créer quoi que ce soit.
+    // Sans ça, un sectorId fabriqué passerait le Zod (string) mais ferait
+    // tomber la création du Merchant en FK violation après création du User.
+    const sector = await prisma.sector.findUnique({
+      where: { id: sectorId },
+      select: { id: true },
+    });
+    if (!sector) {
+      return NextResponse.json(
+        { error: "Secteur d'activité invalide" },
+        { status: 400 }
+      );
+    }
 
     // Vérifier si l'email existe déjà
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -44,31 +58,31 @@ export async function POST(req: NextRequest) {
     // no fragile email-only-credential flow.
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Créer l'utilisateur merchant
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        phone: phone || null,
-        passwordHash,
-        role: "MERCHANT",
-        acceptedCguAt,
-      },
-    });
-
-    // Créer le profil merchant avec le premier secteur disponible
-    const firstSector = await prisma.sector.findFirst();
-    if (firstSector) {
-      await prisma.merchant.create({
+    // Création atomique User + Merchant — sans transaction, un crash entre
+    // les deux laisse un MERCHANT user sans profile, qu'on a déjà patché
+    // côté dashboard mais qui crée un parcours dégradé inutile.
+    const user = await prisma.$transaction(async (tx) => {
+      const u = await tx.user.create({
         data: {
-          userId: user.id,
+          name,
+          email,
+          phone: phone || null,
+          passwordHash,
+          role: "MERCHANT",
+          acceptedCguAt,
+        },
+      });
+      await tx.merchant.create({
+        data: {
+          userId: u.id,
           businessName: name,
           phone: phone || null,
-          sectorId: firstSector.id,
+          sectorId: sector.id,
           plan: merchantPlan,
         },
       });
-    }
+      return u;
+    });
 
     // Welcome email — no longer contains a password. If it fails, the user
     // still has their account and can log in immediately with their own

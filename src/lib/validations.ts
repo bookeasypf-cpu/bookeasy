@@ -241,6 +241,7 @@ export const quickRegisterSchema = z.object({
   email: z.string().email("Email invalide").max(254),
   phone: z.string().max(30).optional().default(""),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères").max(72),
+  sectorId: z.string().min(1, "Choisissez votre secteur d'activité").max(40),
   plan: z.enum(["free", "pro"]).optional().default("free"),
   acceptCgu: z.literal(true, { message: "Vous devez accepter les CGU et la politique de confidentialité" }),
 });

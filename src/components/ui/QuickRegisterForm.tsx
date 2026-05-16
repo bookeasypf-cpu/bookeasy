@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
+
+interface Sector {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 export function QuickRegisterForm() {
   const router = useRouter();
@@ -14,15 +20,28 @@ export function QuickRegisterForm() {
     phone: "",
     password: "",
     confirmPassword: "",
+    sectorId: "",
   });
   const [acceptCgu, setAcceptCgu] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [sectors, setSectors] = useState<Sector[]>([]);
+
+  useEffect(() => {
+    fetch("/api/sectors")
+      .then((res) => res.ok ? res.json() : [])
+      .then((data: Sector[]) => setSectors(Array.isArray(data) ? data : []))
+      .catch(() => setSectors([]));
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    if (!form.sectorId) {
+      toast.error("Choisissez votre secteur d'activité");
+      return;
+    }
     if (!acceptCgu) {
       toast.error("Vous devez accepter les CGU et la politique de confidentialité");
       return;
@@ -46,6 +65,7 @@ export function QuickRegisterForm() {
           email: form.email,
           phone: form.phone,
           password: form.password,
+          sectorId: form.sectorId,
           plan: "free",
           acceptCgu: true,
         }),
@@ -83,6 +103,16 @@ export function QuickRegisterForm() {
         return;
       }
 
+      // Reset the merchant onboarding flag so the tutorial fires on the
+      // very first dashboard render — even if the same browser previously
+      // dismissed it for another test pro account.
+      try {
+        localStorage.removeItem("bookeasy-merchant-onboarding-seen");
+        localStorage.removeItem("bookeasy-medical-onboarding-seen");
+      } catch {
+        // Private browsing / storage disabled — ignore.
+      }
+
       toast.success("Bienvenue sur BookEasy Pro !");
       router.push("/dashboard/profile");
       router.refresh();
@@ -117,6 +147,23 @@ export function QuickRegisterForm() {
         onChange={(e) => setForm({ ...form, phone: e.target.value })}
         className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors"
       />
+      <select
+        value={form.sectorId}
+        onChange={(e) => setForm({ ...form, sectorId: e.target.value })}
+        required
+        disabled={sectors.length === 0}
+        aria-label="Secteur d'activité"
+        className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-colors bg-white disabled:opacity-50"
+      >
+        <option value="" disabled>
+          {sectors.length === 0 ? "Chargement des secteurs..." : "Secteur d'activité"}
+        </option>
+        {sectors.map((s) => (
+          <option key={s.id} value={s.id}>
+            {s.name}
+          </option>
+        ))}
+      </select>
       <div className="relative">
         <input
           type={showPassword ? "text" : "password"}
