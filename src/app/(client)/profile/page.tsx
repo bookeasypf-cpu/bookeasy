@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { Mail, Phone, Pencil, Check, X, Upload, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
-import { compressImage, isUnsupportedImageFormat } from "@/lib/image-compress";
+import { processImageForUpload, isUnsupportedImageFormat } from "@/lib/image-compress";
 
 interface UserProfile {
   id: string;
@@ -79,16 +79,16 @@ export default function ProfilePage() {
     }
 
     if (isUnsupportedImageFormat(file)) {
-      toast.error(
-        "Format non supporté (HEIC / AVIF). Sur iPhone : Réglages → Appareil photo → Formats → Le plus compatible. Ou exportez en JPG/PNG."
-      );
+      toast.error("Format non supporté (AVIF / TIFF). Convertissez en JPG ou PNG.");
       return;
     }
 
-    // Check original file size (will be compressed)
-    const MAX_ORIGINAL_SIZE = 20 * 1024 * 1024; // 20 MB original, will be compressed
+    // 50 MB pre-compression cap — covers any modern phone / camera while
+    // protecting against absurd 100 MB+ raw files. After processing,
+    // the file lands well under the server's 25 MB limit.
+    const MAX_ORIGINAL_SIZE = 50 * 1024 * 1024;
     if (file.size > MAX_ORIGINAL_SIZE) {
-      toast.error(`L'image est trop grosse (${(file.size / 1024 / 1024).toFixed(1)} MB). Max: 20 MB`);
+      toast.error(`L'image est trop grosse (${(file.size / 1024 / 1024).toFixed(1)} MB). Max: 50 MB`);
       return;
     }
 
@@ -102,13 +102,11 @@ export default function ProfilePage() {
 
     // Start upload
     setUploading(true);
-    setUploadStep("Compression de l'image...");
+    setUploadStep("Préparation de l'image...");
     try {
-      // Compress image before uploading
-      const compressedBlob = await compressImage(file);
-      const compressedFile = new File([compressedBlob], file.name, {
-        type: "image/jpeg",
-      });
+      // HEIC → JPEG conversion + canvas resize (avatar preset = 1024 px @0.85).
+      // Returns a File ready to upload, always within the server limit.
+      const compressedFile = await processImageForUpload(file, "avatar");
 
       setUploadStep("Upload en cours...");
 

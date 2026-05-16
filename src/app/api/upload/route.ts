@@ -3,8 +3,13 @@ import { getSession } from "@/lib/auth";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { uploadLimiter, formatRateLimitError } from "@/lib/ratelimit";
 
+// JPEG/PNG/WebP are the canonical web formats. HEIC/HEIF arrive only after
+// client-side conversion via heic2any (see src/lib/image-compress.ts), so
+// the server never has to deal with them directly.
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+// 25 MB lets a 4K photo from a recent phone go through even after a light
+// quality bump. Vercel Blob itself supports up to 5 GB — this is our policy.
+const MAX_SIZE = 25 * 1024 * 1024;
 
 export async function POST(request: Request) {
   try {

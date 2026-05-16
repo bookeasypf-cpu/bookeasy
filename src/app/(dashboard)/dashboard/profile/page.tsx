@@ -20,7 +20,7 @@ import { upload } from "@vercel/blob/client";
 import { PushNotificationToggle } from "@/components/ui/PushNotificationToggle";
 import { UpgradeButton } from "@/components/ui/UpgradeButton";
 import Image from "next/image";
-import { compressImage, isUnsupportedImageFormat } from "@/lib/image-compress";
+import { processImageForUpload, isUnsupportedImageFormat, type ImagePreset } from "@/lib/image-compress";
 
 interface Sector {
   id: string;
@@ -112,34 +112,27 @@ export default function DashboardProfilePage() {
       .catch(() => {});
   }, []);
 
-  // Upload helper — client-direct upload to Vercel Blob (no 4.5MB server limit).
-  // The server only accepts jpeg/png/webp; HEIC/HEIF from iPhone Live Photos
-  // get rejected silently and the spinner would hang forever without the
-  // pre-check + compressImage pipeline.
-  async function uploadFile(file: File): Promise<string | null> {
+  // Upload helper — client-direct to Vercel Blob (bypasses Next 4.5 MB limit).
+  // The preset chooses dimension + JPEG quality so cover banners stay sharp
+  // while small avatars don't waste bandwidth. HEIC/HEIF from iPhone are
+  // auto-converted client-side before reaching the server.
+  async function uploadFile(file: File, preset: ImagePreset): Promise<string | null> {
     if (isUnsupportedImageFormat(file)) {
-      toast.error(
-        "Format non supporté (HEIC / AVIF). Sur iPhone : Réglages → Appareil photo → Formats → Le plus compatible. Ou exportez en JPG/PNG."
-      );
+      toast.error("Format non supporté (AVIF / TIFF). Convertissez en JPG ou PNG.");
       return null;
     }
 
     try {
-      // Canvas-compress large JPEG/PNG/WebP, returns the original File on any
-      // failure with a 10s hard timeout — guarantees no infinite spinner.
-      const blob = await compressImage(file);
-      const fileToUpload =
-        blob instanceof File
-          ? blob
-          : new File([blob], file.name, { type: blob.type || file.type });
+      const processed = await processImageForUpload(file, preset);
 
-      // 60s hard timeout on the upload itself (slow PF mobile network safety net).
-      const uploadPromise = upload(fileToUpload.name, fileToUpload, {
+      // 90s hard timeout on the upload itself — covers big files on slow PF
+      // mobile network without ever hanging the UI indefinitely.
+      const uploadPromise = upload(processed.name, processed, {
         access: "public",
         handleUploadUrl: "/api/upload",
       });
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Upload trop long — vérifiez votre connexion")), 60000)
+        setTimeout(() => reject(new Error("Upload trop long — vérifiez votre connexion")), 90000)
       );
 
       const result = await Promise.race([uploadPromise, timeoutPromise]);
@@ -155,7 +148,7 @@ export default function DashboardProfilePage() {
   // Cover image upload
   async function handleCoverUpload(file: File) {
     setCoverUploading(true);
-    const url = await uploadFile(file);
+    const url = await uploadFile(file, "cover");
     if (url) {
       const res = await fetch("/api/dashboard/photos", {
         method: "PUT",
@@ -190,7 +183,7 @@ export default function DashboardProfilePage() {
   // Gallery photo upload
   async function handlePhotoUpload(file: File) {
     setPhotoUploading(true);
-    const url = await uploadFile(file);
+    const url = await uploadFile(file, "gallery");
     if (url) {
       const res = await fetch("/api/dashboard/photos", {
         method: "POST",
