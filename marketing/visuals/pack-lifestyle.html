@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Pack Lifestyle Polynésien</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --turquoise: #0EA5A0;
+    --turquoise-light: #4DD0CB;
+    --sand: #F4E4C1;
+    --navy: #0F1E2D;
+    --white: #FFFFFF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #1a1a22; color: #fff; padding: 40px 20px; }
+  .back { display: inline-block; color: #00f0d4; text-decoration: none; margin-bottom: 32px; font-weight: 600; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900; text-align: center; margin-bottom: 12px; color: #fff; }
+  .sub { text-align: center; color: #aaa; margin-bottom: 60px; font-size: 18px; }
+  .label { font-size: 14px; font-weight: 600; color: #00f0d4; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; text-align: center; }
+  .row { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; margin-bottom: 80px; align-items: flex-start; }
+  .visual-wrap { display: flex; flex-direction: column; align-items: center; }
+  .caption { margin-top: 16px; padding: 12px 20px; background: rgba(255,255,255,.05); border-radius: 8px; max-width: 540px; color: #ccc; font-size: 14px; line-height: 1.6; }
+
+  /* === POST CARRÉ 1080×1080 (scaled to 540×540) === */
+  .post-square {
+    width: 540px;
+    height: 540px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #0EA5A0 0%, #F4A261 60%, #E76F51 100%);
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  }
+  .post-square::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255,200,100,.4) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 30% 80%, rgba(14,165,160,.6) 0%, transparent 60%),
+      linear-gradient(180deg, transparent 0%, rgba(15,30,45,.4) 100%);
+  }
+  .post-square::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,.15) 100%);
+    pointer-events: none;
+  }
+  .silhouette {
+    position: absolute;
+    bottom: 100px;
+    right: 60px;
+    width: 80px;
+    height: 200px;
+    background: rgba(15,30,45,.7);
+    clip-path: polygon(45% 0%, 55% 8%, 60% 25%, 55% 35%, 70% 60%, 55% 100%, 45% 100%, 30% 60%, 45% 35%, 40% 25%);
+    filter: blur(2px);
+  }
+  .ui-card {
+    position: absolute;
+    top: 80px;
+    left: 40px;
+    width: 280px;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 16px;
+    padding: 16px;
+    color: #fff;
+    box-shadow: 0 10px 40px rgba(0,0,0,.2);
+  }
+  .ui-card .row1 { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .ui-card .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #F4E4C1, #fff); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .ui-card .name { font-weight: 700; font-size: 14px; }
+  .ui-card .meta { font-size: 11px; opacity: .85; }
+  .ui-card .stars { color: #FFD700; font-size: 12px; margin-bottom: 12px; }
+  .ui-card .btn { background: #fff; color: #0F1E2D; padding: 10px; border-radius: 8px; text-align: center; font-weight: 700; font-size: 13px; }
+  .tagline {
+    position: absolute;
+    bottom: 60px;
+    left: 40px;
+    color: #fff;
+  }
+  .tagline .quote { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; line-height: 1.1; font-style: italic; text-shadow: 0 2px 20px rgba(0,0,0,.3); }
+  .tagline .divider { width: 30px; height: 2px; background: #fff; margin: 12px 0; }
+  .tagline .brand { font-weight: 700; font-size: 14px; letter-spacing: 2px; }
+
+  /* === STORY 1080×1920 (scaled to 270×480) === */
+  .post-story {
+    width: 270px;
+    height: 480px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #FFA07A 0%, #E76F51 30%, #0EA5A0 70%, #0F1E2D 100%);
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  }
+  .post-story::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 40% at 50% 30%, rgba(255,210,150,.5) 0%, transparent 70%);
+  }
+  .post-story::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, transparent 0%, rgba(15,30,45,.6) 100%);
+  }
+  .story-title {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 20px rgba(0,0,0,.4);
+  }
+  .story-title .em { display: block; }
+  .story-bottom {
+    position: absolute;
+    bottom: 30px; left: 0; right: 0;
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+  }
+  .story-bottom .divider { width: 30px; height: 2px; background: #fff; margin: 0 auto 12px; }
+  .story-bottom .ss { font-size: 11px; opacity: .9; margin-bottom: 8px; letter-spacing: 1px; }
+  .story-bottom .link { font-weight: 700; font-size: 14px; }
+
+  /* === CARROUSEL — 3 cartes 1080×1080 mini === */
+  .carousel-row { display: flex; gap: 20px; }
+  .slide-mini {
+    width: 280px;
+    height: 280px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.3);
+  }
+  .slide-1 {
+    background: linear-gradient(135deg, #0EA5A0 0%, #F4A261 100%);
+  }
+  .slide-1::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,200,150,.4) 0%, transparent 70%);
+  }
+  .slide-2 {
+    background: linear-gradient(135deg, #0F1E2D 0%, #1a3a5a 50%, #0EA5A0 100%);
+  }
+  .slide-3 {
+    background: linear-gradient(135deg, #E76F51 0%, #F4A261 50%, #0EA5A0 100%);
+  }
+  .slide-content {
+    position: absolute;
+    inset: 24px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .slide-num { font-family: 'Playfair Display', serif; font-style: italic; font-size: 14px; opacity: .8; }
+  .slide-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; line-height: 1.1; }
+  .slide-divider { width: 24px; height: 2px; background: #fff; margin: 8px 0; }
+  .slide-meta { font-size: 11px; opacity: .9; }
+  .slide-cta {
+    background: #fff;
+    color: #0F1E2D;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 12px;
+    align-self: flex-start;
+  }
+
+  /* === REEL COVER 1080×1920 === */
+  .reel-cover {
+    width: 270px;
+    height: 480px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #0EA5A0 0%, #F4A261 40%, #E76F51 70%, #0F1E2D 100%);
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  }
+  .reel-cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 40% at 50% 40%, rgba(255,255,255,.15) 0%, transparent 70%);
+  }
+  .reel-play {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px; height: 60px;
+    background: rgba(255,255,255,.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,.3);
+  }
+  .reel-play::before {
+    content: '';
+    width: 0; height: 0;
+    border-left: 18px solid #0EA5A0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    margin-left: 4px;
+  }
+  .reel-overlay {
+    position: absolute;
+    bottom: 30px;
+    left: 24px;
+    right: 24px;
+    color: #fff;
+    text-shadow: 0 2px 20px rgba(0,0,0,.4);
+  }
+  .reel-overlay h3 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .reel-overlay p {
+    font-size: 12px;
+    opacity: .9;
+  }
+
+  /* Size labels */
+  .size-tag {
+    display: inline-block;
+    background: rgba(0,240,212,.2);
+    color: #00f0d4;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+  <a href="index.html" class="back">← Retour</a>
+  <h1>Pack Lifestyle Polynésien</h1>
+  <p class="sub">4 visuels prêts à publier · Palette turquoise lagon × sable × coucher de soleil</p>
+
+  <!-- POST CARRÉ -->
+  <div class="row">
+    <div class="visual-wrap">
+      <div class="label">1 · Post Instagram</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post-square">
+        <div class="silhouette"></div>
+        <div class="ui-card">
+          <div class="row1">
+            <div class="avatar">🌺</div>
+            <div>
+              <div class="name">Massage Manea Spa</div>
+              <div class="meta">Moorea · 14h00</div>
+            </div>
+          </div>
+          <div class="stars">★★★★★ 4.9 (127 avis)</div>
+          <div class="btn">Réserver →</div>
+        </div>
+        <div class="tagline">
+          <div class="quote">Ta Polynésie,<br/>en 2 clics.</div>
+          <div class="divider"></div>
+          <div class="brand">BOOKEASY.ME</div>
+        </div>
+      </div>
+      <div class="caption">
+        <strong>Légende :</strong> Quand le lagon t'appelle, BookEasy répond. 🌊<br/>
+        Massages, spas, activités… réserve en 2 clics.<br/>
+        👉 bookeasy.me · #BookEasy #Polynésie #FaitÀTahiti
+      </div>
+    </div>
+
+    <!-- STORY -->
+    <div class="visual-wrap">
+      <div class="label">2 · Story Instagram</div>
+      <span class="size-tag">1080 × 1920</span>
+      <div class="post-story">
+        <div class="story-title">
+          <span class="em">Réserve.</span>
+          <span class="em">Vis.</span>
+          <span class="em">Recommence.</span>
+        </div>
+        <div class="story-bottom">
+          <div class="divider"></div>
+          <div class="ss">LA NOUVELLE FAÇON</div>
+          <div class="ss">DE PROFITER DE LA PF</div>
+          <div class="link">bookeasy.me</div>
+        </div>
+      </div>
+      <div class="caption">
+        <strong>Usage :</strong> Story avec sticker lien vers bookeasy.me. Idéal pour saturation de portée organique.
+      </div>
+    </div>
+  </div>
+
+  <!-- CARROUSEL -->
+  <div class="visual-wrap" style="margin: 0 auto 80px; max-width: 1000px;">
+    <div class="label">3 · Carrousel 3 slides</div>
+    <span class="size-tag">1080 × 1080 × 3</span>
+    <div class="carousel-row">
+      <div class="slide-mini slide-1">
+        <div class="slide-content">
+          <div>
+            <div class="slide-num">Swipe →</div>
+          </div>
+          <div>
+            <div class="slide-title">3 raisons<br/>de tester<br/>BookEasy.</div>
+            <div class="slide-divider"></div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-mini slide-2">
+        <div class="slide-content">
+          <div>
+            <div class="slide-num">01.</div>
+            <div class="slide-divider"></div>
+          </div>
+          <div>
+            <div class="slide-title">Tout<br/>en un seul<br/>endroit.</div>
+            <div class="slide-meta" style="margin-top: 10px;">Coiffeur · Resto · Spa · Activités</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-mini slide-3">
+        <div class="slide-content">
+          <div>
+            <div class="slide-num">Prêt(e) ?</div>
+            <div class="slide-divider"></div>
+          </div>
+          <div>
+            <div class="slide-title">Télécharge<br/>BookEasy.</div>
+            <div class="slide-cta" style="margin-top: 12px;">bookeasy.me →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption" style="margin: 16px auto 0; max-width: 800px;">
+      <strong>Format :</strong> Carrousel pédagogique haute portée organique. Inciter à swiper grâce au "Swipe →" sur la slide 1.
+    </div>
+  </div>
+
+  <!-- REEL COVER -->
+  <div class="row">
+    <div class="visual-wrap">
+      <div class="label">4 · Reel / TikTok Cover</div>
+      <span class="size-tag">1080 × 1920 vidéo</span>
+      <div class="reel-cover">
+        <div class="reel-play"></div>
+        <div class="reel-overlay">
+          <h3>La Polynésie<br/>a changé.</h3>
+          <p>15s · Musique cinematic · Drone + UI app</p>
+        </div>
+      </div>
+      <div class="caption">
+        <strong>Script Reel :</strong><br/>
+        0–2s drone lagon · 2–5s téléphone ouvre BookEasy · 5–8s montage rapide massage/resto/paddle "RÉSERVÉ ✓" · 8–12s personne face au lagon, sourit · 12–15s logo BookEasy + tagline.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

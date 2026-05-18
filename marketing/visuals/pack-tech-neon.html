@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Pack Tech Néon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --black: #0A0E1A;
+    --black-2: #060810;
+    --neon: #00F0D4;
+    --violet: #A855F7;
+    --pink: #EC4899;
+    --white: #FFFFFF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #14141d; color: #fff; padding: 40px 20px; }
+  .back { display: inline-block; color: #00f0d4; text-decoration: none; margin-bottom: 32px; font-weight: 600; }
+  h1 { font-size: 56px; font-weight: 900; text-align: center; margin-bottom: 12px; background: linear-gradient(135deg, #00F0D4, #A855F7, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1.5px; }
+  .sub { text-align: center; color: #aaa; margin-bottom: 60px; font-size: 18px; font-family: 'JetBrains Mono', monospace; }
+  .label { font-size: 14px; font-weight: 600; color: #00f0d4; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; text-align: center; font-family: 'JetBrains Mono', monospace; }
+  .row { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; margin-bottom: 80px; align-items: flex-start; }
+  .visual-wrap { display: flex; flex-direction: column; align-items: center; }
+  .caption { margin-top: 16px; padding: 12px 20px; background: rgba(255,255,255,.05); border-radius: 8px; max-width: 540px; color: #ccc; font-size: 14px; line-height: 1.6; }
+
+  /* === Shared grain/noise === */
+  .grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: .4;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  /* === POST CARRÉ 1080×1080 === */
+  .post-square {
+    width: 540px;
+    height: 540px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    background: radial-gradient(ellipse at 30% 30%, #1a1f3a 0%, #0A0E1A 70%);
+    box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 80px rgba(0, 240, 212, .15);
+  }
+  .post-square::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 80% 20%, rgba(168,85,247,.3) 0%, transparent 40%),
+      radial-gradient(circle at 20% 80%, rgba(0,240,212,.3) 0%, transparent 40%);
+  }
+  .neon-card {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotateY(-15deg) rotateX(8deg);
+    width: 240px;
+    background: linear-gradient(135deg, rgba(20,25,45,.95), rgba(10,14,26,.95));
+    border: 1.5px solid rgba(0,240,212,.6);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow:
+      0 0 40px rgba(0,240,212,.5),
+      0 0 80px rgba(168,85,247,.3),
+      inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .neon-card .logo { font-weight: 900; color: #00F0D4; font-size: 14px; letter-spacing: 1.5px; margin-bottom: 16px; text-shadow: 0 0 12px rgba(0,240,212,.8); }
+  .neon-card .conf { background: rgba(0,240,212,.1); border: 1px solid rgba(0,240,212,.4); border-radius: 12px; padding: 14px; }
+  .neon-card .conf .lab { color: #00F0D4; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; }
+  .neon-card .conf .val { color: #fff; font-size: 16px; font-weight: 700; }
+  .trace {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    width: 2px;
+    height: 80px;
+    background: linear-gradient(180deg, transparent, #00F0D4, #A855F7);
+    box-shadow: 0 0 12px #00F0D4;
+    transform: rotate(-25deg);
+    transform-origin: bottom;
+  }
+  .post-tagline {
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    text-align: right;
+    color: #fff;
+  }
+  .post-tagline .big {
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .post-tagline .small {
+    font-size: 13px;
+    color: #00F0D4;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+  .post-tagline .line { width: 30px; height: 2px; background: #00F0D4; margin: 12px 0 12px auto; box-shadow: 0 0 8px #00F0D4; }
+  .post-tagline .link { font-size: 14px; font-weight: 700; }
+
+  /* Animated dots */
+  .dots {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    display: flex;
+    gap: 8px;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #00F0D4;
+    box-shadow: 0 0 12px #00F0D4;
+  }
+  .dot:nth-child(2) { background: #A855F7; box-shadow: 0 0 12px #A855F7; }
+  .dot:nth-child(3) { background: #EC4899; box-shadow: 0 0 12px #EC4899; }
+
+  /* === STORY 1080×1920 === */
+  .post-story {
+    width: 270px;
+    height: 480px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: radial-gradient(ellipse at 50% 30%, #1a1f3a 0%, #0A0E1A 70%);
+    box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 60px rgba(0, 240, 212, .15);
+  }
+  .post-story::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 70% 80%, rgba(168,85,247,.3) 0%, transparent 50%);
+  }
+  .story-dots {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    display: flex;
+    gap: 6px;
+  }
+  .story-dots .d { width: 6px; height: 6px; border-radius: 50%; background: #00F0D4; box-shadow: 0 0 10px #00F0D4; }
+  .story-main {
+    position: absolute;
+    top: 130px;
+    left: 30px;
+    color: #fff;
+  }
+  .story-main .brand {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: .95;
+    letter-spacing: -2px;
+    text-shadow: 0 0 30px rgba(0,240,212,.5);
+  }
+  .story-main .line {
+    width: 40px; height: 3px;
+    background: #00F0D4;
+    margin: 16px 0;
+    box-shadow: 0 0 12px #00F0D4;
+  }
+  .story-mono {
+    position: absolute;
+    top: 290px;
+    left: 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #A855F7;
+    line-height: 1.6;
+  }
+  .story-btn {
+    position: absolute;
+    bottom: 80px;
+    left: 30px; right: 30px;
+    background: linear-gradient(135deg, #00F0D4, #A855F7);
+    color: #0A0E1A;
+    padding: 14px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 14px;
+    box-shadow: 0 0 30px rgba(0,240,212,.4);
+  }
+  .story-link {
+    position: absolute;
+    bottom: 30px;
+    left: 0; right: 0;
+    text-align: center;
+    color: #00F0D4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  /* === CARROUSEL === */
+  .carousel-row { display: flex; gap: 20px; }
+  .slide-mini {
+    width: 280px;
+    height: 280px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: radial-gradient(ellipse at 50% 50%, #1a1f3a 0%, #0A0E1A 70%);
+    box-shadow: 0 10px 40px rgba(0,0,0,.5), 0 0 30px rgba(0,240,212,.1);
+    color: #fff;
+    padding: 24px;
+  }
+  .slide-mini::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(168,85,247,.25) 0%, transparent 50%);
+  }
+  .slide-mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #A855F7; margin-bottom: 16px; position: relative; z-index: 1; }
+  .slide-title-neon { font-size: 26px; font-weight: 900; line-height: 1; letter-spacing: -1px; position: relative; z-index: 1; }
+  .slide-line { width: 24px; height: 2px; background: #00F0D4; margin: 12px 0; box-shadow: 0 0 8px #00F0D4; position: relative; z-index: 1; }
+  .slide-dots { display: flex; gap: 4px; position: absolute; bottom: 24px; right: 24px; }
+  .slide-dots .d { width: 6px; height: 6px; border-radius: 50%; background: #00F0D4; box-shadow: 0 0 8px #00F0D4; }
+  .slide-list { font-size: 13px; line-height: 1.8; position: relative; z-index: 1; }
+  .slide-list .red { color: #EC4899; }
+  .slide-list .green { color: #00F0D4; }
+  .slide-cta-neon {
+    position: absolute;
+    bottom: 20px; left: 24px; right: 24px;
+    background: linear-gradient(135deg, #00F0D4, #A855F7);
+    color: #0A0E1A;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 11px;
+    box-shadow: 0 0 20px rgba(0,240,212,.4);
+    z-index: 2;
+  }
+
+  /* === REEL COVER === */
+  .reel-cover {
+    width: 270px;
+    height: 480px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: radial-gradient(ellipse at 50% 50%, #1a1f3a 0%, #0A0E1A 70%);
+    box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 60px rgba(168, 85, 247, .2);
+  }
+  .reel-cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(0,240,212,.2) 0%, transparent 50%),
+      radial-gradient(circle at 50% 70%, rgba(168,85,247,.2) 0%, transparent 50%);
+  }
+  .reel-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00F0D4, #A855F7);
+    box-shadow: 0 0 40px rgba(0,240,212,.6), 0 0 80px rgba(168,85,247,.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .reel-glow::before {
+    content: '';
+    width: 0; height: 0;
+    border-left: 20px solid #0A0E1A;
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
+    margin-left: 5px;
+  }
+  .reel-top {
+    position: absolute;
+    top: 30px; left: 30px;
+    color: #00F0D4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .reel-bottom {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    right: 30px;
+    color: #fff;
+  }
+  .reel-bottom h3 {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+  .reel-bottom .accent {
+    color: #00F0D4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .size-tag {
+    display: inline-block;
+    background: rgba(0,240,212,.2);
+    color: #00f0d4;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+  <a href="index.html" class="back">← Retour</a>
+  <h1>Pack Tech Néon</h1>
+  <p class="sub">// 4 visuels · noir + néon · niveau PacifikAI</p>
+
+  <!-- POST CARRÉ -->
+  <div class="row">
+    <div class="visual-wrap">
+      <div class="label">1 · Post Instagram</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post-square grain">
+        <div class="dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="neon-card">
+          <div class="logo">⚡ BOOKEASY</div>
+          <div class="conf">
+            <div class="lab">// STATUS</div>
+            <div class="val">Réservé ✓</div>
+          </div>
+        </div>
+        <div class="trace"></div>
+        <div class="post-tagline">
+          <div class="big">RÉSERVE.</div>
+          <div class="big">SANS APPELER.</div>
+          <div class="line"></div>
+          <div class="link">bookeasy.me</div>
+        </div>
+      </div>
+      <div class="caption">
+        <strong>Légende :</strong> Le téléphone qui sonne dans le vide, c'est fini.<br/>
+        BookEasy = réservation instantanée, partout en Polynésie.<br/>
+        👉 bookeasy.me
+      </div>
+    </div>
+
+    <!-- STORY -->
+    <div class="visual-wrap">
+      <div class="label">2 · Story Instagram</div>
+      <span class="size-tag">1080 × 1920</span>
+      <div class="post-story grain">
+        <div class="story-dots">
+          <div class="d"></div>
+          <div class="d"></div>
+          <div class="d"></div>
+        </div>
+        <div class="story-main">
+          <div class="brand">BOOK<br/>EASY</div>
+          <div class="line"></div>
+        </div>
+        <div class="story-mono">
+          /// la réservation<br/>
+          /// nouvelle<br/>
+          /// génération
+        </div>
+        <div class="story-btn">Découvrir →</div>
+        <div class="story-link">bookeasy.me</div>
+      </div>
+      <div class="caption">
+        <strong>Usage :</strong> Story d'impact pour annoncer le lancement officiel. Mise en gros sur Insta + Facebook stories.
+      </div>
+    </div>
+  </div>
+
+  <!-- CARROUSEL -->
+  <div class="visual-wrap" style="margin: 0 auto 80px; max-width: 1000px;">
+    <div class="label">3 · Carrousel 3 slides — "Avant / Maintenant"</div>
+    <span class="size-tag">1080 × 1080 × 3</span>
+    <div class="carousel-row">
+      <div class="slide-mini grain">
+        <div class="slide-mono">// 2026</div>
+        <div class="slide-title-neon">Tu réserves<br/>encore comme<br/>en 2010 ?</div>
+        <div class="slide-line"></div>
+        <div class="slide-dots">
+          <div class="d"></div>
+          <div class="d"></div>
+          <div class="d"></div>
+        </div>
+      </div>
+      <div class="slide-mini grain">
+        <div class="slide-list">
+          <div class="red">❌ AVANT</div>
+          <div class="slide-line"></div>
+          📞 Appeler 5 fois<br/>
+          ⏳ Attendre<br/>
+          😤 "C'est complet"<br/><br/>
+          <div class="green">✅ MAINTENANT</div>
+          <div class="slide-line"></div>
+          ⚡ 2 clics<br/>
+          ✨ Confirmé
+        </div>
+      </div>
+      <div class="slide-mini grain">
+        <div class="slide-mono">// LEVEL UP</div>
+        <div class="slide-title-neon">Passe en<br/>mode 2026.</div>
+        <div class="slide-line"></div>
+        <div class="slide-cta-neon">bookeasy.me →</div>
+      </div>
+    </div>
+    <div class="caption" style="margin: 16px auto 0; max-width: 800px;">
+      <strong>Format :</strong> Carrousel comparatif. Slide 1 hook → Slide 2 problème/solution → Slide 3 CTA. Très partagé en commentaires "tag ami".
+    </div>
+  </div>
+
+  <!-- REEL COVER -->
+  <div class="row">
+    <div class="visual-wrap">
+      <div class="label">4 · Reel / TikTok Cover</div>
+      <span class="size-tag">1080 × 1920 vidéo</span>
+      <div class="reel-cover grain">
+        <div class="reel-top">// ENTERING 2026</div>
+        <div class="reel-glow"></div>
+        <div class="reel-bottom">
+          <h3>Réserver<br/>en 2026 ?</h3>
+          <div class="accent">// the new way</div>
+        </div>
+      </div>
+      <div class="caption">
+        <strong>Script Reel :</strong><br/>
+        0–2s écran noir + glitch "Réserver en 2026 ?" · 2–4s scroll 3D BookEasy · 4–6s DROP : logo flip + particules · 6–9s UI iso phone · 9–12s fade "bookeasy.me" néon.<br/>
+        🎵 Synthwave / electronic.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

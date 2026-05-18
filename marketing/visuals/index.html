@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Visuels Marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 40px 20px; }
+  h1 { font-size: 48px; font-weight: 900; text-align: center; margin-bottom: 8px; background: linear-gradient(135deg, #00f0d4, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .sub { text-align: center; color: #aaa; margin-bottom: 60px; font-size: 18px; }
+  .packs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1600px; margin: 0 auto; }
+  @media (max-width: 1100px) { .packs { grid-template-columns: 1fr; } }
+  .pack-card { background: #14141d; border: 1px solid #2a2a3a; border-radius: 24px; padding: 32px; transition: transform .3s, border-color .3s; }
+  .pack-card:hover { transform: translateY(-4px); border-color: #00f0d4; }
+  .pack-card h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+  .pack-card .palette { display: flex; gap: 8px; margin: 16px 0; }
+  .pack-card .swatch { width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,.1); }
+  .pack-card p { color: #ccc; margin-bottom: 20px; line-height: 1.6; }
+  .pack-card a { display: inline-block; padding: 14px 24px; background: #fff; color: #000; border-radius: 12px; font-weight: 700; text-decoration: none; transition: all .2s; }
+  .pack-card a:hover { transform: scale(1.05); }
+  .tip { max-width: 800px; margin: 60px auto 0; background: linear-gradient(135deg, rgba(0,240,212,.1), rgba(168,85,247,.1)); border: 1px solid rgba(0,240,212,.3); border-radius: 16px; padding: 24px; }
+  .tip h3 { margin-bottom: 12px; color: #00f0d4; }
+  .tip ol { padding-left: 20px; color: #ddd; }
+  .tip li { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+  <h1>BookEasy — Visuels Marketing</h1>
+  <p class="sub">Choisis ta direction artistique. Clique pour voir les 4 visuels (post carré, story, carrousel, reel).</p>
+
+  <div class="packs">
+    <div class="pack-card">
+      <h2>PACK 1 — Lifestyle Polynésien</h2>
+      <div class="palette">
+        <div class="swatch" style="background:#0EA5A0"></div>
+        <div class="swatch" style="background:#F4E4C1"></div>
+        <div class="swatch" style="background:#FFFFFF"></div>
+        <div class="swatch" style="background:#0F1E2D"></div>
+      </div>
+      <p>Photos lagon premium, glassmorphism, typographie élégante. Aspirationnel, ancrage local fort. Idéal pour cible touristes + locaux premium.</p>
+      <a href="pack-lifestyle.html">Voir le pack →</a>
+    </div>
+
+    <div class="pack-card">
+      <h2>PACK 2 — Tech Néon / PacifikAI</h2>
+      <div class="palette">
+        <div class="swatch" style="background:#0A0E1A"></div>
+        <div class="swatch" style="background:#00F0D4"></div>
+        <div class="swatch" style="background:#A855F7"></div>
+        <div class="swatch" style="background:#FFFFFF"></div>
+      </div>
+      <p>Fond sombre, néons turquoise/violet, 3D et traces lumineuses. Wow effect, premium tech. Idéal pour différenciation forte vs concurrents.</p>
+      <a href="pack-tech-neon.html">Voir le pack →</a>
+    </div>
+  </div>
+
+  <div class="tip">
+    <h3>Comment exporter ces visuels en PNG/JPG ?</h3>
+    <ol>
+      <li>Ouvre le pack dans ton navigateur (Chrome / Safari)</li>
+      <li>Clic droit sur un visuel → <strong>"Inspecter l'élément"</strong></li>
+      <li>Dans la console, fais clic droit sur la div du visuel → <strong>"Capturer un nœud"</strong> (Chrome) ou screenshot avec un outil comme CleanShot</li>
+      <li>Ou plus simple : zoom + screenshot natif (Cmd+Shift+4 sur Mac)</li>
+      <li>Chaque visuel est dimensionné aux ratios Instagram réels (1080×1080, 1080×1920)</li>
+    </ol>
+  </div>
+</body>
+</html>
