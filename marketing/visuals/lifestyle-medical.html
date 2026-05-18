@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Pack Lifestyle · Médical & Santé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --med-blue: #0284C7;
+    --med-blue-deep: #075985;
+    --med-light: #E0F2FE;
+    --med-white: #FFFFFF;
+    --med-trust: #0EA5E9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #14141d; color: #fff; padding: 40px 20px; }
+  .back { display: inline-block; color: #0EA5E9; text-decoration: none; margin-bottom: 32px; font-weight: 600; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 900; text-align: center; margin-bottom: 8px; }
+  .sub { text-align: center; color: #aaa; margin-bottom: 60px; font-size: 18px; font-style: italic; }
+  .row { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; margin-bottom: 80px; align-items: flex-start; }
+  .visual-wrap { display: flex; flex-direction: column; align-items: center; }
+  .label { font-size: 13px; font-weight: 600; color: #0EA5E9; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .size-tag { display: inline-block; background: rgba(14,165,233,.2); color: #0EA5E9; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-bottom: 16px; }
+  .caption { margin-top: 16px; padding: 16px 20px; background: rgba(255,255,255,.05); border-radius: 8px; max-width: 540px; color: #ccc; font-size: 13px; line-height: 1.7; }
+  .caption strong { color: #fff; }
+  .geo-tag { display: inline-block; background: rgba(14,165,233,.2); color: #7dd3fc; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; margin: 2px; }
+
+  .post { width: 540px; height: 540px; position: relative; overflow: hidden; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+  .post .bg-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .post .overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(2,132,199,.1) 0%, rgba(7,89,133,.8) 100%); }
+  .post .overlay-clean { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(224,242,254,.4) 0%, rgba(2,132,199,.5) 100%); }
+
+  /* Template 1 — Hero clean */
+  .t1 .accent-bar { position: absolute; top: 40px; left: 40px; color: #fff; font-size: 11px; letter-spacing: 3px; font-weight: 700; }
+  .t1 .accent-bar::before { content: ''; display: inline-block; width: 30px; height: 1px; background: #fff; margin-right: 12px; vertical-align: middle; }
+  .t1 .badge { position: absolute; top: 40px; right: 40px; background: rgba(255,255,255,.95); color: #075985; padding: 6px 12px; border-radius: 100px; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+  .t1 .title-hero { position: absolute; bottom: 90px; left: 40px; right: 40px; color: #fff; font-family: 'Playfair Display', serif; font-style: italic; font-size: 48px; font-weight: 700; line-height: 1.05; letter-spacing: -1px; text-shadow: 0 2px 20px rgba(0,0,0,.3); }
+  .t1 .footer-hero { position: absolute; bottom: 40px; left: 40px; right: 40px; display: flex; justify-content: space-between; align-items: center; color: #fff; }
+  .t1 .footer-hero .brand { font-weight: 800; font-size: 14px; letter-spacing: 2px; }
+  .t1 .footer-hero .sector { font-size: 12px; opacity: .9; letter-spacing: 1px; }
+
+  /* Template 2 — UI Showcase */
+  .t2 .top-tag { position: absolute; top: 30px; left: 30px; background: rgba(255,255,255,.97); color: #075985; padding: 8px 14px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+  .t2 .stat-bubble { position: absolute; top: 30px; right: 30px; background: rgba(255,255,255,.95); padding: 12px 16px; border-radius: 16px; color: #075985; text-align: right; box-shadow: 0 10px 30px rgba(0,0,0,.15); }
+  .t2 .stat-bubble .num { font-size: 24px; font-weight: 900; line-height: 1; color: #0284C7; }
+  .t2 .stat-bubble .lab { font-size: 10px; opacity: .8; margin-top: 4px; }
+  .t2 .ui-card { position: absolute; bottom: 100px; left: 30px; right: 30px; background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,.2); }
+  .t2 .ui-card .row1 { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .t2 .ui-card .av { width: 50px; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #E0F2FE, #0EA5E9); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .t2 .ui-card .name { font-weight: 800; font-size: 17px; color: #075985; }
+  .t2 .ui-card .meta { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .t2 .ui-card .slot-row { display: flex; gap: 6px; margin-bottom: 14px; }
+  .t2 .ui-card .slot { background: #E0F2FE; color: #075985; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; }
+  .t2 .ui-card .slot.active { background: #0EA5E9; color: #fff; }
+  .t2 .ui-card .btn { background: #0284C7; color: #fff; padding: 14px; border-radius: 12px; text-align: center; font-weight: 700; font-size: 14px; }
+  .t2 .ui-card .btn .arrow { float: right; }
+  .t2 .footer { position: absolute; bottom: 30px; left: 30px; color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 2px; }
+
+  /* Template 3 — Testimonial */
+  .t3 .quote-mark { position: absolute; top: 30px; left: 30px; font-family: 'Playfair Display', serif; font-size: 120px; color: rgba(255,255,255,.4); line-height: 1; }
+  .t3 .quote-text { position: absolute; top: 130px; left: 30px; right: 30px; color: #fff; font-family: 'Playfair Display', serif; font-style: italic; font-size: 28px; font-weight: 400; line-height: 1.25; text-shadow: 0 2px 16px rgba(0,0,0,.3); }
+  .t3 .author { position: absolute; bottom: 100px; left: 30px; color: #fff; }
+  .t3 .author .stars { color: #FFD700; font-size: 15px; margin-bottom: 8px; }
+  .t3 .author .name { font-weight: 700; font-size: 15px; }
+  .t3 .author .role { font-size: 12px; opacity: .85; margin-top: 2px; }
+  .t3 .cta-pill { position: absolute; bottom: 30px; left: 30px; right: 30px; background: #fff; color: #075985; padding: 14px; border-radius: 100px; text-align: center; font-weight: 800; font-size: 13px; letter-spacing: 1.5px; }
+</style>
+</head>
+<body>
+  <a href="index.html" class="back">← Retour au hub</a>
+  <h1>Lifestyle · Médical & Santé</h1>
+  <p class="sub">3 templates · clean, professionnel · optimisés GEO/SEO</p>
+
+  <div class="row">
+    <!-- TEMPLATE 1 : HERO -->
+    <div class="visual-wrap">
+      <div class="label">Template 1 · Hero Clean</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post t1">
+        <img class="bg-img" src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1080&q=80&auto=format&fit=crop" alt="Médecin stéthoscope clean" />
+        <div class="overlay"></div>
+        <div class="accent-bar">SANTÉ · POLYNÉSIE</div>
+        <div class="badge">✓ VÉRIFIÉS</div>
+        <div class="title-hero">Ta santé,<br/>sans la salle<br/>d'attente.</div>
+        <div class="footer-hero">
+          <div class="brand">BOOKEASY.ME</div>
+          <div class="sector">MÉDECINS · SPÉCIALISTES</div>
+        </div>
+      </div>
+      <div class="caption">
+        <strong>📍 Copy GEO-optimisé :</strong><br/>
+        Prendre RDV médecin en Polynésie n'a jamais été aussi simple. BookEasy référence <strong>180 professionnels de santé</strong> à Tahiti — généralistes, dentistes, kinés, ostéopathes. Confirmation instantanée, rappel SMS, suivi du dossier.<br/><br/>
+        <span class="geo-tag">#medecinPapeete</span><span class="geo-tag">#dentistePolynesie</span><span class="geo-tag">#kineMoorea</span><span class="geo-tag">#santeTahiti</span>
+      </div>
+    </div>
+
+    <!-- TEMPLATE 2 : UI SHOWCASE -->
+    <div class="visual-wrap">
+      <div class="label">Template 2 · UI Showcase</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post t2">
+        <img class="bg-img" src="https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?w=1080&q=80&auto=format&fit=crop" alt="Cabinet médical moderne" />
+        <div class="overlay-clean"></div>
+        <div class="top-tag">⚡ RDV SOUS 48H</div>
+        <div class="stat-bubble">
+          <div class="num">180</div>
+          <div class="lab">PROS DE SANTÉ</div>
+        </div>
+        <div class="ui-card">
+          <div class="row1">
+            <div class="av">🩺</div>
+            <div>
+              <div class="name">Dr Vairea Tehei</div>
+              <div class="meta">Médecin généraliste · Papeete</div>
+            </div>
+          </div>
+          <div class="slot-row">
+            <div class="slot">Lun 9h</div>
+            <div class="slot active">Mar 14h</div>
+            <div class="slot">Mer 11h</div>
+            <div class="slot">Jeu 16h</div>
+          </div>
+          <div class="btn">Confirmer le RDV <span class="arrow">→</span></div>
+        </div>
+        <div class="footer">BOOKEASY.ME</div>
+      </div>
+      <div class="caption">
+        <strong>📍 Copy GEO-optimisé :</strong><br/>
+        <em>Question : comment prendre RDV chez un médecin à Papeete ?</em><br/>
+        Réponse : BookEasy affiche les créneaux disponibles en temps réel pour 180 professionnels de santé en PF. Confirmation immédiate, rappel SMS 24h avant, fini les heures au téléphone.<br/><br/>
+        <span class="geo-tag">format Q&A pour ChatGPT</span><span class="geo-tag">temps réel</span><span class="geo-tag">stat citable</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEMPLATE 3 : TESTIMONIAL -->
+  <div class="row">
+    <div class="visual-wrap">
+      <div class="label">Template 3 · Témoignage</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post t3">
+        <img class="bg-img" src="https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=1080&q=80&auto=format&fit=crop" alt="Médecin consultation patient" />
+        <div class="overlay"></div>
+        <div class="quote-mark">"</div>
+        <div class="quote-text">Mon dentiste répondait jamais. J'ai trouvé mieux en 2 min sur BookEasy, RDV pris pour le lendemain.</div>
+        <div class="author">
+          <div class="stars">★★★★★</div>
+          <div class="name">Moana R.</div>
+          <div class="role">Papeete · maman 2 enfants</div>
+        </div>
+        <div class="cta-pill">PRENDS RDV → BOOKEASY.ME</div>
+      </div>
+      <div class="caption">
+        <strong>📍 Copy GEO-optimisé :</strong><br/>
+        <strong>+1 200 RDV médicaux</strong> validés via BookEasy en avril 2026. 94% confirmés sous 48h. Médecins généralistes, dentistes, kinés, ostéo — toute la santé en Polynésie au même endroit.<br/><br/>
+        <span class="geo-tag">E-E-A-T trust</span><span class="geo-tag">stat primaire</span><span class="geo-tag">secteur sensible OK</span>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="visual-wrap" style="max-width: 540px;">
+      <div class="label">Conseil d'usage</div>
+      <span class="size-tag">stratégie</span>
+      <div style="background: linear-gradient(135deg, rgba(14,165,233,.1), rgba(7,89,133,.4)); border: 1px solid rgba(14,165,233,.3); border-radius: 16px; padding: 24px; color: #fff;">
+        <h3 style="margin-bottom: 12px; color: #0EA5E9;">🎯 Spécificités secteur médical</h3>
+        <ul style="padding-left: 20px; line-height: 1.8; font-size: 14px;">
+          <li><strong>Tonalité</strong> · rassurante, professionnelle (pas humoristique)</li>
+          <li><strong>Pas de XP/gamification</strong> visible (déjà désactivé code)</li>
+          <li><strong>Mettre en avant</strong> · confidentialité, rappels, suivi dossier</li>
+          <li><strong>Éviter</strong> · "deals", "promo", "à saisir"</li>
+        </ul>
+        <h3 style="margin: 20px 0 12px; color: #0EA5E9;">📈 Hashtags secteur Santé</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #ccc;">
+          #SantePolynesie #MedecinPapeete #DentisteTahiti #KineMoorea #OsteoPF #RDVMedical #SoinsTahiti #BookEasy
+        </p>
+        <h3 style="margin: 20px 0 12px; color: #0EA5E9;">🔍 Mots-clés SEO</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #ccc;">
+          "médecin Papeete RDV" · "dentiste Tahiti urgence" · "ostéopathe Moorea" · "kiné Punaauia" · "généraliste près de chez moi PF"
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

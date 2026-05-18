@@ -6,66 +6,170 @@
 <title>BookEasy — Visuels Marketing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&display=swap" rel="stylesheet" />
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 40px 20px; }
-  h1 { font-size: 48px; font-weight: 900; text-align: center; margin-bottom: 8px; background: linear-gradient(135deg, #00f0d4, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .sub { text-align: center; color: #aaa; margin-bottom: 60px; font-size: 18px; }
-  .packs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1600px; margin: 0 auto; }
-  @media (max-width: 1100px) { .packs { grid-template-columns: 1fr; } }
-  .pack-card { background: #14141d; border: 1px solid #2a2a3a; border-radius: 24px; padding: 32px; transition: transform .3s, border-color .3s; }
-  .pack-card:hover { transform: translateY(-4px); border-color: #00f0d4; }
-  .pack-card h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
-  .pack-card .palette { display: flex; gap: 8px; margin: 16px 0; }
-  .pack-card .swatch { width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,.1); }
-  .pack-card p { color: #ccc; margin-bottom: 20px; line-height: 1.6; }
-  .pack-card a { display: inline-block; padding: 14px 24px; background: #fff; color: #000; border-radius: 12px; font-weight: 700; text-decoration: none; transition: all .2s; }
-  .pack-card a:hover { transform: scale(1.05); }
-  .tip { max-width: 800px; margin: 60px auto 0; background: linear-gradient(135deg, rgba(0,240,212,.1), rgba(168,85,247,.1)); border: 1px solid rgba(0,240,212,.3); border-radius: 16px; padding: 24px; }
-  .tip h3 { margin-bottom: 12px; color: #00f0d4; }
-  .tip ol { padding-left: 20px; color: #ddd; }
-  .tip li { margin-bottom: 8px; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 60px 20px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 900; text-align: center; margin-bottom: 12px; background: linear-gradient(135deg, #0EA5A0, #F4E4C1, #E76F51); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; }
+  .sub { text-align: center; color: #aaa; margin-bottom: 24px; font-size: 18px; font-style: italic; }
+  .stack-badge { text-align: center; margin-bottom: 60px; }
+  .stack-badge span { display: inline-block; background: rgba(14,165,160,.2); color: #0EA5A0; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 700; letter-spacing: 1px; margin: 0 4px; }
+
+  .section-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; text-align: center; margin: 80px 0 12px; }
+  .section-sub { text-align: center; color: #888; margin-bottom: 40px; font-size: 15px; }
+
+  /* Pack cards (Lifestyle / Tech Néon) */
+  .packs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1400px; margin: 0 auto; }
+  @media (max-width: 900px) { .packs { grid-template-columns: 1fr; } }
+
+  .sectors { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; max-width: 1400px; margin: 0 auto; }
+  @media (max-width: 900px) { .sectors { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #14141d;
+    border: 1px solid #2a2a3a;
+    border-radius: 24px;
+    padding: 28px;
+    transition: transform .3s, border-color .3s, box-shadow .3s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .card:hover { transform: translateY(-6px); border-color: #0EA5A0; box-shadow: 0 20px 50px rgba(14,165,160,.15); }
+
+  .card-pack h2 { font-size: 26px; font-weight: 800; margin-bottom: 12px; }
+  .card-pack .palette { display: flex; gap: 8px; margin: 16px 0; }
+  .swatch { width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(255,255,255,.1); }
+  .card-pack p { color: #ccc; margin-bottom: 20px; line-height: 1.6; font-size: 14px; }
+  .card-pack .cta { display: inline-block; padding: 10px 20px; background: #fff; color: #000; border-radius: 10px; font-weight: 700; font-size: 13px; }
+
+  .card-sector { padding: 24px; }
+  .card-sector .emoji { font-size: 40px; margin-bottom: 12px; }
+  .card-sector h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .card-sector .tag { display: inline-block; background: rgba(0,240,212,.15); color: #00f0d4; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; margin-bottom: 14px; }
+  .card-sector p { color: #aaa; font-size: 13px; line-height: 1.6; margin-bottom: 14px; }
+  .card-sector .templates { display: flex; gap: 4px; }
+  .card-sector .templates span { flex: 1; height: 4px; border-radius: 2px; background: linear-gradient(90deg, #0EA5A0, #F4E4C1); }
+
+  .tip {
+    max-width: 1000px;
+    margin: 80px auto 0;
+    background: linear-gradient(135deg, rgba(0,240,212,.08), rgba(168,85,247,.08));
+    border: 1px solid rgba(0,240,212,.3);
+    border-radius: 20px;
+    padding: 32px;
+  }
+  .tip h3 { margin-bottom: 16px; color: #00f0d4; font-size: 20px; }
+  .tip .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  @media (max-width: 800px) { .tip .grid2 { grid-template-columns: 1fr; } }
+  .tip ol, .tip ul { padding-left: 20px; color: #ddd; }
+  .tip li { margin-bottom: 8px; line-height: 1.6; }
+  .tip strong { color: #fff; }
 </style>
 </head>
 <body>
-  <h1>BookEasy — Visuels Marketing</h1>
-  <p class="sub">Choisis ta direction artistique. Clique pour voir les 4 visuels (post carré, story, carrousel, reel).</p>
+  <h1>BookEasy</h1>
+  <p class="sub">Visuels Marketing · Polynésie française</p>
+  <div class="stack-badge">
+    <span>GEO Optimisé</span>
+    <span>SEO Local PF</span>
+    <span>E-E-A-T</span>
+    <span>Schema-Ready</span>
+  </div>
 
+  <!-- DIRECTIONS ARTISTIQUES -->
+  <h2 class="section-title">Direction artistique</h2>
+  <p class="section-sub">2 packs identitaires distincts — recommandation : Lifestyle en principal (80%) + Tech Néon en signature (20%)</p>
   <div class="packs">
-    <div class="pack-card">
-      <h2>PACK 1 — Lifestyle Polynésien</h2>
+    <a href="pack-lifestyle.html" class="card card-pack">
+      <h2>Pack 1 · Lifestyle Polynésien</h2>
       <div class="palette">
         <div class="swatch" style="background:#0EA5A0"></div>
         <div class="swatch" style="background:#F4E4C1"></div>
-        <div class="swatch" style="background:#FFFFFF"></div>
+        <div class="swatch" style="background:#E76F51"></div>
         <div class="swatch" style="background:#0F1E2D"></div>
       </div>
-      <p>Photos lagon premium, glassmorphism, typographie élégante. Aspirationnel, ancrage local fort. Idéal pour cible touristes + locaux premium.</p>
-      <a href="pack-lifestyle.html">Voir le pack →</a>
-    </div>
-
-    <div class="pack-card">
-      <h2>PACK 2 — Tech Néon / PacifikAI</h2>
+      <p>Photos premium, glassmorphism, typographie Playfair. Aspirationnel, ancrage local fort. Recommandé en principal.</p>
+      <div class="cta">Voir le pack →</div>
+    </a>
+    <a href="pack-tech-neon.html" class="card card-pack">
+      <h2>Pack 2 · Tech Néon</h2>
       <div class="palette">
         <div class="swatch" style="background:#0A0E1A"></div>
         <div class="swatch" style="background:#00F0D4"></div>
         <div class="swatch" style="background:#A855F7"></div>
         <div class="swatch" style="background:#FFFFFF"></div>
       </div>
-      <p>Fond sombre, néons turquoise/violet, 3D et traces lumineuses. Wow effect, premium tech. Idéal pour différenciation forte vs concurrents.</p>
-      <a href="pack-tech-neon.html">Voir le pack →</a>
+      <p>Fond sombre, néons, 3D et glow. Wow effect réservé aux moments forts (lancement, nouvelles features).</p>
+      <div class="cta">Voir le pack →</div>
+    </a>
+  </div>
+
+  <!-- TEMPLATES SECTEUR -->
+  <h2 class="section-title">Templates Lifestyle par secteur</h2>
+  <p class="section-sub">3 templates réutilisables × 3 secteurs · vraies photos · copy GEO-optimisé</p>
+  <div class="sectors">
+    <a href="lifestyle-spa.html" class="card card-sector">
+      <div class="emoji">🌺</div>
+      <h3>Spa & Esthétique</h3>
+      <div class="tag">FÉMININ · PREMIUM</div>
+      <p>Massage, soins visage, bien-être. Tonalité douce, photos lagon/spa, palette turquoise + sable.</p>
+      <div class="templates"><span></span><span></span><span></span></div>
+      <p style="margin-top: 12px; color: #00f0d4; font-size: 12px; font-weight: 600;">3 templates · 47 spas PF</p>
+    </a>
+    <a href="lifestyle-barber.html" class="card card-sector">
+      <div class="emoji">✂️</div>
+      <h3>Barber & Coiffure</h3>
+      <div class="tag">MASCULIN · LIFESTYLE</div>
+      <p>Coupe homme, barbe, dégradé. Tonalité chaude, photos mood barber, palette ambre + charbon.</p>
+      <div class="templates"><span></span><span></span><span></span></div>
+      <p style="margin-top: 12px; color: #F59E0B; font-size: 12px; font-weight: 600;">3 templates · 62 coiffeurs PF</p>
+    </a>
+    <a href="lifestyle-medical.html" class="card card-sector">
+      <div class="emoji">🩺</div>
+      <h3>Médical & Santé</h3>
+      <div class="tag">RASSURANT · PRO</div>
+      <p>Médecins, dentistes, kinés. Tonalité confiance, photos clean, palette bleu médical + blanc.</p>
+      <div class="templates"><span></span><span></span><span></span></div>
+      <p style="margin-top: 12px; color: #0EA5E9; font-size: 12px; font-weight: 600;">3 templates · 180 pros santé PF</p>
+    </a>
+  </div>
+
+  <!-- GUIDE GEO/SEO -->
+  <div class="tip">
+    <h3>📖 Comment ces visuels exploitent le GEO/SEO</h3>
+    <div class="grid2">
+      <div>
+        <h4 style="color: #fff; margin-bottom: 12px;">Chaque template intègre :</h4>
+        <ul>
+          <li><strong>Stats primaires citables</strong> (47 spas, 62 coiffeurs, 180 pros santé) → cité par ChatGPT/Perplexity</li>
+          <li><strong>Format Q&A</strong> dans les légendes → matche le format FAQPage schema</li>
+          <li><strong>Mots-clés locaux</strong> (ville + secteur) → "réserver spa Papeete"</li>
+          <li><strong>Prix transparents XPF</strong> → trust signal pour E-E-A-T</li>
+          <li><strong>Hashtags optimisés</strong> par secteur et par plateforme</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color: #fff; margin-bottom: 12px;">À faire en parallèle :</h4>
+        <ol>
+          <li><strong>Publier 3×/semaine</strong> avec rotation des templates</li>
+          <li><strong>Légende type 100 mots</strong> avec keywords + Q&A + CTA</li>
+          <li><strong>Stickers stories</strong> avec sticker question = signal Instagram</li>
+          <li><strong>Reposter en Reel</strong> avec son tendance = portée x10</li>
+          <li><strong>Tagger les marchands partenaires</strong> = effet réseau</li>
+        </ol>
+      </div>
     </div>
   </div>
 
-  <div class="tip">
-    <h3>Comment exporter ces visuels en PNG/JPG ?</h3>
+  <!-- EXPORT TIP -->
+  <div class="tip" style="background: linear-gradient(135deg, rgba(244,228,193,.05), rgba(231,111,81,.05)); border-color: rgba(244,228,193,.3);">
+    <h3 style="color: #F4E4C1;">📸 Exporter en PNG/JPG pour publier</h3>
     <ol>
-      <li>Ouvre le pack dans ton navigateur (Chrome / Safari)</li>
-      <li>Clic droit sur un visuel → <strong>"Inspecter l'élément"</strong></li>
-      <li>Dans la console, fais clic droit sur la div du visuel → <strong>"Capturer un nœud"</strong> (Chrome) ou screenshot avec un outil comme CleanShot</li>
-      <li>Ou plus simple : zoom + screenshot natif (Cmd+Shift+4 sur Mac)</li>
-      <li>Chaque visuel est dimensionné aux ratios Instagram réels (1080×1080, 1080×1920)</li>
+      <li>Ouvre le secteur dans Chrome → <strong>Cmd+Shift+4</strong> sur Mac (ou outil de capture Windows)</li>
+      <li>Sélectionne la zone du visuel → screenshot direct en haute qualité</li>
+      <li>Ou : clic droit sur le visuel → <strong>"Capturer un nœud"</strong> dans DevTools Chrome (qualité max)</li>
+      <li>Format final : PNG 1080×1080 (post) ou 1080×1920 (story) — compatible Instagram, Facebook, TikTok</li>
     </ol>
   </div>
 </body>

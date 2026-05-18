@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Pack Lifestyle · Barber & Coiffure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --amber: #D97706;
+    --copper: #B45309;
+    --charcoal: #1C1917;
+    --cream: #FAF3E0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #14141d; color: #fff; padding: 40px 20px; }
+  .back { display: inline-block; color: #00f0d4; text-decoration: none; margin-bottom: 32px; font-weight: 600; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 900; text-align: center; margin-bottom: 8px; }
+  .sub { text-align: center; color: #aaa; margin-bottom: 60px; font-size: 18px; font-style: italic; }
+  .row { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; margin-bottom: 80px; align-items: flex-start; }
+  .visual-wrap { display: flex; flex-direction: column; align-items: center; }
+  .label { font-size: 13px; font-weight: 600; color: #f59e0b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .size-tag { display: inline-block; background: rgba(245,158,11,.2); color: #f59e0b; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-bottom: 16px; }
+  .caption { margin-top: 16px; padding: 16px 20px; background: rgba(255,255,255,.05); border-radius: 8px; max-width: 540px; color: #ccc; font-size: 13px; line-height: 1.7; }
+  .caption strong { color: #fff; }
+  .geo-tag { display: inline-block; background: rgba(217,119,6,.2); color: #fbbf24; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; margin: 2px; }
+
+  .post { width: 540px; height: 540px; position: relative; overflow: hidden; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .post .bg-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .post .overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(28,25,23,0) 0%, rgba(28,25,23,.9) 100%); }
+  .post .overlay-warm { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(217,119,6,.2) 0%, rgba(28,25,23,.6) 100%); }
+
+  /* Template 1 — Hero éditorial */
+  .t1 .accent-bar { position: absolute; top: 40px; left: 40px; color: #fff; font-size: 11px; letter-spacing: 3px; font-weight: 700; }
+  .t1 .accent-bar::before { content: ''; display: inline-block; width: 30px; height: 1px; background: #D97706; margin-right: 12px; vertical-align: middle; }
+  .t1 .title-hero { position: absolute; bottom: 90px; left: 40px; right: 40px; color: #FAF3E0; font-family: 'Playfair Display', serif; font-style: italic; font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -1px; text-shadow: 0 2px 20px rgba(0,0,0,.5); }
+  .t1 .title-hero .gold { color: #FBBF24; }
+  .t1 .footer-hero { position: absolute; bottom: 40px; left: 40px; right: 40px; display: flex; justify-content: space-between; align-items: center; color: #FAF3E0; }
+  .t1 .footer-hero .brand { font-weight: 800; font-size: 14px; letter-spacing: 2px; }
+  .t1 .footer-hero .sector { font-size: 12px; opacity: .8; letter-spacing: 1px; color: #FBBF24; }
+
+  /* Template 2 — UI Showcase */
+  .t2 .top-tag { position: absolute; top: 30px; left: 30px; background: #1C1917; color: #FBBF24; padding: 8px 14px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 1px; border: 1px solid #D97706; }
+  .t2 .stat-bubble { position: absolute; top: 30px; right: 30px; background: rgba(28,25,23,.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(251,191,36,.4); padding: 12px 16px; border-radius: 16px; color: #FBBF24; text-align: right; }
+  .t2 .stat-bubble .num { font-size: 24px; font-weight: 900; line-height: 1; }
+  .t2 .stat-bubble .lab { font-size: 10px; opacity: .9; margin-top: 4px; color: #FAF3E0; }
+  .t2 .ui-card { position: absolute; bottom: 100px; left: 30px; right: 30px; background: #FAF3E0; border-radius: 20px; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,.4); }
+  .t2 .ui-card .row1 { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .t2 .ui-card .av { width: 50px; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #D97706, #1C1917); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #FBBF24; }
+  .t2 .ui-card .name { font-weight: 800; font-size: 17px; color: #1C1917; }
+  .t2 .ui-card .meta { font-size: 12px; color: #6b5f4a; margin-top: 2px; }
+  .t2 .ui-card .stars { color: #D97706; font-size: 13px; margin-bottom: 14px; }
+  .t2 .ui-card .stars span { color: #6b5f4a; font-size: 12px; margin-left: 4px; }
+  .t2 .ui-card .btn { background: #1C1917; color: #FBBF24; padding: 14px; border-radius: 12px; text-align: center; font-weight: 700; font-size: 14px; letter-spacing: 1px; }
+  .t2 .ui-card .btn .arrow { float: right; }
+  .t2 .footer { position: absolute; bottom: 30px; left: 30px; color: #FAF3E0; font-weight: 800; font-size: 14px; letter-spacing: 2px; }
+
+  /* Template 3 — Testimonial */
+  .t3 .quote-mark { position: absolute; top: 30px; left: 30px; font-family: 'Playfair Display', serif; font-size: 120px; color: #D97706; line-height: 1; opacity: .95; }
+  .t3 .quote-text { position: absolute; top: 130px; left: 30px; right: 30px; color: #FAF3E0; font-family: 'Playfair Display', serif; font-style: italic; font-size: 28px; font-weight: 400; line-height: 1.25; text-shadow: 0 2px 16px rgba(0,0,0,.4); }
+  .t3 .author { position: absolute; bottom: 100px; left: 30px; color: #FAF3E0; }
+  .t3 .author .stars { color: #FBBF24; font-size: 15px; margin-bottom: 8px; }
+  .t3 .author .name { font-weight: 700; font-size: 15px; }
+  .t3 .author .role { font-size: 12px; opacity: .85; margin-top: 2px; }
+  .t3 .cta-pill { position: absolute; bottom: 30px; left: 30px; right: 30px; background: #FBBF24; color: #1C1917; padding: 14px; border-radius: 100px; text-align: center; font-weight: 800; font-size: 13px; letter-spacing: 1.5px; }
+</style>
+</head>
+<body>
+  <a href="index.html" class="back">← Retour au hub</a>
+  <h1>Lifestyle · Barber & Coiffure</h1>
+  <p class="sub">3 templates réutilisables · optimisés GEO/SEO Polynésie</p>
+
+  <div class="row">
+    <!-- TEMPLATE 1 : HERO -->
+    <div class="visual-wrap">
+      <div class="label">Template 1 · Hero Éditorial</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post t1">
+        <img class="bg-img" src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1080&q=80&auto=format&fit=crop" alt="Barbier moderne intérieur" />
+        <div class="overlay"></div>
+        <div class="accent-bar">RITUEL · POLYNÉSIE</div>
+        <div class="title-hero">Le coiffeur,<br/>réservé en<br/><span class="gold">2 clics.</span></div>
+        <div class="footer-hero">
+          <div class="brand">BOOKEASY.ME</div>
+          <div class="sector">BARBER · COIFFURE</div>
+        </div>
+      </div>
+      <div class="caption">
+        <strong>📍 Copy GEO-optimisé :</strong><br/>
+        Réserver un coiffeur à Papeete sans appeler ? C'est fini les "rappelez plus tard". BookEasy référence <strong>62 coiffeurs et barbiers</strong> à Tahiti, Moorea, Punaauia — créneaux temps réel, paiement XPF, rappels automatiques.<br/><br/>
+        <span class="geo-tag">#coiffeurPapeete</span><span class="geo-tag">#barberTahiti</span><span class="geo-tag">#coiffurePolynesie</span><span class="geo-tag">#barberMoorea</span>
+      </div>
+    </div>
+
+    <!-- TEMPLATE 2 : UI SHOWCASE -->
+    <div class="visual-wrap">
+      <div class="label">Template 2 · UI Showcase</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post t2">
+        <img class="bg-img" src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=1080&q=80&auto=format&fit=crop" alt="Tondeuse barbier outils" />
+        <div class="overlay-warm"></div>
+        <div class="top-tag">⚡ DISPO MAINTENANT</div>
+        <div class="stat-bubble">
+          <div class="num">62</div>
+          <div class="lab">COIFFEURS PF</div>
+        </div>
+        <div class="ui-card">
+          <div class="row1">
+            <div class="av">✂️</div>
+            <div>
+              <div class="name">Fades & Co.</div>
+              <div class="meta">Coupe homme + barbe · 45 min · 4 500 XPF</div>
+            </div>
+          </div>
+          <div class="stars">★★★★★ <span>4.8 · 89 avis</span></div>
+          <div class="btn">Réserver maintenant <span class="arrow">→</span></div>
+        </div>
+        <div class="footer">BOOKEASY.ME</div>
+      </div>
+      <div class="caption">
+        <strong>📍 Copy GEO-optimisé :</strong><br/>
+        <em>Question : combien coûte une coupe homme à Papeete ?</em><br/>
+        Réponse : entre 3 000 et 6 500 XPF selon le coiffeur. BookEasy te montre les prix en clair, les avis vérifiés, et les créneaux du jour. Plus de surprises.<br/><br/>
+        <span class="geo-tag">format Q&A pour ChatGPT</span><span class="geo-tag">prix transparents</span><span class="geo-tag">stat citable</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEMPLATE 3 : TESTIMONIAL -->
+  <div class="row">
+    <div class="visual-wrap">
+      <div class="label">Template 3 · Témoignage</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post t3">
+        <img class="bg-img" src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=1080&q=80&auto=format&fit=crop" alt="Barbier moderne salon" />
+        <div class="overlay"></div>
+        <div class="quote-mark">"</div>
+        <div class="quote-text">Plus jamais à attendre 30 min au téléphone. Je réserve mon barbier le matin, j'y vais à 18h. Game changer.</div>
+        <div class="author">
+          <div class="stars">★★★★★</div>
+          <div class="name">Teiki M.</div>
+          <div class="role">Punaauia · client depuis février 2026</div>
+        </div>
+        <div class="cta-pill">RÉSERVE TA COUPE → BOOKEASY.ME</div>
+      </div>
+      <div class="caption">
+        <strong>📍 Copy GEO-optimisé :</strong><br/>
+        <strong>+3 100 coupes réservées</strong> via BookEasy en avril 2026. Note moyenne barbiers : 4.7/5. Coupe homme, dégradé, taille de barbe — trouve ton barbier en 30 secondes.<br/><br/>
+        <span class="geo-tag">E-E-A-T social proof</span><span class="geo-tag">stat primaire</span><span class="geo-tag">trust signal</span>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="visual-wrap" style="max-width: 540px;">
+      <div class="label">Conseil d'usage</div>
+      <span class="size-tag">stratégie</span>
+      <div style="background: linear-gradient(135deg, rgba(217,119,6,.1), rgba(28,25,23,.6)); border: 1px solid rgba(251,191,36,.3); border-radius: 16px; padding: 24px; color: #fff;">
+        <h3 style="margin-bottom: 12px; color: #FBBF24;">🎯 Cadence recommandée</h3>
+        <ul style="padding-left: 20px; line-height: 1.8; font-size: 14px;">
+          <li><strong>Mardi</strong> · Template 1 (Hero éditorial)</li>
+          <li><strong>Jeudi</strong> · Template 2 (UI Showcase barbier)</li>
+          <li><strong>Samedi</strong> · Template 3 (Témoignage)</li>
+        </ul>
+        <h3 style="margin: 20px 0 12px; color: #FBBF24;">📈 Hashtags secteur Coiffure</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #ccc;">
+          #BarberTahiti #CoiffeurPapeete #FadePF #CoiffureMoorea #BarbierPunaauia #DégradéTahiti #BookEasy #StyleHommePF
+        </p>
+        <h3 style="margin: 20px 0 12px; color: #FBBF24;">🔍 Mots-clés SEO</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #ccc;">
+          "barber Papeete" · "coiffeur Tahiti réservation" · "salon coiffure Moorea" · "prix coupe homme Polynésie" · "barbier près de chez moi"
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

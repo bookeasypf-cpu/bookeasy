@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Pack Lifestyle · Spa & Esthétique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --turquoise: #0EA5A0;
+    --sand: #F4E4C1;
+    --navy: #0F1E2D;
+    --white: #FFFFFF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #14141d; color: #fff; padding: 40px 20px; }
+  .back { display: inline-block; color: #00f0d4; text-decoration: none; margin-bottom: 32px; font-weight: 600; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 900; text-align: center; margin-bottom: 8px; }
+  .sub { text-align: center; color: #aaa; margin-bottom: 60px; font-size: 18px; font-style: italic; }
+  .row { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; margin-bottom: 80px; align-items: flex-start; }
+  .visual-wrap { display: flex; flex-direction: column; align-items: center; }
+  .label { font-size: 13px; font-weight: 600; color: #00f0d4; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .size-tag { display: inline-block; background: rgba(0,240,212,.2); color: #00f0d4; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-bottom: 16px; }
+  .caption {
+    margin-top: 16px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,.05);
+    border-radius: 8px;
+    max-width: 540px;
+    color: #ccc;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .caption strong { color: #fff; }
+  .geo-tag { display: inline-block; background: rgba(168,85,247,.2); color: #c084fc; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; margin: 2px; }
+
+  /* Base post structure */
+  .post {
+    width: 540px;
+    height: 540px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .post .bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .post .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15,30,45,0) 0%, rgba(15,30,45,.85) 100%);
+  }
+  .post .overlay-soft {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(14,165,160,.25) 0%, rgba(15,30,45,.5) 100%);
+  }
+
+  /* Template 1: HERO Magazine */
+  .t1 .accent-bar {
+    position: absolute;
+    top: 40px; left: 40px;
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 3px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .t1 .accent-bar::before {
+    content: '';
+    display: inline-block;
+    width: 30px; height: 1px;
+    background: #fff;
+    margin-right: 12px;
+    vertical-align: middle;
+  }
+  .t1 .title-hero {
+    position: absolute;
+    bottom: 90px;
+    left: 40px;
+    right: 40px;
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 20px rgba(0,0,0,.4);
+  }
+  .t1 .footer-hero {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    right: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+  }
+  .t1 .footer-hero .brand { font-weight: 800; font-size: 14px; letter-spacing: 2px; }
+  .t1 .footer-hero .sector { font-size: 12px; opacity: .8; letter-spacing: 1px; }
+
+  /* Template 2: UI Showcase */
+  .t2 .top-tag {
+    position: absolute;
+    top: 30px; left: 30px;
+    background: rgba(255,255,255,.95);
+    color: #0F1E2D;
+    padding: 8px 14px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .t2 .stat-bubble {
+    position: absolute;
+    top: 30px; right: 30px;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,.3);
+    padding: 12px 16px;
+    border-radius: 16px;
+    color: #fff;
+    text-align: right;
+  }
+  .t2 .stat-bubble .num { font-size: 24px; font-weight: 900; line-height: 1; }
+  .t2 .stat-bubble .lab { font-size: 10px; opacity: .9; margin-top: 4px; }
+  .t2 .ui-card {
+    position: absolute;
+    bottom: 100px;
+    left: 30px;
+    right: 30px;
+    background: rgba(255,255,255,.97);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.3);
+  }
+  .t2 .ui-card .row1 { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .t2 .ui-card .av { width: 50px; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #F4E4C1, #0EA5A0); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .t2 .ui-card .name { font-weight: 800; font-size: 17px; color: #0F1E2D; }
+  .t2 .ui-card .meta { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .t2 .ui-card .stars { color: #F59E0B; font-size: 13px; margin-bottom: 14px; }
+  .t2 .ui-card .stars span { color: #6b7280; font-size: 12px; margin-left: 4px; }
+  .t2 .ui-card .btn { background: #0F1E2D; color: #fff; padding: 14px; border-radius: 12px; text-align: center; font-weight: 700; font-size: 14px; }
+  .t2 .ui-card .btn .arrow { float: right; }
+  .t2 .footer { position: absolute; bottom: 30px; left: 30px; color: #fff; font-weight: 800; font-size: 14px; letter-spacing: 2px; }
+
+  /* Template 3: Testimonial */
+  .t3 .quote-mark {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    font-family: 'Playfair Display', serif;
+    font-size: 120px;
+    color: #F4E4C1;
+    line-height: 1;
+    opacity: .9;
+  }
+  .t3 .quote-text {
+    position: absolute;
+    top: 130px;
+    left: 30px;
+    right: 30px;
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.25;
+    text-shadow: 0 2px 16px rgba(0,0,0,.4);
+  }
+  .t3 .author {
+    position: absolute;
+    bottom: 100px;
+    left: 30px;
+    color: #fff;
+  }
+  .t3 .author .stars { color: #FFD700; font-size: 15px; margin-bottom: 8px; }
+  .t3 .author .name { font-weight: 700; font-size: 15px; }
+  .t3 .author .role { font-size: 12px; opacity: .85; margin-top: 2px; }
+  .t3 .cta-pill {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    right: 30px;
+    background: rgba(255,255,255,.95);
+    color: #0F1E2D;
+    padding: 14px;
+    border-radius: 100px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+  <a href="index.html" class="back">← Retour au hub</a>
+  <h1>Lifestyle · Spa & Esthétique</h1>
+  <p class="sub">3 templates réutilisables · optimisés GEO/SEO Polynésie</p>
+
+  <div class="row">
+    <!-- TEMPLATE 1 : HERO MAGAZINE -->
+    <div class="visual-wrap">
+      <div class="label">Template 1 · Hero Magazine</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post t1">
+        <img class="bg-img" src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1080&q=80&auto=format&fit=crop" alt="Spa polynésien massage" />
+        <div class="overlay"></div>
+        <div class="accent-bar">BIEN-ÊTRE · POLYNÉSIE</div>
+        <div class="title-hero">L'art du<br/>relâchement,<br/>réinventé.</div>
+        <div class="footer-hero">
+          <div class="brand">BOOKEASY.ME</div>
+          <div class="sector">SPA & ESTHÉTIQUE</div>
+        </div>
+      </div>
+      <div class="caption">
+        <strong>📍 Copy GEO-optimisé :</strong><br/>
+        Réserver un massage à Papeete n'a jamais été aussi simple. BookEasy référence <strong>47 spas et esthéticiennes</strong> à Tahiti, Moorea, Bora Bora — avis vérifiés, créneaux temps réel. Prix moyens : 6 500–14 000 XPF.<br/><br/>
+        <span class="geo-tag">#spaPapeete</span><span class="geo-tag">#bienetreTahiti</span><span class="geo-tag">#massagePolynesie</span><span class="geo-tag">#estheticienneMoorea</span>
+      </div>
+    </div>
+
+    <!-- TEMPLATE 2 : UI SHOWCASE -->
+    <div class="visual-wrap">
+      <div class="label">Template 2 · UI Showcase</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post t2">
+        <img class="bg-img" src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1080&q=80&auto=format&fit=crop" alt="Spa fleurs bien-être" />
+        <div class="overlay-soft"></div>
+        <div class="top-tag">⚡ NOUVEAU À PAPEETE</div>
+        <div class="stat-bubble">
+          <div class="num">47</div>
+          <div class="lab">SPAS DISPO</div>
+        </div>
+        <div class="ui-card">
+          <div class="row1">
+            <div class="av">🌺</div>
+            <div>
+              <div class="name">Manea Spa</div>
+              <div class="meta">Massage polynésien · 60 min · 8 500 XPF</div>
+            </div>
+          </div>
+          <div class="stars">★★★★★ <span>4.9 · 127 avis</span></div>
+          <div class="btn">Réserver maintenant <span class="arrow">→</span></div>
+        </div>
+        <div class="footer">BOOKEASY.ME</div>
+      </div>
+      <div class="caption">
+        <strong>📍 Copy GEO-optimisé :</strong><br/>
+        <em>Question fréquente : où trouver un bon spa à Papeete ?</em><br/>
+        Réponse : BookEasy référence les 47 meilleurs spas de Tahiti avec notes vérifiées. Manea Spa, Moana Spa, Pure Spa Bora Bora… Réservation en 2 clics, paiement en XPF.<br/><br/>
+        <span class="geo-tag">format Q&A pour ChatGPT</span><span class="geo-tag">stat citable</span><span class="geo-tag">prix XPF</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEMPLATE 3 : TESTIMONIAL -->
+  <div class="row">
+    <div class="visual-wrap">
+      <div class="label">Template 3 · Témoignage</div>
+      <span class="size-tag">1080 × 1080</span>
+      <div class="post t3">
+        <img class="bg-img" src="https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1080&q=80&auto=format&fit=crop" alt="Spa serviette pierres" />
+        <div class="overlay"></div>
+        <div class="quote-mark">"</div>
+        <div class="quote-text">J'ai réservé mon massage en 30 secondes depuis le canapé. Une heure plus tard j'étais sur la table. Magique.</div>
+        <div class="author">
+          <div class="stars">★★★★★</div>
+          <div class="name">Hina T.</div>
+          <div class="role">Papeete · cliente depuis mars 2026</div>
+        </div>
+        <div class="cta-pill">RÉSERVE TON MOMENT → BOOKEASY.ME</div>
+      </div>
+      <div class="caption">
+        <strong>📍 Copy GEO-optimisé :</strong><br/>
+        Les Polynésiens ont adopté BookEasy. <strong>+2 400 réservations bien-être</strong> validées en avril 2026, note moyenne 4.8/5. Tu cherches ton prochain massage à Papeete, Punaauia, ou Moorea ? On a ce qu'il te faut.<br/><br/>
+        <span class="geo-tag">E-E-A-T témoignage</span><span class="geo-tag">stat primaire</span><span class="geo-tag">trust signal</span>
+      </div>
+    </div>
+
+    <!-- BLOC EXPORT INFO -->
+    <div class="visual-wrap" style="max-width: 540px;">
+      <div class="label">Conseil d'usage</div>
+      <span class="size-tag">stratégie</span>
+      <div style="background: linear-gradient(135deg, rgba(0,240,212,.1), rgba(168,85,247,.1)); border: 1px solid rgba(0,240,212,.3); border-radius: 16px; padding: 24px; color: #fff;">
+        <h3 style="margin-bottom: 12px; color: #00f0d4;">🎯 Cadence de publication recommandée</h3>
+        <ul style="padding-left: 20px; line-height: 1.8; font-size: 14px;">
+          <li><strong>Lundi</strong> · Template 1 (Hero aspirationnel)</li>
+          <li><strong>Mercredi</strong> · Template 2 (UI Showcase avec marchand)</li>
+          <li><strong>Vendredi</strong> · Template 3 (Témoignage client)</li>
+        </ul>
+        <h3 style="margin: 20px 0 12px; color: #00f0d4;">📈 Hashtags secteur Spa</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #ccc;">
+          #SpaTahiti #BienetrePolynesie #MassagePapeete #EstheticienneMoorea #SpaBoraBora #DetenteTahiti #WellnessPF #BookEasy
+        </p>
+        <h3 style="margin: 20px 0 12px; color: #00f0d4;">🔍 Mots-clés SEO (à intégrer)</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #ccc;">
+          "réserver spa Papeete" · "massage Tahiti en ligne" · "esthéticienne Moorea" · "soins visage Polynésie" · "meilleur spa Bora Bora"
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
