@@ -12,11 +12,12 @@ import toast from "react-hot-toast";
 import QRCode from "qrcode";
 
 const amounts = [
-  { value: 2000, label: "2 000 F" },
-  { value: 5000, label: "5 000 F" },
-  { value: 10000, label: "10 000 F" },
-  { value: 20000, label: "20 000 F" },
-  { value: 50000, label: "50 000 F" },
+  // Consistent F CFP everywhere — was previously "2 000 F" / "5 000 F CFP" / "CFP" mixed.
+  { value: 2000, label: "2 000 F CFP" },
+  { value: 5000, label: "5 000 F CFP" },
+  { value: 10000, label: "10 000 F CFP" },
+  { value: 20000, label: "20 000 F CFP" },
+  { value: 50000, label: "50 000 F CFP" },
 ];
 
 interface MerchantOption {
@@ -263,7 +264,37 @@ function GiftCardsContent() {
           </button>
         </div>
 
-        {tab === "buy" && !sent && (
+        {tab === "buy" && !sent && status === "unauthenticated" && (
+          <Card className="rounded-2xl border-0 shadow-sm">
+            <CardContent className="p-8 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-[#0066FF]/10 flex items-center justify-center mx-auto mb-4">
+                <Gift className="h-7 w-7 text-[#0066FF]" />
+              </div>
+              <h3 className="text-lg font-bold text-[#0C1B2A] dark:text-white mb-2">
+                Connectez-vous pour offrir
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm mx-auto">
+                Vous devez avoir un compte pour acheter une Carte Cadeau et la suivre dans votre espace.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <a
+                  href="/login?callbackUrl=/gift-cards"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#0066FF] text-white text-sm font-semibold hover:bg-[#0052CC] transition-colors"
+                >
+                  Se connecter
+                </a>
+                <a
+                  href="/register?callbackUrl=/gift-cards"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  Créer un compte
+                </a>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === "buy" && !sent && status !== "unauthenticated" && (
           <Card className="rounded-2xl border-0 shadow-sm">
             <CardContent className="p-6">
               <form onSubmit={handleBuy} className="space-y-6">
@@ -464,7 +495,7 @@ function GiftCardsContent() {
                   ) : (
                     <>
                       <Send className="h-4 w-4" />
-                      Offrir {amounts.find((a) => a.value === selectedAmount)?.label} CFP
+                      Offrir {amounts.find((a) => a.value === selectedAmount)?.label}
                     </>
                   )}
                 </button>

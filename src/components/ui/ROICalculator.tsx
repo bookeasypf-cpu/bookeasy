@@ -154,7 +154,7 @@ export function ROICalculator() {
         </div>
 
         <Link
-          href="/register?role=MERCHANT"
+          href="/pricing#inscription-pro"
           className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white font-semibold text-sm hover:shadow-lg hover:shadow-[#0066FF]/25 transition-all"
         >
           Commencer gratuitement

@@ -25,10 +25,19 @@ export default async function MyBookingsPage() {
     orderBy: { date: "desc" },
   });
 
+  // Today's date in YYYY-MM-DD (matches the Booking.date string format).
+  const today = new Date().toISOString().split("T")[0];
+
+  // Upcoming = still actionable from the client's side. We MUST include
+  // PENDING_PAYMENT so the client can see (and pay or cancel) a booking
+  // they started but haven't paid yet — otherwise the booking is invisible
+  // and they think they lost their money or the slot.
   const upcoming = bookings.filter(
     (b) =>
-      (b.status === "CONFIRMED" || b.status === "PENDING") &&
-      b.date >= new Date().toISOString().split("T")[0]
+      (b.status === "CONFIRMED" ||
+        b.status === "PENDING" ||
+        b.status === "PENDING_PAYMENT") &&
+      b.date >= today
   );
 
   const past = bookings.filter(
@@ -37,8 +46,10 @@ export default async function MyBookingsPage() {
       b.status === "CANCELLED_BY_CLIENT" ||
       b.status === "CANCELLED_BY_MERCHANT" ||
       b.status === "NO_SHOW" ||
-      (b.date < new Date().toISOString().split("T")[0] &&
-        (b.status === "CONFIRMED" || b.status === "PENDING"))
+      (b.date < today &&
+        (b.status === "CONFIRMED" ||
+          b.status === "PENDING" ||
+          b.status === "PENDING_PAYMENT"))
   );
 
   return (

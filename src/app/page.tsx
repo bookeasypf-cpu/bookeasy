@@ -463,7 +463,7 @@ export default async function HomePage() {
           <ScrollReveal delay={300}>
             <MagneticButton className="inline-block">
               <Link
-                href="/register?role=MERCHANT"
+                href="/pricing#inscription-pro"
                 className="btn-slide btn-press inline-flex items-center gap-2 bg-gradient-to-r from-[#0066FF] to-[#00B4D8] hover:from-[#0052CC] hover:to-[#0891B2] text-white px-7 py-3.5 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 text-base"
               >
                 <span className="btn-text">

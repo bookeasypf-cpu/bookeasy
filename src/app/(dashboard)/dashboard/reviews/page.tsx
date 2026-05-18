@@ -32,10 +32,12 @@ export default async function DashboardReviewsPage() {
             <Star className="h-7 w-7 text-white" />
           </div>
           <h2 className="text-lg font-bold text-[#0C1B2A] dark:text-white mb-2">
-            Activez les avis clients
+            {isMedical ? "Activez les avis patients" : "Activez les avis clients"}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-md mx-auto mb-6">
-            Passez en PRO pour permettre à vos clients de noter et commenter vos services. Les avis renforcent votre crédibilité et attirent de nouveaux clients.
+            {isMedical
+              ? "Passez en PRO pour permettre à vos patients de noter et commenter vos consultations. Les avis renforcent votre crédibilité et attirent de nouveaux patients."
+              : "Passez en PRO pour permettre à vos clients de noter et commenter vos services. Les avis renforcent votre crédibilité et attirent de nouveaux clients."}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
@@ -48,7 +50,7 @@ export default async function DashboardReviewsPage() {
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
               <Users className="h-4 w-4 text-[#0066FF]" />
-              Plus de clients
+              {isMedical ? "Plus de patients" : "Plus de clients"}
             </div>
           </div>
           <Link

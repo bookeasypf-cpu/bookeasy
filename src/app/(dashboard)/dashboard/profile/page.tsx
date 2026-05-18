@@ -166,17 +166,28 @@ export default function DashboardProfilePage() {
     setCoverUploading(false);
   }
 
-  // Remove cover image
+  // Remove cover image — loading state + try/catch so the user always
+  // gets feedback even if the network drops mid-request.
   async function handleRemoveCover() {
-    const res = await fetch("/api/dashboard/photos", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ coverImage: null }),
-    });
-    const data = await res.json();
-    if (!data.error) {
+    if (coverUploading) return;
+    setCoverUploading(true);
+    try {
+      const res = await fetch("/api/dashboard/photos", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coverImage: null }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        toast.error(data.error || "Erreur lors de la suppression");
+        return;
+      }
       setCoverImage(null);
-      toast.success("Photo de couverture supprimee !");
+      toast.success("Photo de couverture supprimée !");
+    } catch {
+      toast.error("Erreur réseau, réessayez");
+    } finally {
+      setCoverUploading(false);
     }
   }
 
@@ -193,9 +204,9 @@ export default function DashboardProfilePage() {
       const data = await res.json();
       if (!data.error) {
         setPhotos((prev) => [...prev, data]);
-        toast.success("Photo ajoutee !");
+        toast.success("Photo ajoutée !");
       } else {
-        toast.error("Erreur lors de l'ajout");
+        toast.error(data.error || "Erreur lors de l'ajout");
       }
     }
     setPhotoUploading(false);
@@ -209,7 +220,7 @@ export default function DashboardProfilePage() {
     const data = await res.json();
     if (data.success) {
       setPhotos((prev) => prev.filter((p) => p.id !== photoId));
-      toast.success("Photo supprimee !");
+      toast.success("Photo supprimée !");
     } else {
       toast.error("Erreur lors de la suppression");
     }
@@ -232,18 +243,18 @@ export default function DashboardProfilePage() {
     []
   );
 
-  const handleCoverDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setCoverDragOver(false);
-      const file = e.dataTransfer.files?.[0];
-      if (file && file.type.startsWith("image/")) {
-        handleCoverUpload(file);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  // Plain handler (no useCallback) — keeps `handleCoverUpload` always
+  // referring to the latest closure so a quick double-drop can't fire
+  // the stale version twice with inconsistent state.
+  const handleCoverDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setCoverDragOver(false);
+    if (coverUploading) return;
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      handleCoverUpload(file);
+    }
+  };
 
   // File input handlers
   function handleCoverFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -261,19 +272,26 @@ export default function DashboardProfilePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const res = await fetch("/api/dashboard/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    if (data.error) {
-      toast.error(data.error);
-    } else {
-      toast.success("Profil mis a jour !");
-      router.refresh();
+    try {
+      const res = await fetch("/api/dashboard/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (data.error) {
+        toast.error(data.error);
+      } else {
+        toast.success("Profil mis à jour !");
+        router.refresh();
+      }
+    } catch {
+      toast.error("Erreur réseau, réessayez");
+    } finally {
+      // Always release the loading state, even on network failure —
+      // without this, the "Enregistrer" button stays disabled forever.
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   const accentGradient = isMedical
@@ -589,19 +607,25 @@ export default function DashboardProfilePage() {
                 type="button"
                 disabled={savingPayment}
                 onClick={async () => {
+                  // Optimistic update with rollback on failure — the UI
+                  // never lies about what's stored on the server.
+                  const prevValue = paymentPolicy;
                   setPaymentPolicy(opt.value);
                   setSavingPayment(true);
                   try {
-                    await fetch("/api/dashboard/profile", {
+                    const res = await fetch("/api/dashboard/profile", {
                       method: "PUT",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ paymentPolicy: opt.value }),
                     });
+                    if (!res.ok) throw new Error("HTTP " + res.status);
                     toast.success("Mode de paiement mis à jour");
                   } catch {
-                    toast.error("Erreur lors de la mise à jour");
+                    setPaymentPolicy(prevValue);
+                    toast.error("Erreur lors de la mise à jour, réessayez");
+                  } finally {
+                    setSavingPayment(false);
                   }
-                  setSavingPayment(false);
                 }}
                 className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 ${
                   paymentPolicy === opt.value

@@ -204,8 +204,10 @@ export default function OnboardingTutorial({
                 </button>
               </div>
             </motion.div>
-          ) : (
-            /* STEP CONTENT */
+          ) : step ? (
+            /* STEP CONTENT — `step` guarded so a rapid double-click on
+               "Suivant" that pushes currentStep past steps.length doesn't
+               crash on a non-null assertion. */
             <motion.div
               key={currentStep}
               custom={direction}
@@ -222,21 +224,21 @@ export default function OnboardingTutorial({
 
               {/* Icon */}
               <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${c.iconBg} flex items-center justify-center mb-5 ${c.text}`}>
-                {step!.icon}
+                {step.icon}
               </div>
 
               {/* Title & description */}
               <h3 className="text-xl font-bold text-[#0C1B2A] mb-2">
-                {step!.title}
+                {step.title}
               </h3>
               <p className="text-gray-500 leading-relaxed mb-5">
-                {step!.description}
+                {step.description}
               </p>
 
               {/* Tips */}
-              {step!.tips && step!.tips.length > 0 && (
+              {step.tips && step.tips.length > 0 && (
                 <div className="bg-gray-50 rounded-2xl p-4 mb-6 space-y-2.5">
-                  {step!.tips.map((tip, i) => (
+                  {step.tips.map((tip, i) => (
                     <div key={i} className="flex items-start gap-2.5">
                       <CheckCircle className={`h-4 w-4 ${isMedical ? "text-emerald-500" : "text-green-500"} mt-0.5 shrink-0`} />
                       <span className="text-sm text-gray-600">{tip}</span>
@@ -283,7 +285,7 @@ export default function OnboardingTutorial({
                 </button>
               </div>
             </motion.div>
-          )}
+          ) : null}
         </AnimatePresence>
       </motion.div>
     </div>

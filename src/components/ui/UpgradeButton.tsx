@@ -31,7 +31,10 @@ export function UpgradeButton({ className = "" }: { className?: string }) {
           form.submit();
         }
       } else if (data.error === "Non autorisé") {
-        router.push("/register?role=MERCHANT&plan=pro");
+        // Non-merchants must first create an account via QuickRegisterForm
+        // on /pricing — the legacy /register?role=MERCHANT URL is a dead
+        // path (it always creates CLIENT accounts).
+        router.push("/pricing#inscription-pro");
       } else {
         alert(data.error || "Erreur lors du paiement");
         setLoading(false);

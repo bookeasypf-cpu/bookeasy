@@ -124,13 +124,29 @@ export const supportMessageSchema = z.object({
 // DASHBOARD — PHOTOS
 // ─────────────────────────────────────────────
 
+// Photo URLs MUST come from our own Blob store. Without this guard, a
+// malicious or buggy client could persist any URL — including a tracking
+// pixel or a domain not whitelisted in next.config remotePatterns,
+// which makes next/image throw a 500 at render time (= invisible image
+// with no clear error to debug).
+const isAllowedPhotoUrl = (url: string) =>
+  /^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\//i.test(url);
+
 export const addPhotoSchema = z.object({
-  url: z.string().url("URL invalide"),
+  url: z
+    .string()
+    .url("URL invalide")
+    .refine(isAllowedPhotoUrl, "URL non autorisée (doit être sur Vercel Blob)"),
   caption: z.string().max(200).optional().default(""),
 });
 
 export const updateCoverSchema = z.object({
-  coverImage: z.string().url().nullable().optional(),
+  coverImage: z
+    .string()
+    .url()
+    .refine(isAllowedPhotoUrl, "URL non autorisée")
+    .nullable()
+    .optional(),
 });
 
 // ─────────────────────────────────────────────

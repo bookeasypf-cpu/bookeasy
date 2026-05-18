@@ -23,10 +23,14 @@ export function useUpdateChecker() {
       }
     };
 
+    // Debug logs in dev only — they were spamming the console every
+    // 30s in production for every connected user.
+    const isDev = process.env.NODE_ENV === "development";
+
     // First fetch to establish baseline
     getVersion().then((version) => {
       if (version) {
-        console.log("[UpdateChecker] Initial version:", version);
+        if (isDev) console.log("[UpdateChecker] Initial version:", version);
         lastVersionRef.current = version;
       }
     });
@@ -36,12 +40,13 @@ export function useUpdateChecker() {
       getVersion().then((version) => {
         if (!version) return;
 
-        // Log every check
-        console.log("[UpdateChecker] Current version:", version, "Last version:", lastVersionRef.current);
+        if (isDev) {
+          console.log("[UpdateChecker] Current version:", version, "Last version:", lastVersionRef.current);
+        }
 
         // If version changed, new version is available
         if (lastVersionRef.current && version !== lastVersionRef.current && !notifiedRef.current) {
-          console.log("[UpdateChecker] Version changed! Showing notification");
+          if (isDev) console.log("[UpdateChecker] Version changed! Showing notification");
           lastVersionRef.current = version;
           notifiedRef.current = true;
 

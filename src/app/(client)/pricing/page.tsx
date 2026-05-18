@@ -55,7 +55,11 @@ const plans = [
       "Support prioritaire",
     ],
     cta: "Choisir Pro",
-    href: "/register?role=MERCHANT&plan=pro",
+    // All pro signups go through QuickRegisterForm on this same page —
+    // the user creates a FREE merchant account first, then upgrades
+    // from the dashboard. /register?role=MERCHANT was a dead URL
+    // (register/page.tsx ignores the param and creates a CLIENT).
+    href: "#inscription-pro",
     popular: true,
   },
 ];
@@ -218,12 +222,13 @@ export default function PricingPage() {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Vous avez d&apos;autres questions ?
             </p>
-            <Link
+            {/* Plain anchor — next/link doesn't reliably open mailto: */}
+            <a
               href="mailto:bookeasy.pf@gmail.com"
               className="inline-flex items-center gap-2 text-[#0066FF] font-semibold hover:underline"
             >
               Contactez-nous <ArrowRight className="h-4 w-4" />
-            </Link>
+            </a>
           </div>
         </div>
       </div>
