@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Calendrier Éditorial 30j</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 40px 20px 80px; }
+
+  /* TOOLBAR */
+  .toolbar { position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; gap: 8px; }
+  .toolbar a, .toolbar button { background: rgba(255,255,255,.08); backdrop-filter: blur(20px); color: #fff; padding: 8px 14px; border-radius: 100px; text-decoration: none; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,.15); cursor: pointer; font-family: inherit; transition: all .2s; }
+  .toolbar a:hover, .toolbar button:hover { background: rgba(255,255,255,.16); }
+
+  /* HERO */
+  .hero { text-align: center; margin-bottom: 32px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900; margin-bottom: 8px; background: linear-gradient(135deg, #0EA5A0, #F4E4C1, #E76F51, #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; }
+  .hero .sub { color: #aaa; font-size: 16px; font-style: italic; margin-bottom: 24px; }
+  .hero .stats { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
+  .hero .stat { text-align: center; }
+  .hero .stat .num { font-size: 32px; font-weight: 900; color: #fff; line-height: 1; }
+  .hero .stat .lab { font-size: 10px; color: #888; letter-spacing: 1px; text-transform: uppercase; margin-top: 6px; }
+
+  /* FILTERS */
+  .filters { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin: 36px auto; max-width: 1200px; }
+  .filter-btn { background: #14141d; color: #aaa; border: 1px solid #2a2a3a; padding: 8px 14px; border-radius: 100px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all .2s; font-family: inherit; }
+  .filter-btn:hover { border-color: #fff; color: #fff; }
+  .filter-btn.active { background: #fff; color: #000; border-color: #fff; }
+
+  /* CALENDAR */
+  .calendar { max-width: 1400px; margin: 0 auto; }
+  .week-row { margin-bottom: 24px; }
+  .week-label { font-size: 11px; color: #666; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; letter-spacing: 1px; padding-left: 4px; }
+  .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+  @media (max-width: 1000px) { .days-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .days-grid { grid-template-columns: 1fr; } }
+
+  .day-headers { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-bottom: 12px; }
+  @media (max-width: 1000px) { .day-headers { display: none; } }
+  .day-header { text-align: center; font-size: 11px; color: #888; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 8px; }
+
+  .day-card {
+    background: #14141d;
+    border: 1px solid #2a2a3a;
+    border-radius: 14px;
+    padding: 12px;
+    min-height: 130px;
+    cursor: pointer;
+    transition: all .25s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .day-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.3); }
+  .day-card.empty { background: rgba(255,255,255,.02); border-style: dashed; cursor: default; opacity: .4; }
+  .day-card.empty:hover { transform: none; border-color: #2a2a3a; }
+
+  .day-card .date-row { display: flex; justify-content: space-between; align-items: baseline; }
+  .day-card .date-num { font-size: 22px; font-weight: 900; }
+  .day-card .day-name { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+  .day-card .type-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 700;
+    align-self: flex-start;
+  }
+  .day-card .sector-name { font-size: 12px; color: #ccc; line-height: 1.3; font-weight: 600; }
+  .day-card .platforms { display: flex; gap: 3px; margin-top: auto; }
+  .day-card .platforms span { font-size: 12px; }
+  .day-card .time { font-size: 10px; color: #666; font-family: 'JetBrains Mono', monospace; }
+  .day-card.upgrade { border-color: rgba(236,72,153,.5); box-shadow: 0 0 30px rgba(236,72,153,.15); }
+  .day-card.upgrade::before { content: '🚀'; position: absolute; top: -10px; right: -10px; font-size: 24px; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(20px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn .2s; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: #14141d; border: 1px solid #2a2a3a; border-radius: 24px; padding: 32px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp .3s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .modal-close { float: right; background: rgba(255,255,255,.1); color: #fff; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px; }
+  .modal h2 { font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 6px; }
+  .modal .date-label { color: #aaa; font-size: 13px; margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; }
+  .modal .meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .modal .badge { padding: 5px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+  .modal .section { margin-bottom: 24px; }
+  .modal .section h4 { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 700; }
+  .modal .caption-box { background: #0a0a0f; border: 1px solid #2a2a3a; border-radius: 12px; padding: 16px; font-size: 14px; line-height: 1.6; color: #ddd; white-space: pre-line; position: relative; }
+  .modal .copy-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,.1); color: #fff; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .modal .copy-btn:hover { background: rgba(255,255,255,.2); }
+  .modal .hashtags-box { color: #00f0d4; font-size: 13px; font-family: 'JetBrains Mono', monospace; line-height: 1.7; }
+  .modal .notes-box { background: rgba(168,85,247,.1); border: 1px solid rgba(168,85,247,.3); border-radius: 10px; padding: 12px; font-size: 13px; color: #c084fc; }
+
+  /* LEGEND */
+  .legend { max-width: 1400px; margin: 60px auto 0; padding: 28px; background: linear-gradient(135deg, rgba(0,240,212,.05), rgba(168,85,247,.05)); border: 1px solid rgba(0,240,212,.2); border-radius: 20px; }
+  .legend h3 { margin-bottom: 16px; font-size: 18px; }
+  .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .legend-item { display: flex; gap: 12px; align-items: flex-start; }
+  .legend-item .dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .legend-item .text strong { display: block; font-size: 13px; margin-bottom: 2px; }
+  .legend-item .text span { font-size: 11px; color: #888; line-height: 1.4; }
+
+  @media print {
+    .toolbar, .filters, .modal-overlay { display: none !important; }
+    body { background: #fff; color: #000; padding: 20px; }
+    .day-card { border-color: #ddd; background: #fff; color: #000; }
+    h1, .hero .stat .num { color: #000; -webkit-text-fill-color: #000; }
+  }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="index.html">← Hub</a>
+    <button onclick="window.print()">🖨️ Imprimer</button>
+  </div>
+
+  <div class="hero">
+    <h1>Calendrier Éditorial</h1>
+    <p class="sub">30 jours · Mai → Juin 2026 · Toute la stratégie planifiée</p>
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-posts">—</div><div class="lab">Posts planifiés</div></div>
+      <div class="stat"><div class="num" id="stat-sectors">—</div><div class="lab">Secteurs couverts</div></div>
+      <div class="stat"><div class="num" id="stat-upgrades">—</div><div class="lab">Upgrade Pro</div></div>
+      <div class="stat"><div class="num" id="stat-welcomes">—</div><div class="lab">Welcome Free</div></div>
+      <div class="stat"><div class="num" id="stat-edu">—</div><div class="lab">Éducatifs</div></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" data-type="all">Tous</button>
+    <button class="filter-btn" data-type="hero">🎨 Hero</button>
+    <button class="filter-btn" data-type="ui">📱 UI Showcase</button>
+    <button class="filter-btn" data-type="testimonial">💬 Témoignage</button>
+    <button class="filter-btn" data-type="welcome">👋 Welcome Free</button>
+    <button class="filter-btn" data-type="upgrade">🚀 Upgrade Pro</button>
+    <button class="filter-btn" data-type="educational">📚 Éducatif</button>
+  </div>
+
+  <div class="calendar">
+    <div class="day-headers">
+      <div class="day-header">Lundi</div>
+      <div class="day-header">Mardi</div>
+      <div class="day-header">Mercredi</div>
+      <div class="day-header">Jeudi</div>
+      <div class="day-header">Vendredi</div>
+      <div class="day-header">Samedi</div>
+      <div class="day-header">Dimanche</div>
+    </div>
+    <div id="weeks-container"></div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <h3>📚 Légende & Stratégie</h3>
+    <div class="legend-grid" id="legend-grid"></div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="modal" id="modal-content"></div>
+  </div>
+
+<script type="module">
+  import { CALENDAR, PLATFORM_INFO, TYPE_INFO } from './data/calendar.js';
+  import { SECTORS } from './data/sectors.js';
+
+  // ─── STATS ───
+  document.getElementById('stat-posts').textContent = CALENDAR.length;
+  document.getElementById('stat-sectors').textContent = new Set(CALENDAR.map(p => p.sector).filter(Boolean)).size;
+  document.getElementById('stat-upgrades').textContent = CALENDAR.filter(p => p.type === 'upgrade').length;
+  document.getElementById('stat-welcomes').textContent = CALENDAR.filter(p => p.type === 'welcome').length;
+  document.getElementById('stat-edu').textContent = CALENDAR.filter(p => p.type === 'educational').length;
+
+  // ─── LEGEND ───
+  const legendGrid = document.getElementById('legend-grid');
+  const legendItems = [
+    { type: 'hero', text: 'Format aspirationnel premier de semaine, ton magazine éditorial' },
+    { type: 'ui', text: 'Showcase concret d\'un marchand avec prix, avis, CTA' },
+    { type: 'testimonial', text: 'Quote client réel = social proof fort, déclenche réservation' },
+    { type: 'welcome', text: 'Bienvenue à un nouveau marchand (plan free), story légère' },
+    { type: 'upgrade', text: 'POST CLÉ DU MOIS : marchand passe Pro, format premium + boost' },
+    { type: 'educational', text: 'Carrousel pédagogique = haute portée organique et partage' },
+  ];
+  legendGrid.innerHTML = legendItems.map(i => {
+    const info = TYPE_INFO[i.type];
+    return `<div class="legend-item">
+      <div class="dot" style="background: ${info.color}"></div>
+      <div class="text"><strong>${info.icon} ${info.label}</strong><span>${i.text}</span></div>
+    </div>`;
+  }).join('');
+
+  // ─── CALENDAR RENDER ───
+  // Group by week
+  const weeks = {};
+  CALENDAR.forEach(p => {
+    if (!weeks[p.week]) weeks[p.week] = [];
+    weeks[p.week].push(p);
+  });
+
+  // Day mapping for grid placement (Lun=0..Dim=6)
+  const dayIndex = { 'Lundi': 0, 'Mardi': 1, 'Mercredi': 2, 'Jeudi': 3, 'Vendredi': 4, 'Samedi': 5, 'Dimanche': 6 };
+
+  const container = document.getElementById('weeks-container');
+  let html = '';
+  Object.keys(weeks).sort((a,b)=>a-b).forEach(weekNum => {
+    const posts = weeks[weekNum];
+    const firstDate = posts[0].date;
+    html += `<div class="week-row">
+      <div class="week-label">// SEMAINE ${weekNum} — début ${firstDate}</div>
+      <div class="days-grid">`;
+
+    // Build slots (7 days)
+    const slots = Array(7).fill(null);
+    posts.forEach(p => { slots[dayIndex[p.day]] = p; });
+
+    slots.forEach((p, idx) => {
+      if (!p) {
+        html += `<div class="day-card empty"></div>`;
+        return;
+      }
+      const typeInfo = TYPE_INFO[p.type];
+      const sectorInfo = p.sector ? SECTORS[p.sector] : null;
+      const dateNum = new Date(p.date).getDate();
+      const platforms = p.platforms.map(pl => PLATFORM_INFO[pl]?.icon || '').join('');
+      const upgradeClass = p.type === 'upgrade' ? 'upgrade' : '';
+
+      html += `<div class="day-card ${upgradeClass}" data-type="${p.type}" data-index="${CALENDAR.indexOf(p)}">
+        <div class="date-row">
+          <span class="date-num">${dateNum}</span>
+          <span class="day-name">${p.day.slice(0,3)}</span>
+        </div>
+        <div class="type-tag" style="background: ${typeInfo.color}22; color: ${typeInfo.color};">
+          ${typeInfo.icon} ${typeInfo.label}
+        </div>
+        <div class="sector-name">${sectorInfo ? sectorInfo.emoji + ' ' + sectorInfo.name : '📚 ' + p.title}</div>
+        <div class="time">${p.time} ${platforms}</div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+  container.innerHTML = html;
+
+  // ─── CLICK HANDLERS ───
+  document.querySelectorAll('.day-card[data-index]').forEach(card => {
+    card.addEventListener('click', () => {
+      const idx = parseInt(card.dataset.index);
+      openModal(CALENDAR[idx]);
+    });
+  });
+
+  // ─── FILTERS ───
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const type = btn.dataset.type;
+      document.querySelectorAll('.day-card').forEach(card => {
+        if (!card.dataset.type) return;
+        card.style.opacity = (type === 'all' || card.dataset.type === type) ? '1' : '0.15';
+      });
+    });
+  });
+
+  // ─── MODAL ───
+  function openModal(p) {
+    const typeInfo = TYPE_INFO[p.type];
+    const sectorInfo = p.sector ? SECTORS[p.sector] : null;
+    const platforms = p.platforms.map(pl => {
+      const info = PLATFORM_INFO[pl];
+      return `<span class="badge" style="background: ${info.color}22; color: ${info.color};">${info.icon} ${info.label}</span>`;
+    }).join('');
+
+    document.getElementById('modal-content').innerHTML = `
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <h2>${p.title}</h2>
+      <p class="date-label">${p.day} ${p.date} · ${p.time}</p>
+      <div class="meta-row">
+        <span class="badge" style="background: ${typeInfo.color}22; color: ${typeInfo.color};">${typeInfo.icon} ${typeInfo.label}</span>
+        ${sectorInfo ? `<span class="badge" style="background: rgba(255,255,255,.08); color: #ddd;">${sectorInfo.emoji} ${sectorInfo.name}</span>` : ''}
+        ${platforms}
+      </div>
+
+      <div class="section">
+        <h4>📝 Caption à publier</h4>
+        <div class="caption-box">
+          <button class="copy-btn" onclick="copyText(this, \`${p.caption.replace(/`/g,'\\`').replace(/\$/g,'\\$')}\`)">Copier</button>
+          ${p.caption}
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>#️⃣ Hashtags</h4>
+        <div class="hashtags-box">${p.hashtags}</div>
+      </div>
+
+      ${p.notes ? `<div class="section">
+        <h4>💡 Notes stratégiques</h4>
+        <div class="notes-box">${p.notes}</div>
+      </div>` : ''}
+    `;
+    document.getElementById('modal').classList.add('active');
+  }
+
+  window.closeModal = () => document.getElementById('modal').classList.remove('active');
+  window.copyText = (btn, text) => {
+    navigator.clipboard.writeText(text);
+    btn.textContent = '✓ Copié';
+    setTimeout(() => btn.textContent = 'Copier', 1500);
+  };
+
+  // Close modal with ESC
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+</body>
+</html>
