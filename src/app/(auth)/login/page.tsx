@@ -16,10 +16,22 @@ export default function LoginPage() {
   );
 }
 
+// Anti open-redirect: only accept callback paths internal to the app.
+// A bare "/" is the safe fallback. Without this, a crafted email link
+// like ?callbackUrl=https://phish.example could send a freshly-logged-in
+// user to a malicious page that mirrors our UI.
+function safeCallback(raw: string | null | undefined): string {
+  if (!raw) return "/";
+  // Must be a same-origin path (starts with single "/"), reject "//" and
+  // any absolute URL scheme.
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/";
+  return raw;
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = safeCallback(searchParams.get("callbackUrl"));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 

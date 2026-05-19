@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { formatPrice, formatDuration } from "@/lib/utils";
-import { Plus, Pencil, Trash2, Clock, Star } from "lucide-react";
+import { Plus, Pencil, Trash2, Clock, Star, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 import { useMerchantProfile } from "@/components/providers/MerchantProfileProvider";
+import { FREE_PLAN_MAX_SERVICES } from "@/lib/constants";
 
 interface Service {
   id: string;
@@ -21,7 +23,8 @@ interface Service {
 }
 
 export default function DashboardServicesPage() {
-  const { isMedical } = useMerchantProfile();
+  const { isMedical, plan } = useMerchantProfile();
+  const isFreePlan = plan !== "PRO";
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -131,6 +134,12 @@ export default function DashboardServicesPage() {
     );
   }
 
+  // Free plan is capped at FREE_PLAN_MAX_SERVICES (3 today). When the user
+  // is editing an existing service the cap doesn't apply — we only block
+  // *creation* past the limit.
+  const atFreeLimit = isFreePlan && services.length >= FREE_PLAN_MAX_SERVICES;
+  const showLimitWarning = isFreePlan && !editingId;
+
   return (
     <div className="page-transition">
       <div className="flex items-center justify-between mb-6">
@@ -139,14 +148,54 @@ export default function DashboardServicesPage() {
         </h1>
         <button
           onClick={() => {
+            if (atFreeLimit) {
+              toast.error(
+                `Plan gratuit limité à ${FREE_PLAN_MAX_SERVICES} ${isMedical ? "consultations" : "services"}. Passez en PRO pour en ajouter plus.`
+              );
+              return;
+            }
             resetForm();
             setShowForm(true);
           }}
-          className={`inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-xl ${btnGradient} text-white hover:shadow-lg ${btnShadow} transition-all duration-300`}
+          disabled={atFreeLimit}
+          title={atFreeLimit ? "Limite atteinte — passez en PRO" : undefined}
+          className={`inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-xl ${btnGradient} text-white hover:shadow-lg ${btnShadow} transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
         >
-          <Plus className="h-4 w-4 mr-1.5" /> Ajouter
+          {atFreeLimit ? (
+            <>
+              <Lock className="h-4 w-4 mr-1.5" /> Limite atteinte
+            </>
+          ) : (
+            <>
+              <Plus className="h-4 w-4 mr-1.5" /> Ajouter
+            </>
+          )}
         </button>
       </div>
+
+      {/* Free plan counter — shows current usage + upsell when relevant.
+          Hidden once the user is on PRO (services illimités) or editing. */}
+      {showLimitWarning && (
+        <Card className={`mb-6 rounded-2xl border-0 shadow-sm animate-fade-in-up ${atFreeLimit ? "ring-1 ring-amber-300/40 bg-amber-50/40 dark:bg-amber-900/10" : ""}`}>
+          <CardContent className="py-3 px-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
+            <p className="text-gray-700 dark:text-gray-300">
+              <strong className={atFreeLimit ? "text-amber-700 dark:text-amber-400" : ""}>
+                {services.length}/{FREE_PLAN_MAX_SERVICES}
+              </strong>{" "}
+              {isMedical ? "consultations" : "services"} utilisés —{" "}
+              {atFreeLimit
+                ? "limite du plan gratuit atteinte."
+                : `il vous reste ${FREE_PLAN_MAX_SERVICES - services.length} ${isMedical ? "consultation(s)" : "service(s)"} sur le plan gratuit.`}
+            </p>
+            <Link
+              href="/pricing"
+              className={`shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg ${btnGradient} text-white hover:shadow-md transition-all`}
+            >
+              Passer en PRO
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
       {showForm && (
         <Card className="mb-6 rounded-2xl border-0 shadow-sm animate-fade-in-up">

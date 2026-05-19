@@ -259,6 +259,11 @@ model Booking {
   @@index([merchantId, date])
   @@index([merchantId, date, startTime])
   @@index([status, paymentExpiresAt])
+  // Reminders cron: WHERE date = ? AND status = 'CONFIRMED' AND reminderSentAt IS NULL.
+  // Without this composite index, the daily run does a full table scan
+  // — fine at 50 bookings/day, slow at 500+, and the cron timeout on
+  // Vercel Hobby is 300 s.
+  @@index([date, status, reminderSentAt])
   @@map("bookings")
 }
 

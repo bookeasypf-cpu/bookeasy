@@ -6,7 +6,10 @@ import { addPhotoSchema, updateCoverSchema, zodFirstError } from "@/lib/validati
 export async function GET() {
   try {
     const session = await getSession();
-    if (!session?.user) {
+    // GET aligned with PUT/POST/DELETE — only MERCHANT users have a
+    // photos resource. A CLIENT hitting this route was returning their
+    // (non-existent) merchant profile, an unintentional surface.
+    if (!session?.user || session.user.role !== "MERCHANT") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

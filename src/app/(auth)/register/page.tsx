@@ -19,10 +19,17 @@ export default function RegisterPage() {
   );
 }
 
+// Anti open-redirect: see /login/page.tsx for rationale.
+function safeCallback(raw: string | null | undefined): string {
+  if (!raw) return "";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "";
+  return raw;
+}
+
 function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "";
+  const callbackUrl = safeCallback(searchParams.get("callbackUrl"));
   const refCodeFromUrl = searchParams.get("ref") || "";
   // /register only creates CLIENT accounts. Pros use /pricing → QuickRegisterForm.
   const role = "CLIENT" as const;

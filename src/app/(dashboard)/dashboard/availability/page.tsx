@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { DAYS_OF_WEEK } from "@/lib/constants";
@@ -21,16 +21,40 @@ export default function DashboardAvailabilityPage() {
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  // Snapshot of the last persisted schedule. Used to detect unsaved
+  // changes without persisting "dirty" state in React state directly.
+  const savedSnapshotRef = useRef<string>("[]");
+  const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
     fetch("/api/dashboard/availability")
       .then((r) => r.json())
       .then((data) => {
-        setSchedule(data || []);
+        const initial = data || [];
+        setSchedule(initial);
+        savedSnapshotRef.current = JSON.stringify(initial);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
+
+  // Recompute dirty flag whenever schedule changes.
+  useEffect(() => {
+    setIsDirty(JSON.stringify(schedule) !== savedSnapshotRef.current);
+  }, [schedule]);
+
+  // Warn the user before they close the tab or navigate away with
+  // unsaved schedule edits — losing 10 minutes of work to a misclick
+  // is a real frustration the audit flagged.
+  useEffect(() => {
+    if (!isDirty) return;
+    const beforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", beforeUnload);
+    return () => window.removeEventListener("beforeunload", beforeUnload);
+  }, [isDirty]);
 
   function addSlot(dayOfWeek: number) {
     setSchedule([
@@ -60,8 +84,13 @@ export default function DashboardAvailabilityPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ schedule }),
     });
-    if (res.ok) toast.success("Horaires enregistrés !");
-    else toast.error("Erreur");
+    if (res.ok) {
+      toast.success("Horaires enregistrés !");
+      savedSnapshotRef.current = JSON.stringify(schedule);
+      setIsDirty(false);
+    } else {
+      toast.error("Erreur");
+    }
     setSaving(false);
   }
 
@@ -93,11 +122,18 @@ export default function DashboardAvailabilityPage() {
   return (
     <div className="page-transition">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white animate-fade-in-up">Horaires</h1>
+        <h1 className="text-2xl font-bold text-[#0C1B2A] dark:text-white animate-fade-in-up flex items-center gap-2">
+          Horaires
+          {isDirty && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full">
+              ● Modifications non enregistrées
+            </span>
+          )}
+        </h1>
         <button
           onClick={handleSave}
-          disabled={saving}
-          className={`inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-xl ${btnGradient} text-white hover:shadow-lg ${btnShadow} transition-all duration-300 disabled:opacity-50`}
+          disabled={saving || !isDirty}
+          className={`inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-xl ${btnGradient} text-white hover:shadow-lg ${btnShadow} transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {saving ? "..." : "Enregistrer"}
         </button>
