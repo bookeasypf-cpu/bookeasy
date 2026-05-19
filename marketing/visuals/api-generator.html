@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — API Génération Auto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 40px 20px 80px; }
+  .toolbar { position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; gap: 8px; }
+  .toolbar a { background: rgba(255,255,255,.08); backdrop-filter: blur(20px); color: #fff; padding: 8px 14px; border-radius: 100px; text-decoration: none; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,.15); }
+
+  .hero { text-align: center; margin-bottom: 40px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900; margin-bottom: 8px; background: linear-gradient(135deg, #00f0d4, #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; }
+  .sub { color: #aaa; font-size: 16px; font-style: italic; }
+  .badge-pro { display: inline-block; background: rgba(0,240,212,.2); color: #00f0d4; padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-top: 14px; }
+
+  .layout { display: grid; grid-template-columns: 420px 1fr; gap: 40px; max-width: 1500px; margin: 0 auto; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  .panel { background: #14141d; border: 1px solid #2a2a3a; border-radius: 20px; padding: 28px; height: fit-content; }
+  .panel h3 { font-size: 16px; margin-bottom: 4px; }
+  .panel .panel-sub { color: #888; font-size: 12px; margin-bottom: 20px; }
+  .panel label { display: block; font-size: 11px; color: #aaa; margin: 16px 0 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .panel input, .panel select { width: 100%; background: #0a0a0f; border: 1px solid #2a2a3a; color: #fff; padding: 12px 14px; border-radius: 10px; font-size: 14px; font-family: inherit; }
+  .panel input:focus, .panel select:focus { outline: none; border-color: #00f0d4; }
+  .panel .options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .panel .opt-btn { background: #0a0a0f; border: 1px solid #2a2a3a; color: #aaa; padding: 10px 6px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; transition: all .2s; }
+  .panel .opt-btn:hover { border-color: #00f0d4; color: #fff; }
+  .panel .opt-btn.active { background: #00f0d4; color: #000; border-color: #00f0d4; }
+  .panel .build-btn { width: 100%; margin-top: 24px; background: linear-gradient(135deg, #00f0d4, #A855F7); color: #000; padding: 14px; border-radius: 12px; border: none; font-weight: 800; font-size: 15px; cursor: pointer; font-family: inherit; letter-spacing: 1px; }
+  .panel .build-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(0,240,212,.3); }
+
+  .endpoint-box { margin-top: 20px; background: #050507; border: 1px solid #2a2a3a; border-radius: 10px; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00f0d4; word-break: break-all; line-height: 1.5; position: relative; }
+  .endpoint-box .copy { position: absolute; top: 6px; right: 6px; background: rgba(255,255,255,.1); border: none; color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; font-family: inherit; }
+
+  /* PREVIEW */
+  .preview h3 { font-size: 16px; margin-bottom: 6px; }
+  .preview .panel-sub { color: #888; font-size: 12px; margin-bottom: 20px; }
+  .preview-img-box { background: #14141d; border: 1px solid #2a2a3a; border-radius: 20px; padding: 24px; min-height: 600px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .preview-img-box img { max-width: 100%; max-height: 70vh; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .preview-img-box.loading::before { content: '⏳ Génération en cours...'; color: #aaa; font-size: 14px; }
+  .preview-img-box.empty::before { content: '👈 Configure puis clique sur "Générer"'; color: #666; font-size: 14px; }
+  .preview-img-box .download { position: absolute; bottom: 16px; right: 16px; background: rgba(255,255,255,.1); backdrop-filter: blur(20px); color: #fff; padding: 8px 14px; border-radius: 100px; text-decoration: none; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,.2); }
+
+  /* WORKFLOW EXPLAIN */
+  .workflow { max-width: 1500px; margin: 60px auto 0; padding: 32px; background: linear-gradient(135deg, rgba(0,240,212,.05), rgba(168,85,247,.05)); border: 1px solid rgba(0,240,212,.2); border-radius: 24px; }
+  .workflow h2 { font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 8px; }
+  .workflow .sub { color: #888; font-size: 14px; margin-bottom: 24px; }
+  .flow-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 800px) { .flow-grid { grid-template-columns: 1fr 1fr; } }
+  .flow-step { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 18px; }
+  .flow-step .num { font-family: 'JetBrains Mono', monospace; color: #00f0d4; font-size: 12px; margin-bottom: 8px; font-weight: 700; }
+  .flow-step h4 { font-size: 14px; margin-bottom: 6px; }
+  .flow-step p { color: #aaa; font-size: 12px; line-height: 1.5; }
+
+  .pro-note { margin-top: 20px; background: rgba(236,72,153,.1); border: 1px solid rgba(236,72,153,.3); border-radius: 14px; padding: 18px; }
+  .pro-note h4 { color: #f9a8d4; font-size: 14px; margin-bottom: 8px; }
+  .pro-note p { color: #ddd; font-size: 13px; line-height: 1.6; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="index.html">← Hub</a>
+  </div>
+
+  <div class="hero">
+    <h1>API Génération Auto</h1>
+    <p class="sub">/api/marketing/og · génère un visuel marketing depuis un merchant ID</p>
+    <div class="badge-pro">⚡ Photo merchant authentique pour les plans PRO</div>
+  </div>
+
+  <div class="layout">
+    <!-- PANEL -->
+    <div class="panel">
+      <h3>🔧 Configuration</h3>
+      <p class="panel-sub">Choisis un marchand et un template</p>
+
+      <label>Merchant ID (réel en DB)</label>
+      <input id="merchantId" type="text" placeholder="cl... ou cuid" />
+
+      <label>Template</label>
+      <div class="options">
+        <button class="opt-btn active" data-template="hero">🎨 Hero</button>
+        <button class="opt-btn" data-template="ui">📱 UI</button>
+        <button class="opt-btn" data-template="testimonial">💬 Témoig.</button>
+      </div>
+
+      <label>Format</label>
+      <div class="options" style="grid-template-columns: repeat(2, 1fr);">
+        <button class="opt-btn active" data-format="square">⬛ Post 1080×1080</button>
+        <button class="opt-btn" data-format="story">📱 Story 1080×1920</button>
+      </div>
+
+      <label>Base URL (dev/prod)</label>
+      <select id="baseUrl">
+        <option value="http://localhost:3000">http://localhost:3000 (dev)</option>
+        <option value="https://bookeasy.me">https://bookeasy.me (prod)</option>
+      </select>
+
+      <button class="build-btn" onclick="generate()">⚡ Générer le visuel</button>
+
+      <label style="margin-top: 24px;">Endpoint généré</label>
+      <div class="endpoint-box" id="endpoint">
+        <button class="copy" onclick="copyEndpoint()">Copier</button>
+        ?merchantId=...&template=hero&format=square
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview">
+      <h3>📸 Aperçu généré</h3>
+      <p class="panel-sub">L'image est servie par Next.js avec cache 1h</p>
+      <div class="preview-img-box empty" id="previewBox"></div>
+    </div>
+  </div>
+
+  <!-- WORKFLOW -->
+  <div class="workflow">
+    <h2>🔄 Comment ça marche en production</h2>
+    <p class="sub">Pipeline complète de génération marketing</p>
+    <div class="flow-grid">
+      <div class="flow-step">
+        <div class="num">// 01</div>
+        <h4>Marchand signup</h4>
+        <p>Webhook trigger sur création de merchant + upload de coverImage</p>
+      </div>
+      <div class="flow-step">
+        <div class="num">// 02</div>
+        <h4>Génération auto</h4>
+        <p>Appel à /api/marketing/og avec merchantId + template selon le plan</p>
+      </div>
+      <div class="flow-step">
+        <div class="num">// 03</div>
+        <h4>Notification admin</h4>
+        <p>Mara reçoit l'aperçu par mail, valide et publie</p>
+      </div>
+      <div class="flow-step">
+        <div class="num">// 04</div>
+        <h4>Publication Buffer</h4>
+        <p>Visuel poussé vers Buffer/Hootsuite avec caption du calendrier</p>
+      </div>
+    </div>
+
+    <div class="pro-note">
+      <h4>💎 Différenciation Plan PRO</h4>
+      <p>
+        Plan <strong>FREE</strong> → photo Unsplash générique du secteur (anonyme)<br/>
+        Plan <strong>PRO</strong> → photo réelle du marchand en arrière-plan + son nom + ses services<br/>
+        → Argument de vente direct dans le pricing : "Tes visuels marketing, générés automatiquement avec ta photo."
+      </p>
+    </div>
+  </div>
+
+<script>
+  let template = 'hero';
+  let format = 'square';
+
+  document.querySelectorAll('.opt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.dataset.template;
+      const f = btn.dataset.format;
+      if (t) {
+        template = t;
+        document.querySelectorAll('[data-template]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      if (f) {
+        format = f;
+        document.querySelectorAll('[data-format]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      updateEndpoint();
+    });
+  });
+
+  function updateEndpoint() {
+    const merchantId = document.getElementById('merchantId').value || 'MERCHANT_ID';
+    const base = document.getElementById('baseUrl').value;
+    const url = `${base}/api/marketing/og?merchantId=${merchantId}&template=${template}&format=${format}`;
+    document.getElementById('endpoint').innerHTML = `<button class="copy" onclick="copyEndpoint()">Copier</button>${url}`;
+  }
+
+  document.getElementById('merchantId').addEventListener('input', updateEndpoint);
+  document.getElementById('baseUrl').addEventListener('change', updateEndpoint);
+
+  function copyEndpoint() {
+    const url = document.getElementById('endpoint').innerText;
+    navigator.clipboard.writeText(url.replace('Copier', '').trim());
+    event.target.textContent = '✓';
+    setTimeout(() => event.target.textContent = 'Copier', 1500);
+  }
+
+  function generate() {
+    const merchantId = document.getElementById('merchantId').value;
+    if (!merchantId) {
+      alert('Renseigne un merchantId réel');
+      return;
+    }
+    const base = document.getElementById('baseUrl').value;
+    const url = `${base}/api/marketing/og?merchantId=${merchantId}&template=${template}&format=${format}&t=${Date.now()}`;
+    const box = document.getElementById('previewBox');
+    box.classList.remove('empty');
+    box.classList.add('loading');
+    box.innerHTML = '';
+
+    const img = new Image();
+    img.onload = () => {
+      box.classList.remove('loading');
+      box.innerHTML = `
+        <img src="${url}" alt="Visuel généré" />
+        <a class="download" href="${url}" download="bookeasy-${template}-${format}.png">⬇ Télécharger</a>
+      `;
+    };
+    img.onerror = () => {
+      box.classList.remove('loading');
+      box.innerHTML = `<div style="color: #f87171; text-align: center;">❌ Erreur de génération<br/><small style="color: #888; margin-top: 8px; display: inline-block;">Vérifie que le serveur Next.js tourne et que le merchantId existe.</small></div>`;
+    };
+    img.src = url;
+  }
+
+  updateEndpoint();
+</script>
+</body>
+</html>
