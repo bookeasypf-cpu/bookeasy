@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Aperçu Marchand Dynamique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 40px 20px; }
+  .back { display: inline-block; color: #00f0d4; text-decoration: none; margin-bottom: 24px; font-weight: 600; }
+  .hero { text-align: center; margin-bottom: 40px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 900; margin-bottom: 8px; }
+  .sub { color: #aaa; font-size: 16px; font-style: italic; }
+  .demo-tag { display: inline-block; background: rgba(168,85,247,.2); color: #c084fc; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-top: 12px; }
+
+  .layout { display: grid; grid-template-columns: 400px 1fr; gap: 40px; max-width: 1400px; margin: 0 auto; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  /* FORM */
+  .form-panel { background: #14141d; border: 1px solid #2a2a3a; border-radius: 20px; padding: 28px; height: fit-content; position: sticky; top: 20px; }
+  .form-panel h3 { font-size: 18px; margin-bottom: 20px; }
+  .form-panel label { display: block; font-size: 12px; color: #aaa; margin: 14px 0 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .form-panel input, .form-panel select { width: 100%; background: #0a0a0f; border: 1px solid #2a2a3a; color: #fff; padding: 10px 14px; border-radius: 10px; font-size: 14px; font-family: inherit; transition: border-color .2s; }
+  .form-panel input:focus, .form-panel select:focus { outline: none; border-color: #00f0d4; }
+  .form-panel .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-panel .hint { font-size: 11px; color: #666; margin-top: 4px; }
+  .form-panel .reset { width: 100%; margin-top: 20px; background: #2a2a3a; color: #fff; padding: 10px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; transition: all .2s; }
+  .form-panel .reset:hover { background: #3a3a4a; }
+
+  /* PREVIEW */
+  .preview-panel h3 { font-size: 18px; margin-bottom: 16px; color: #888; font-weight: 600; }
+  .templates-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; }
+
+  /* POST BASE */
+  .post { width: 460px; height: 460px; position: relative; overflow: hidden; border-radius: 20px; box-shadow: 0 16px 50px rgba(0,0,0,.5); margin: 0 auto; }
+  .post .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.5s; }
+  .post:hover .bg { transform: scale(1.05); }
+  .post .overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,30,45,0) 0%, rgba(15,30,45,.85) 100%); }
+
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  @keyframes sparkle { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
+
+  /* T1 */
+  .t1 .accent-bar { position: absolute; top: 34px; left: 34px; color: #fff; font-size: 10px; letter-spacing: 3px; font-weight: 700; }
+  .t1 .accent-bar::before { content: ''; display: inline-block; width: 26px; height: 1px; background: var(--accent); margin-right: 10px; vertical-align: middle; }
+  .t1 .title-hero { position: absolute; bottom: 80px; left: 34px; right: 34px; color: #fff; font-family: 'Playfair Display', serif; font-style: italic; font-size: 44px; font-weight: 700; line-height: 1; }
+  .t1 .footer-hero { position: absolute; bottom: 34px; left: 34px; right: 34px; display: flex; justify-content: space-between; color: #fff; font-size: 11px; }
+  .t1 .footer-hero .brand { font-weight: 800; letter-spacing: 2px; }
+  .t1 .footer-hero .sector { color: var(--accent); letter-spacing: 1px; }
+
+  /* T2 */
+  .t2 .overlay-soft { position: absolute; inset: 0; background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 25%, transparent), rgba(15,30,45,.5)); }
+  .t2 .top-tag { position: absolute; top: 26px; left: 26px; background: #fff; color: var(--deep); padding: 7px 12px; border-radius: 100px; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+  .t2 .stat-bubble { position: absolute; top: 26px; right: 26px; background: rgba(255,255,255,.2); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.3); padding: 10px 14px; border-radius: 14px; color: #fff; text-align: right; }
+  .t2 .stat-bubble .num { font-size: 22px; font-weight: 900; line-height: 1; }
+  .t2 .stat-bubble .lab { font-size: 9px; opacity: .9; margin-top: 3px; }
+  .t2 .ui-card { position: absolute; bottom: 80px; left: 26px; right: 26px; background: #fff; border-radius: 18px; padding: 18px; box-shadow: 0 16px 40px rgba(0,0,0,.3); }
+  .t2 .ui-card .row1 { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .t2 .ui-card .av { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--primary)); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .t2 .ui-card .name { font-weight: 800; font-size: 15px; color: var(--deep); }
+  .t2 .ui-card .meta { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .t2 .ui-card .stars { color: #F59E0B; font-size: 12px; margin-bottom: 12px; animation: sparkle 2s infinite; }
+  .t2 .ui-card .stars span { color: #6b7280; font-size: 11px; margin-left: 4px; }
+  .t2 .ui-card .btn { background: var(--deep); color: #fff; padding: 12px; border-radius: 10px; text-align: center; font-weight: 700; font-size: 13px; position: relative; overflow: hidden; }
+  .t2 .ui-card .btn::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent); background-size: 200% 100%; animation: shimmer 3s infinite; }
+  .t2 .ui-card .btn .arrow { float: right; }
+  .t2 .footer { position: absolute; bottom: 26px; left: 26px; color: #fff; font-weight: 800; font-size: 11px; letter-spacing: 2px; }
+
+  /* Code preview */
+  .code-snippet { margin-top: 40px; background: #050507; border: 1px solid #2a2a3a; border-radius: 14px; padding: 24px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #ccc; overflow-x: auto; line-height: 1.6; }
+  .code-snippet .key { color: #00f0d4; }
+  .code-snippet .str { color: #fbbf24; }
+  .code-snippet .com { color: #666; }
+</style>
+</head>
+<body>
+  <a href="index.html" class="back">← Hub</a>
+  <div class="hero">
+    <h1>Aperçu Marchand Dynamique</h1>
+    <p class="sub">Édite les infos → le visuel se met à jour en temps réel</p>
+    <div class="demo-tag">PROOF OF CONCEPT — Branchera sur Prisma en prod</div>
+  </div>
+
+  <div class="layout">
+    <!-- FORM -->
+    <div class="form-panel">
+      <h3>🏪 Données marchand</h3>
+
+      <label>Secteur</label>
+      <select id="sector">
+        <option value="spa">🌺 Spa & Bien-être</option>
+        <option value="institut">✨ Institut de beauté</option>
+        <option value="massage">💆 Massage thérapeutique</option>
+        <option value="manucure">💅 Manucure & Onglerie</option>
+        <option value="maquillage">💄 Maquilleuse pro</option>
+        <option value="tatoueur">🎨 Tatoueur</option>
+        <option value="barber">✂️ Barber</option>
+        <option value="coiffeur">💇 Coiffeur</option>
+        <option value="coach">💪 Coach sportif</option>
+        <option value="medecin">🩺 Médecin</option>
+        <option value="dentiste">🦷 Dentiste</option>
+        <option value="osteopathe">🧘 Ostéopathe</option>
+        <option value="kine">🦵 Kiné</option>
+        <option value="infirmier">💉 Infirmier domicile</option>
+      </select>
+
+      <label>Nom du commerce</label>
+      <input id="name" type="text" value="Manea Spa Tahiti" />
+
+      <label>Service principal</label>
+      <input id="service" type="text" value="Massage polynésien" />
+
+      <div class="row">
+        <div>
+          <label>Durée</label>
+          <input id="duration" type="text" value="60 min" />
+        </div>
+        <div>
+          <label>Prix (XPF)</label>
+          <input id="price" type="text" value="8 500" />
+        </div>
+      </div>
+
+      <label>Ville</label>
+      <select id="city">
+        <option>Papeete</option>
+        <option>Punaauia</option>
+        <option>Pirae</option>
+        <option>Moorea</option>
+        <option>Bora Bora</option>
+        <option>Raiatea</option>
+        <option>Taravao</option>
+      </select>
+
+      <div class="row">
+        <div>
+          <label>Note /5</label>
+          <input id="rating" type="number" min="0" max="5" step="0.1" value="4.9" />
+        </div>
+        <div>
+          <label>Nb avis</label>
+          <input id="reviews" type="number" value="127" />
+        </div>
+      </div>
+
+      <label>Tagline</label>
+      <input id="tagline" type="text" value="L'art du relâchement, réinventé." />
+      <div class="hint">Visible sur le Template 1</div>
+
+      <button class="reset" onclick="loadFromSector()">↻ Charger valeurs du secteur</button>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-panel">
+      <h3>Aperçu en temps réel · 2 templates</h3>
+      <div class="templates-grid">
+        <div>
+          <div class="post t1" id="t1">
+            <img class="bg" id="t1-bg" src="" alt="" />
+            <div class="overlay"></div>
+            <div class="accent-bar" id="t1-cat"></div>
+            <div class="title-hero" id="t1-title"></div>
+            <div class="footer-hero">
+              <span class="brand">BOOKEASY.ME</span>
+              <span class="sector" id="t1-sector"></span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="post t2" id="t2">
+            <img class="bg" id="t2-bg" src="" alt="" />
+            <div class="overlay-soft"></div>
+            <div class="top-tag" id="t2-tag"></div>
+            <div class="stat-bubble">
+              <div class="num" id="t2-rating"></div>
+              <div class="lab" id="t2-reviews"></div>
+            </div>
+            <div class="ui-card">
+              <div class="row1">
+                <div class="av" id="t2-emoji"></div>
+                <div>
+                  <div class="name" id="t2-name"></div>
+                  <div class="meta" id="t2-meta"></div>
+                </div>
+              </div>
+              <div class="stars" id="t2-stars"></div>
+              <div class="btn">Réserver maintenant <span class="arrow">→</span></div>
+            </div>
+            <div class="footer">BOOKEASY.ME</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CODE -->
+      <div class="code-snippet">
+<span class="com">// En production, ce visuel sera généré depuis la DB Prisma :</span>
+<span class="key">const</span> merchant = <span class="key">await</span> prisma.merchant.findUnique({
+  where: { id: <span class="str">'xxxx'</span> },
+  include: { services: <span class="key">true</span>, reviews: <span class="key">true</span> }
+})
+
+<span class="key">return</span> renderMarketingCard({
+  sector: merchant.sector,
+  name: merchant.businessName,
+  service: merchant.services[<span class="str">0</span>].name,
+  price: merchant.services[<span class="str">0</span>].price,
+  rating: merchant.avgRating,
+  reviews: merchant.reviewCount,
+  city: merchant.city,
+  photo: merchant.coverImage
+})
+</div>
+    </div>
+  </div>
+
+<script type="module">
+  import { SECTORS } from './data/sectors.js';
+
+  const els = {
+    sector: document.getElementById('sector'),
+    name: document.getElementById('name'),
+    service: document.getElementById('service'),
+    duration: document.getElementById('duration'),
+    price: document.getElementById('price'),
+    city: document.getElementById('city'),
+    rating: document.getElementById('rating'),
+    reviews: document.getElementById('reviews'),
+    tagline: document.getElementById('tagline'),
+  };
+
+  function update() {
+    const sectorKey = els.sector.value;
+    const sector = SECTORS[sectorKey];
+    if (!sector) return;
+
+    const cssVars = `--primary: ${sector.palette.primary}; --accent: ${sector.palette.accent}; --deep: ${sector.palette.deep};`;
+    document.getElementById('t1').setAttribute('style', cssVars);
+    document.getElementById('t2').setAttribute('style', cssVars);
+
+    // T1
+    document.getElementById('t1-bg').src = sector.photos[0];
+    document.getElementById('t1-cat').textContent = `${sector.category.toUpperCase()} · ${els.city.value.toUpperCase()}`;
+    document.getElementById('t1-title').textContent = els.tagline.value;
+    document.getElementById('t1-sector').textContent = sector.name.toUpperCase();
+
+    // T2
+    document.getElementById('t2-bg').src = sector.photos[1];
+    document.getElementById('t2-tag').textContent = `⚡ DISPO À ${els.city.value.toUpperCase()}`;
+    document.getElementById('t2-rating').textContent = els.rating.value;
+    document.getElementById('t2-reviews').textContent = `${els.reviews.value} AVIS`;
+    document.getElementById('t2-emoji').textContent = sector.emoji;
+    document.getElementById('t2-name').textContent = els.name.value;
+    document.getElementById('t2-meta').textContent = `${els.service.value} · ${els.duration.value} · ${els.price.value} XPF`;
+    document.getElementById('t2-stars').innerHTML = `★★★★★ <span>${els.rating.value} · ${els.reviews.value} avis</span>`;
+  }
+
+  window.loadFromSector = function() {
+    const sectorKey = els.sector.value;
+    const sector = SECTORS[sectorKey];
+    if (!sector) return;
+    els.name.value = sector.example.name;
+    els.service.value = sector.example.service;
+    els.duration.value = sector.example.duration;
+    els.price.value = sector.example.price.replace(' XPF', '');
+    els.rating.value = sector.example.rating;
+    els.reviews.value = sector.example.reviews;
+    els.tagline.value = sector.tagline.hero;
+    update();
+  };
+
+  // Bind all inputs
+  Object.values(els).forEach(el => el.addEventListener('input', update));
+  Object.values(els).forEach(el => el.addEventListener('change', update));
+
+  // Initial render
+  update();
+</script>
+</body>
+</html>

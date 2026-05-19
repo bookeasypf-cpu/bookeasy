@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Tous les secteurs (39 visuels)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 60px 20px; }
+
+  /* HERO */
+  .hero { text-align: center; margin-bottom: 40px; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 900; margin-bottom: 12px; background: linear-gradient(135deg, #0EA5A0, #F4E4C1, #E76F51, #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; }
+  .hero .sub { color: #aaa; font-size: 18px; font-style: italic; margin-bottom: 20px; }
+  .hero .badges span { display: inline-block; background: rgba(14,165,160,.15); color: #0EA5A0; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 1px; margin: 0 3px; }
+
+  /* FILTERS */
+  .filters { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 40px 0 60px; }
+  .filter-btn { background: #14141d; color: #aaa; border: 1px solid #2a2a3a; padding: 10px 20px; border-radius: 100px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all .3s; }
+  .filter-btn:hover { border-color: #fff; color: #fff; }
+  .filter-btn.active { background: #fff; color: #000; border-color: #fff; }
+
+  /* SECTOR ROW */
+  .sector-row { max-width: 1800px; margin: 0 auto 80px; opacity: 1; transition: opacity .4s; }
+  .sector-row.hidden { display: none; }
+  .sector-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding: 0 12px; }
+  .sector-header .emoji { font-size: 40px; }
+  .sector-header h2 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 800; }
+  .sector-header .cat { background: rgba(255,255,255,.08); color: #ccc; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .sector-header .stat-mini { margin-left: auto; color: #aaa; font-size: 13px; }
+  .sector-header .stat-mini strong { color: #fff; }
+
+  .templates-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 1200px) { .templates-row { grid-template-columns: 1fr; } }
+
+  /* TEMPLATE WRAP */
+  .tw { display: flex; flex-direction: column; align-items: center; }
+  .tw-label { font-size: 11px; color: #888; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+
+  /* BASE POST */
+  .post { width: 460px; height: 460px; position: relative; overflow: hidden; border-radius: 20px; box-shadow: 0 16px 50px rgba(0,0,0,.5); animation: fadeInUp .8s ease both; }
+  .post .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.5s; }
+  .post:hover .bg { transform: scale(1.06); }
+  .post .overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,30,45,0) 0%, rgba(15,30,45,.85) 100%); }
+  .post .overlay-soft { position: absolute; inset: 0; }
+
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 rgba(255,255,255,0); } 50% { box-shadow: 0 0 30px rgba(255,255,255,.3); } }
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  @keyframes sparkle { 0%, 100% { opacity: .7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
+
+  /* ─────── TEMPLATE 1 : HERO MAGAZINE ─────── */
+  .t1 .accent-bar { position: absolute; top: 34px; left: 34px; color: #fff; font-size: 10px; letter-spacing: 3px; font-weight: 700; }
+  .t1 .accent-bar::before { content: ''; display: inline-block; width: 26px; height: 1px; background: var(--accent); margin-right: 10px; vertical-align: middle; }
+  .t1 .title-hero { position: absolute; bottom: 80px; left: 34px; right: 34px; color: #fff; font-family: 'Playfair Display', serif; font-style: italic; font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -1px; text-shadow: 0 2px 18px rgba(0,0,0,.4); }
+  .t1 .footer-hero { position: absolute; bottom: 34px; left: 34px; right: 34px; display: flex; justify-content: space-between; align-items: center; color: #fff; font-size: 11px; }
+  .t1 .footer-hero .brand { font-weight: 800; letter-spacing: 2px; }
+  .t1 .footer-hero .sector { opacity: .85; letter-spacing: 1px; color: var(--accent); }
+
+  /* ─────── TEMPLATE 2 : UI SHOWCASE ─────── */
+  .t2 .overlay-soft { background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 30%, transparent) 0%, rgba(15,30,45,.5) 100%); }
+  .t2 .top-tag { position: absolute; top: 26px; left: 26px; background: rgba(255,255,255,.97); color: var(--deep); padding: 7px 12px; border-radius: 100px; font-size: 10px; font-weight: 700; letter-spacing: 1px; animation: pulseGlow 2s infinite; }
+  .t2 .stat-bubble { position: absolute; top: 26px; right: 26px; background: rgba(255,255,255,.2); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.3); padding: 10px 14px; border-radius: 14px; color: #fff; text-align: right; }
+  .t2 .stat-bubble .num { font-size: 22px; font-weight: 900; line-height: 1; }
+  .t2 .stat-bubble .lab { font-size: 9px; opacity: .9; margin-top: 4px; }
+  .t2 .ui-card { position: absolute; bottom: 80px; left: 26px; right: 26px; background: rgba(255,255,255,.97); border-radius: 18px; padding: 18px; box-shadow: 0 16px 40px rgba(0,0,0,.3); }
+  .t2 .ui-card .row1 { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .t2 .ui-card .av { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--primary)); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .t2 .ui-card .name { font-weight: 800; font-size: 15px; color: var(--deep); }
+  .t2 .ui-card .meta { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .t2 .ui-card .stars { color: #F59E0B; font-size: 12px; margin-bottom: 12px; animation: sparkle 2s infinite; display: inline-block; }
+  .t2 .ui-card .stars span { color: #6b7280; font-size: 11px; margin-left: 4px; }
+  .t2 .ui-card .btn { background: var(--deep); color: #fff; padding: 12px; border-radius: 10px; text-align: center; font-weight: 700; font-size: 13px; position: relative; overflow: hidden; }
+  .t2 .ui-card .btn::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent); background-size: 200% 100%; animation: shimmer 3s infinite; }
+  .t2 .ui-card .btn .arrow { float: right; }
+  .t2 .footer { position: absolute; bottom: 26px; left: 26px; color: #fff; font-weight: 800; font-size: 11px; letter-spacing: 2px; }
+
+  /* ─────── TEMPLATE 3 : TESTIMONIAL ─────── */
+  .t3 .quote-mark { position: absolute; top: 26px; left: 26px; font-family: 'Playfair Display', serif; font-size: 100px; color: var(--accent); line-height: 1; opacity: .9; }
+  .t3 .quote-text { position: absolute; top: 110px; left: 26px; right: 26px; color: #fff; font-family: 'Playfair Display', serif; font-style: italic; font-size: 22px; font-weight: 400; line-height: 1.3; text-shadow: 0 2px 16px rgba(0,0,0,.4); }
+  .t3 .author { position: absolute; bottom: 85px; left: 26px; color: #fff; }
+  .t3 .author .stars { color: #FFD700; font-size: 13px; margin-bottom: 6px; }
+  .t3 .author .name { font-weight: 700; font-size: 13px; }
+  .t3 .author .role { font-size: 11px; opacity: .85; margin-top: 2px; }
+  .t3 .cta-pill { position: absolute; bottom: 26px; left: 26px; right: 26px; background: rgba(255,255,255,.97); color: var(--deep); padding: 12px; border-radius: 100px; text-align: center; font-weight: 800; font-size: 11px; letter-spacing: 1.5px; }
+
+  /* TOP TOOLBAR */
+  .toolbar { position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; gap: 8px; }
+  .toolbar a { background: rgba(255,255,255,.1); backdrop-filter: blur(20px); color: #fff; padding: 10px 16px; border-radius: 100px; text-decoration: none; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,.2); transition: all .2s; }
+  .toolbar a:hover { background: rgba(255,255,255,.2); }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="index.html">← Hub</a>
+    <a href="merchant-preview.html">Aperçu marchand</a>
+  </div>
+
+  <div class="hero">
+    <h1>13 secteurs · 39 visuels</h1>
+    <p class="sub">Toute la Polynésie, prête à publier</p>
+    <div class="badges">
+      <span>Animations CSS</span>
+      <span>GEO-Optimisé</span>
+      <span>Photos Unsplash</span>
+      <span>MJ Prompts inclus</span>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" data-cat="all">Tous (13)</button>
+    <button class="filter-btn" data-cat="beauté">🌸 Beauté</button>
+    <button class="filter-btn" data-cat="coiffure">✂️ Coiffure</button>
+    <button class="filter-btn" data-cat="sport">💪 Sport</button>
+    <button class="filter-btn" data-cat="médical">🩺 Médical</button>
+  </div>
+
+  <div id="sectors-container"></div>
+
+<script type="module">
+  import { SECTORS, SECTOR_KEYS, CATEGORIES } from './data/sectors.js';
+
+  const container = document.getElementById('sectors-container');
+
+  function renderSector(key, s, index) {
+    const cssVars = `--primary: ${s.palette.primary}; --accent: ${s.palette.accent}; --deep: ${s.palette.deep}; --surface: ${s.palette.surface};`;
+    const animDelay = `style="animation-delay: ${index * 0.05}s"`;
+    const catColor = CATEGORIES[s.category]?.color || '#888';
+
+    return `
+      <div class="sector-row" data-cat="${s.category}" id="sector-${key}">
+        <div class="sector-header">
+          <span class="emoji">${s.emoji}</span>
+          <h2>${s.name}</h2>
+          <span class="cat" style="color: ${catColor}; border: 1px solid ${catColor};">${s.category}</span>
+          <span class="stat-mini"><strong>${s.stat.count}</strong> ${s.stat.label}</span>
+        </div>
+        <div class="templates-row">
+          <!-- T1 HERO -->
+          <div class="tw">
+            <div class="tw-label">Template 1 · Hero Magazine</div>
+            <div class="post t1" style="${cssVars}" ${animDelay}>
+              <img class="bg" src="${s.photos[0]}" alt="${s.name}" loading="lazy" />
+              <div class="overlay"></div>
+              <div class="accent-bar">${s.category.toUpperCase()} · POLYNÉSIE</div>
+              <div class="title-hero">${s.tagline.hero}</div>
+              <div class="footer-hero">
+                <span class="brand">BOOKEASY.ME</span>
+                <span class="sector">${s.name.toUpperCase()}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- T2 UI SHOWCASE -->
+          <div class="tw">
+            <div class="tw-label">Template 2 · UI Showcase</div>
+            <div class="post t2" style="${cssVars}" ${animDelay}>
+              <img class="bg" src="${s.photos[1]}" alt="${s.name}" loading="lazy" />
+              <div class="overlay-soft"></div>
+              <div class="top-tag">⚡ ${s.stat.count} DISPO PF</div>
+              <div class="stat-bubble">
+                <div class="num">${s.example.rating}</div>
+                <div class="lab">${s.example.reviews} AVIS</div>
+              </div>
+              <div class="ui-card">
+                <div class="row1">
+                  <div class="av">${s.emoji}</div>
+                  <div>
+                    <div class="name">${s.example.name}</div>
+                    <div class="meta">${s.example.service} · ${s.example.duration} · ${s.example.price}</div>
+                  </div>
+                </div>
+                <div class="stars">★★★★★ <span>${s.example.rating} · ${s.example.reviews} avis</span></div>
+                <div class="btn">Réserver maintenant <span class="arrow">→</span></div>
+              </div>
+              <div class="footer">BOOKEASY.ME</div>
+            </div>
+          </div>
+
+          <!-- T3 TESTIMONIAL -->
+          <div class="tw">
+            <div class="tw-label">Template 3 · Témoignage</div>
+            <div class="post t3" style="${cssVars}" ${animDelay}>
+              <img class="bg" src="${s.photos[2]}" alt="${s.name}" loading="lazy" />
+              <div class="overlay"></div>
+              <div class="quote-mark">"</div>
+              <div class="quote-text">${s.testimonial.quote}</div>
+              <div class="author">
+                <div class="stars">★★★★★</div>
+                <div class="name">${s.testimonial.author}</div>
+                <div class="role">${s.testimonial.meta}</div>
+              </div>
+              <div class="cta-pill">RÉSERVE → BOOKEASY.ME</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Render all sectors grouped by category
+  const orderedCategories = ['beauté', 'coiffure', 'sport', 'médical'];
+  let html = '';
+  let index = 0;
+  for (const cat of orderedCategories) {
+    for (const key of SECTOR_KEYS) {
+      if (SECTORS[key].category === cat) {
+        html += renderSector(key, SECTORS[key], index++);
+      }
+    }
+  }
+  container.innerHTML = html;
+
+  // Filter logic
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat;
+      document.querySelectorAll('.sector-row').forEach(row => {
+        if (cat === 'all' || row.dataset.cat === cat) {
+          row.classList.remove('hidden');
+        } else {
+          row.classList.add('hidden');
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

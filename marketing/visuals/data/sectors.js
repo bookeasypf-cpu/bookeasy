@@ -1,0 +1,581 @@
+/**
+ * BookEasy — Master config secteurs marketing
+ * 13 secteurs × 3 templates = 39 visuels générables
+ *
+ * Pour modifier un secteur : édite ici, tous les templates se mettent à jour.
+ * Stats primaires citables = important pour GEO (ChatGPT/Perplexity).
+ */
+
+export const SECTORS = {
+  // ═══════════════════════════ BEAUTÉ & BIEN-ÊTRE ═══════════════════════════
+  spa: {
+    name: "Spa & Bien-être",
+    slug: "spa",
+    emoji: "🌺",
+    category: "beauté",
+    palette: {
+      primary: "#0EA5A0",
+      accent: "#F4E4C1",
+      deep: "#0F1E2D",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 47, label: "spas en PF" },
+    tagline: { hero: "L'art du relâchement, réinventé." },
+    example: {
+      name: "Manea Spa",
+      service: "Massage polynésien",
+      duration: "60 min",
+      price: "8 500 XPF",
+      rating: 4.9,
+      reviews: 127,
+    },
+    testimonial: {
+      quote: "J'ai réservé mon massage en 30 secondes depuis le canapé. Une heure plus tard j'étais sur la table. Magique.",
+      author: "Hina T.",
+      meta: "Papeete · cliente depuis mars 2026",
+    },
+    keywords: ["spa Papeete", "massage Tahiti", "bien-être Polynésie", "esthéticienne Moorea"],
+    hashtags: ["#SpaTahiti", "#BienetrePolynesie", "#MassagePapeete", "#WellnessPF"],
+    qa: {
+      q: "Où trouver un bon spa à Papeete ?",
+      a: "BookEasy référence les 47 meilleurs spas de Tahiti avec notes vérifiées et créneaux temps réel. Prix moyens : 6 500–14 000 XPF.",
+    },
+    midjourney: "Polynesian spa massage room, golden hour lighting, tiare flowers, warm tones, photography, --ar 1:1 --style raw",
+  },
+
+  institut: {
+    name: "Institut de Beauté",
+    slug: "institut",
+    emoji: "✨",
+    category: "beauté",
+    palette: {
+      primary: "#D946EF",
+      accent: "#FDF2F8",
+      deep: "#4A044E",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1570172619002-633db5b1afe6?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 38, label: "instituts beauté" },
+    tagline: { hero: "Ta beauté, sublimée." },
+    example: {
+      name: "Belle Vahine",
+      service: "Soin visage complet",
+      duration: "75 min",
+      price: "9 800 XPF",
+      rating: 4.8,
+      reviews: 94,
+    },
+    testimonial: {
+      quote: "Mon institut préféré, réservation en 2 clics. Je ne perds plus de temps au téléphone.",
+      author: "Vaihere L.",
+      meta: "Punaauia · cliente fidèle",
+    },
+    keywords: ["institut beauté Papeete", "soin visage Tahiti", "épilation Moorea", "esthétique PF"],
+    hashtags: ["#InstitutBeautePF", "#SoinVisageTahiti", "#EsthetiquePolynesie"],
+    qa: {
+      q: "Comment réserver un soin visage à Tahiti ?",
+      a: "BookEasy affiche les disponibilités de 38 instituts en Polynésie. Réservation directe, paiement XPF, rappel automatique.",
+    },
+    midjourney: "Beauty institute facial treatment room, soft pink lighting, modern minimal decor, --ar 1:1 --style raw",
+  },
+
+  massage: {
+    name: "Massage Thérapeutique",
+    slug: "massage",
+    emoji: "💆",
+    category: "beauté",
+    palette: {
+      primary: "#059669",
+      accent: "#D1FAE5",
+      deep: "#064E3B",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1591343395082-e120087004b4?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1532926381893-7542290edf1d?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 52, label: "masseurs certifiés" },
+    tagline: { hero: "Le toucher qui répare." },
+    example: {
+      name: "Tane Massage",
+      service: "Massage taurumi",
+      duration: "90 min",
+      price: "12 000 XPF",
+      rating: 4.9,
+      reviews: 156,
+    },
+    testimonial: {
+      quote: "Le taurumi traditionnel, réservé en 2 clics. Une expérience authentique.",
+      author: "Manava P.",
+      meta: "Moorea · cliente régulière",
+    },
+    keywords: ["massage Papeete", "taurumi Tahiti", "lomi-lomi PF", "massage thérapeutique Moorea"],
+    hashtags: ["#MassageTahiti", "#TaurumiPF", "#MassagePolynesie"],
+    qa: {
+      q: "Quel est le prix d'un massage à Tahiti ?",
+      a: "Entre 6 000 et 15 000 XPF pour 60 à 90 min selon le type. BookEasy affiche les prix en clair pour 52 masseurs.",
+    },
+    midjourney: "Traditional Polynesian massage, monoi oil, wooden table, tropical leaves, warm sunset light, --ar 1:1",
+  },
+
+  manucure: {
+    name: "Manucure & Onglerie",
+    slug: "manucure",
+    emoji: "💅",
+    category: "beauté",
+    palette: {
+      primary: "#EC4899",
+      accent: "#FCE7F3",
+      deep: "#831843",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1610992015734-2eef47ef0011?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 41, label: "onglistes en PF" },
+    tagline: { hero: "Tes mains, ton style." },
+    example: {
+      name: "Nail Art Vahine",
+      service: "Pose gel + nail art",
+      duration: "90 min",
+      price: "7 500 XPF",
+      rating: 4.8,
+      reviews: 203,
+    },
+    testimonial: {
+      quote: "Le top du nail art à Papeete. Réservation easy, résultat magnifique.",
+      author: "Heinui T.",
+      meta: "Papeete · cliente VIP",
+    },
+    keywords: ["manucure Papeete", "onglerie Tahiti", "nail art Moorea", "pose gel PF"],
+    hashtags: ["#ManucureTahiti", "#NailArtPF", "#OnglerieMoorea"],
+    qa: {
+      q: "Combien coûte une manucure à Papeete ?",
+      a: "Entre 3 500 XPF (vernis simple) et 9 000 XPF (gel + nail art) selon la prestation. BookEasy montre tout en clair.",
+    },
+    midjourney: "Nail salon close-up, colorful nail polish, modern studio, pink lighting, --ar 1:1",
+  },
+
+  maquillage: {
+    name: "Maquilleuse Pro",
+    slug: "maquillage",
+    emoji: "💄",
+    category: "beauté",
+    palette: {
+      primary: "#DC2626",
+      accent: "#FEE2E2",
+      deep: "#7F1D1D",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1583241800698-9c2e4ad4d4b8?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 24, label: "maquilleuses pro" },
+    tagline: { hero: "Ton jour J, sublimé." },
+    example: {
+      name: "Heimana Makeup",
+      service: "Maquillage mariée",
+      duration: "120 min",
+      price: "18 000 XPF",
+      rating: 5.0,
+      reviews: 67,
+    },
+    testimonial: {
+      quote: "Heimana m'a maquillée pour mon mariage. Magique. Réserver via BookEasy = zéro stress.",
+      author: "Tehani M.",
+      meta: "Mariée 2026 · Papeete",
+    },
+    keywords: ["maquilleuse Tahiti", "mariage Polynésie", "makeup artist Moorea", "maquillage Papeete"],
+    hashtags: ["#MaquilleuseTahiti", "#MariagePolynesie", "#MakeupPF"],
+    qa: {
+      q: "Comment trouver une maquilleuse pour mariage en Polynésie ?",
+      a: "BookEasy référence 24 maquilleuses pro PF avec portfolio, tarifs, avis. Réservation directe pour mariage, shooting, événement.",
+    },
+    midjourney: "Professional makeup artist, beauty studio, bride, soft lighting, elegant, --ar 1:1",
+  },
+
+  tatoueur: {
+    name: "Tatoueur",
+    slug: "tatoueur",
+    emoji: "🎨",
+    category: "beauté",
+    palette: {
+      primary: "#1E293B",
+      accent: "#FCA5A5",
+      deep: "#0F172A",
+      surface: "#F8FAFC",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1542856391-010fb87dcfed?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1565058379802-bbe93b2f703a?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1568515045052-f9a854d70bfd?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 19, label: "tatoueurs en PF" },
+    tagline: { hero: "L'art polynésien, ancré." },
+    example: {
+      name: "Mana Tattoo",
+      service: "Tatouage polynésien",
+      duration: "Session 3h",
+      price: "45 000 XPF",
+      rating: 4.9,
+      reviews: 87,
+    },
+    testimonial: {
+      quote: "Mon tatouage traditionnel, réservé en ligne. L'artiste m'a appelé pour préparer le motif. Parfait.",
+      author: "Tamatoa R.",
+      meta: "Papeete · client engagé",
+    },
+    keywords: ["tatoueur Tahiti", "tatouage polynésien", "tattoo Moorea", "ink PF"],
+    hashtags: ["#TatouageTahiti", "#PolynesianTattoo", "#TattooPF"],
+    qa: {
+      q: "Où se faire tatouer en Polynésie ?",
+      a: "BookEasy liste 19 tatoueurs certifiés en PF avec portfolio en ligne. Spécialistes art polynésien, réservation directe.",
+    },
+    midjourney: "Polynesian tattoo studio, traditional patterns, focused artist working, dim warm light, --ar 1:1",
+  },
+
+  // ═══════════════════════════ COIFFURE ═══════════════════════════
+  barber: {
+    name: "Barber",
+    slug: "barber",
+    emoji: "✂️",
+    category: "coiffure",
+    palette: {
+      primary: "#D97706",
+      accent: "#FBBF24",
+      deep: "#1C1917",
+      surface: "#FAF3E0",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 34, label: "barbiers en PF" },
+    tagline: { hero: "Le rituel masculin." },
+    example: {
+      name: "Fades & Co.",
+      service: "Coupe + barbe",
+      duration: "45 min",
+      price: "4 500 XPF",
+      rating: 4.8,
+      reviews: 89,
+    },
+    testimonial: {
+      quote: "Plus jamais à attendre 30 min au téléphone. Je réserve mon barbier le matin, j'y vais à 18h.",
+      author: "Teiki M.",
+      meta: "Punaauia · client depuis février 2026",
+    },
+    keywords: ["barber Papeete", "barbier Tahiti", "fade Moorea", "coupe homme PF"],
+    hashtags: ["#BarberTahiti", "#FadePF", "#BarbierPapeete"],
+    qa: {
+      q: "Combien coûte une coupe homme à Papeete ?",
+      a: "Entre 3 000 et 6 500 XPF selon le barbier. BookEasy te montre les prix, avis vérifiés, créneaux du jour.",
+    },
+    midjourney: "Modern barbershop, vintage chair, warm tungsten lighting, masculine mood, --ar 1:1",
+  },
+
+  coiffeur: {
+    name: "Coiffeur Mixte",
+    slug: "coiffeur",
+    emoji: "💇",
+    category: "coiffure",
+    palette: {
+      primary: "#A855F7",
+      accent: "#F3E8FF",
+      deep: "#4C1D95",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 62, label: "salons coiffure" },
+    tagline: { hero: "Ta coiffure, sans attendre." },
+    example: {
+      name: "Salon Vahine",
+      service: "Coupe + brushing",
+      duration: "60 min",
+      price: "5 500 XPF",
+      rating: 4.7,
+      reviews: 142,
+    },
+    testimonial: {
+      quote: "Coloration parfaite, RDV pris en 30 secondes. BookEasy m'a sauvé un samedi matin.",
+      author: "Moana T.",
+      meta: "Papeete · cliente fidèle",
+    },
+    keywords: ["coiffeur Papeete", "salon coiffure Tahiti", "coloration Moorea", "brushing PF"],
+    hashtags: ["#CoiffeurTahiti", "#SalonPF", "#ColorationPapeete"],
+    qa: {
+      q: "Comment réserver un coiffeur à Papeete ?",
+      a: "BookEasy référence 62 salons en PF avec créneaux temps réel. Coupe, coloration, brushing, balayage — réservation directe en XPF.",
+    },
+    midjourney: "Modern hair salon, female stylist, natural daylight, elegant interior, --ar 1:1",
+  },
+
+  // ═══════════════════════════ SPORT ═══════════════════════════
+  coach: {
+    name: "Coach Sportif",
+    slug: "coach",
+    emoji: "💪",
+    category: "sport",
+    palette: {
+      primary: "#EA580C",
+      accent: "#FED7AA",
+      deep: "#7C2D12",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 28, label: "coachs certifiés" },
+    tagline: { hero: "Ta meilleure version, coachée." },
+    example: {
+      name: "Mana Fit Coach",
+      service: "Séance personnelle",
+      duration: "60 min",
+      price: "6 500 XPF",
+      rating: 4.9,
+      reviews: 76,
+    },
+    testimonial: {
+      quote: "Mon coach m'attend, mes objectifs s'alignent. Réserver mes séances en 1 clic = motivation x2.",
+      author: "Heimana V.",
+      meta: "Papeete · -8 kg en 3 mois",
+    },
+    keywords: ["coach sportif Tahiti", "personal trainer Papeete", "fitness Moorea", "remise en forme PF"],
+    hashtags: ["#CoachSportifPF", "#FitnessTahiti", "#PersonalTrainerPapeete"],
+    qa: {
+      q: "Combien coûte un coach sportif en Polynésie ?",
+      a: "Entre 5 000 et 9 000 XPF la séance d'1h. BookEasy référence 28 coachs certifiés PF avec abonnements possibles.",
+    },
+    midjourney: "Personal trainer outdoor session, beach workout, sunrise, athletic energy, --ar 1:1",
+  },
+
+  // ═══════════════════════════ MÉDICAL ═══════════════════════════
+  medecin: {
+    name: "Médecin Généraliste",
+    slug: "medecin",
+    emoji: "🩺",
+    category: "médical",
+    palette: {
+      primary: "#0284C7",
+      accent: "#E0F2FE",
+      deep: "#075985",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 89, label: "médecins en PF" },
+    tagline: { hero: "Ta santé, sans la salle d'attente." },
+    example: {
+      name: "Dr Vairea Tehei",
+      service: "Consultation généraliste",
+      duration: "20 min",
+      price: "3 500 XPF",
+      rating: 4.8,
+      reviews: 234,
+    },
+    testimonial: {
+      quote: "Mon médecin répondait jamais. J'ai trouvé mieux en 2 min sur BookEasy, RDV pris pour le lendemain.",
+      author: "Moana R.",
+      meta: "Papeete · maman 2 enfants",
+    },
+    keywords: ["médecin Papeete RDV", "généraliste Tahiti", "consultation Moorea", "RDV santé PF"],
+    hashtags: ["#MedecinPapeete", "#SantePolynesie", "#RDVMedicalTahiti"],
+    qa: {
+      q: "Comment prendre RDV chez un médecin à Papeete ?",
+      a: "BookEasy affiche les créneaux disponibles temps réel pour 89 médecins en PF. Confirmation immédiate, rappel SMS.",
+    },
+    midjourney: "Modern medical office, doctor stethoscope, clean professional, soft natural light, --ar 1:1",
+  },
+
+  dentiste: {
+    name: "Dentiste",
+    slug: "dentiste",
+    emoji: "🦷",
+    category: "médical",
+    palette: {
+      primary: "#06B6D4",
+      accent: "#CFFAFE",
+      deep: "#164E63",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 42, label: "dentistes en PF" },
+    tagline: { hero: "Ton sourire, soigné." },
+    example: {
+      name: "Dr Pia Tehei",
+      service: "Détartrage + contrôle",
+      duration: "30 min",
+      price: "6 800 XPF",
+      rating: 4.9,
+      reviews: 156,
+    },
+    testimonial: {
+      quote: "Plus jamais de mal de dents non traité. RDV dentiste BookEasy, c'est fait en 1 minute.",
+      author: "Tearii L.",
+      meta: "Punaauia · patient régulier",
+    },
+    keywords: ["dentiste Papeete", "RDV dentaire Tahiti", "détartrage Moorea", "soins dentaires PF"],
+    hashtags: ["#DentistePapeete", "#SoinsDentairesTahiti", "#DentaireMoorea"],
+    qa: {
+      q: "Comment prendre RDV chez un dentiste à Papeete ?",
+      a: "BookEasy liste 42 dentistes en PF avec créneaux dispo. Détartrage, urgence, soins, orthodontie — réservation en clair.",
+    },
+    midjourney: "Modern dental clinic, professional dentist chair, bright clean environment, --ar 1:1",
+  },
+
+  osteopathe: {
+    name: "Ostéopathe",
+    slug: "osteopathe",
+    emoji: "🧘",
+    category: "médical",
+    palette: {
+      primary: "#0891B2",
+      accent: "#A5F3FC",
+      deep: "#155E75",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1519824145371-296894a0daa9?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1591343395082-e120087004b4?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 23, label: "ostéopathes PF" },
+    tagline: { hero: "Le corps, remis en équilibre." },
+    example: {
+      name: "Tane Ostéo",
+      service: "Séance complète",
+      duration: "45 min",
+      price: "7 500 XPF",
+      rating: 4.9,
+      reviews: 112,
+    },
+    testimonial: {
+      quote: "Mon dos me faisait souffrir depuis 6 mois. Une séance, RDV pris sur BookEasy en 30 secondes. Soulagé.",
+      author: "Heitamatoa V.",
+      meta: "Papeete · profession libérale",
+    },
+    keywords: ["ostéopathe Papeete", "ostéo Tahiti", "mal de dos Moorea", "ostéopathie PF"],
+    hashtags: ["#OsteoTahiti", "#OsteopathePapeete", "#MalDeDosPF"],
+    qa: {
+      q: "Combien coûte une séance d'ostéopathie en Polynésie ?",
+      a: "Entre 6 500 et 9 000 XPF la séance de 45 min. BookEasy liste 23 ostéopathes diplômés en PF.",
+    },
+    midjourney: "Osteopath treatment room, natural wood, calm atmosphere, professional setting, --ar 1:1",
+  },
+
+  kine: {
+    name: "Kinésithérapeute",
+    slug: "kine",
+    emoji: "🦵",
+    category: "médical",
+    palette: {
+      primary: "#0EA5E9",
+      accent: "#BAE6FD",
+      deep: "#0C4A6E",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1571388208497-71bedc66e932?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 31, label: "kinés en PF" },
+    tagline: { hero: "Rééduquer, retrouver, repartir." },
+    example: {
+      name: "Cabinet Kiné Plus",
+      service: "Séance rééducation",
+      duration: "30 min",
+      price: "3 800 XPF",
+      rating: 4.8,
+      reviews: 198,
+    },
+    testimonial: {
+      quote: "Après ma blessure, j'avais besoin de séances rapides. BookEasy m'a trouvé un kiné dispo en 2 jours.",
+      author: "Mihimana T.",
+      meta: "Punaauia · sportive amateur",
+    },
+    keywords: ["kiné Papeete", "kinésithérapeute Tahiti", "rééducation Moorea", "physio PF"],
+    hashtags: ["#KinePapeete", "#KineTahiti", "#ReeducationPF"],
+    qa: {
+      q: "Comment trouver un kiné rapidement à Tahiti ?",
+      a: "BookEasy affiche 31 kinés en PF avec premiers créneaux disponibles. Suivi de séries, rééducation post-op, sport.",
+    },
+    midjourney: "Physiotherapy clinic, treatment table, bright modern equipment, --ar 1:1",
+  },
+
+  infirmier: {
+    name: "Infirmier à Domicile",
+    slug: "infirmier",
+    emoji: "💉",
+    category: "médical",
+    palette: {
+      primary: "#10B981",
+      accent: "#D1FAE5",
+      deep: "#064E3B",
+      surface: "#FFFFFF",
+    },
+    photos: [
+      "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=1080&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=1080&q=80&auto=format&fit=crop",
+    ],
+    stat: { count: 47, label: "infirmiers PF" },
+    tagline: { hero: "Soins à domicile, sans complication." },
+    example: {
+      name: "Infirmier Mana",
+      service: "Soin à domicile",
+      duration: "20 min",
+      price: "Prise en charge CPS",
+      rating: 4.9,
+      reviews: 87,
+    },
+    testimonial: {
+      quote: "Pour ma maman alitée, l'infirmier passe chaque matin. BookEasy a simplifié le planning.",
+      author: "Tiare R.",
+      meta: "Papeete · aidante familiale",
+    },
+    keywords: ["infirmier domicile Papeete", "soins à domicile Tahiti", "IDE Moorea", "infirmier PF"],
+    hashtags: ["#InfirmierPF", "#SoinsADomicileTahiti", "#IDEPapeete"],
+    qa: {
+      q: "Comment réserver un infirmier à domicile en Polynésie ?",
+      a: "BookEasy liste 47 IDE PF disponibles. Soins, pansements, injections, suivi chronique — prise en charge CPS.",
+    },
+    midjourney: "Home care nurse, gentle professional, soft natural light, caring atmosphere, --ar 1:1",
+  },
+};
+
+export const SECTOR_KEYS = Object.keys(SECTORS);
+export const CATEGORIES = {
+  beauté: { label: "Beauté & Bien-être", color: "#EC4899" },
+  coiffure: { label: "Coiffure", color: "#D97706" },
+  sport: { label: "Sport & Fitness", color: "#EA580C" },
+  médical: { label: "Médical & Santé", color: "#0284C7" },
+};
