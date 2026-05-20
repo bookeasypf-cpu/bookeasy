@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { signupLimiter, formatRateLimitError } from "@/lib/ratelimit";
 import { quickRegisterSchema, zodFirstError } from "@/lib/validations";
 import { sendMerchantWelcome } from "@/lib/email";
+import { notifyAdminMarketingEvent } from "@/lib/marketing/notify";
 
 export async function POST(req: NextRequest) {
   try {
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
     // Création atomique User + Merchant — sans transaction, un crash entre
     // les deux laisse un MERCHANT user sans profile, qu'on a déjà patché
     // côté dashboard mais qui crée un parcours dégradé inutile.
-    const user = await prisma.$transaction(async (tx) => {
+    const { user, merchantId } = await prisma.$transaction(async (tx) => {
       const u = await tx.user.create({
         data: {
           name,
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
           acceptedCguAt,
         },
       });
-      await tx.merchant.create({
+      const m = await tx.merchant.create({
         data: {
           userId: u.id,
           businessName: name,
@@ -80,8 +81,9 @@ export async function POST(req: NextRequest) {
           sectorId: sector.id,
           plan: merchantPlan,
         },
+        select: { id: true },
       });
-      return u;
+      return { user: u, merchantId: m.id };
     });
 
     // Welcome email — no longer contains a password. If it fails, the user
@@ -91,6 +93,10 @@ export async function POST(req: NextRequest) {
     // their credentials).
     sendMerchantWelcome(email, name).catch((err) => {
       console.error("[QUICK-REGISTER] Welcome email failed:", err instanceof Error ? err.message : err);
+    });
+
+    notifyAdminMarketingEvent({ event: "welcome", merchantId }).catch((err) => {
+      console.error("[QUICK-REGISTER] Marketing notify failed:", err instanceof Error ? err.message : err);
     });
 
     return NextResponse.json({

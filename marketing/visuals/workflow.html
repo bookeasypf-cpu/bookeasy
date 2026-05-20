@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Workflow Marketing Automatisé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 40px 20px 80px; }
+  .toolbar { position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; gap: 8px; }
+  .toolbar a { background: rgba(255,255,255,.08); backdrop-filter: blur(20px); color: #fff; padding: 8px 14px; border-radius: 100px; text-decoration: none; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,.15); }
+
+  .hero { text-align: center; margin-bottom: 50px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900; margin-bottom: 8px; background: linear-gradient(135deg, #10B981, #00f0d4, #A855F7, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; }
+  .sub { color: #aaa; font-size: 16px; font-style: italic; }
+
+  /* Triggers */
+  .triggers { max-width: 1200px; margin: 0 auto 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 800px) { .triggers { grid-template-columns: 1fr; } }
+  .trigger { background: #14141d; border: 1px solid #2a2a3a; border-radius: 20px; padding: 28px; position: relative; overflow: hidden; }
+  .trigger::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--c); }
+  .trigger.welcome { --c: #10B981; }
+  .trigger.upgrade { --c: #EC4899; }
+  .trigger .badge { display: inline-block; padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 800; letter-spacing: 1px; margin-bottom: 12px; }
+  .trigger.welcome .badge { background: rgba(16,185,129,.2); color: #6EE7B7; }
+  .trigger.upgrade .badge { background: rgba(236,72,153,.2); color: #F9A8D4; }
+  .trigger h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .trigger .file { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #888; margin-bottom: 14px; }
+  .trigger p { color: #ccc; font-size: 14px; line-height: 1.6; }
+  .trigger .arrow { font-size: 24px; margin: 14px 0; color: var(--c); }
+  .trigger .result { background: #0a0a0f; border: 1px solid #2a2a3a; border-radius: 12px; padding: 14px; font-size: 13px; color: #ddd; line-height: 1.6; }
+
+  /* Pipeline */
+  .pipeline { max-width: 1200px; margin: 0 auto 60px; }
+  .pipeline h2 { text-align: center; font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 8px; }
+  .pipeline .desc { text-align: center; color: #888; font-size: 14px; margin-bottom: 40px; }
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; position: relative; }
+  @media (max-width: 1000px) { .steps { grid-template-columns: 1fr; } }
+  .step { background: #14141d; border: 1px solid #2a2a3a; border-radius: 14px; padding: 18px; position: relative; }
+  .step .num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00f0d4; margin-bottom: 8px; font-weight: 700; }
+  .step h4 { font-size: 14px; margin-bottom: 6px; }
+  .step p { color: #aaa; font-size: 12px; line-height: 1.5; }
+
+  /* Test panel */
+  .test-panel { max-width: 800px; margin: 0 auto 60px; background: linear-gradient(135deg, rgba(0,240,212,.06), rgba(168,85,247,.06)); border: 1px solid rgba(0,240,212,.25); border-radius: 24px; padding: 36px; }
+  .test-panel h2 { font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 8px; }
+  .test-panel .desc { color: #aaa; font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+  .test-panel label { display: block; font-size: 11px; color: #aaa; margin: 16px 0 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .test-panel input, .test-panel select { width: 100%; background: #0a0a0f; border: 1px solid #2a2a3a; color: #fff; padding: 12px 14px; border-radius: 10px; font-size: 14px; font-family: inherit; }
+  .test-panel .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .test-panel button { width: 100%; margin-top: 20px; background: linear-gradient(135deg, #10B981, #EC4899); color: #fff; padding: 14px; border-radius: 12px; border: none; font-weight: 800; font-size: 15px; cursor: pointer; font-family: inherit; letter-spacing: 1px; }
+  .test-panel button:hover { transform: translateY(-1px); }
+  .test-panel .result-msg { margin-top: 16px; padding: 14px; border-radius: 10px; font-size: 13px; display: none; }
+  .test-panel .result-msg.success { display: block; background: rgba(16,185,129,.15); border: 1px solid #10B981; color: #6EE7B7; }
+  .test-panel .result-msg.error { display: block; background: rgba(248,113,113,.15); border: 1px solid #f87171; color: #fca5a5; }
+
+  /* Env */
+  .env-block { max-width: 800px; margin: 0 auto; background: #050507; border: 1px solid #2a2a3a; border-radius: 14px; padding: 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; color: #ccc; }
+  .env-block .key { color: #00f0d4; }
+  .env-block .com { color: #666; font-style: italic; }
+  .env-block h4 { font-family: 'Inter', sans-serif; color: #fff; margin-bottom: 14px; font-size: 16px; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="index.html">← Hub</a>
+    <a href="api-generator.html">⚡ API Gen</a>
+  </div>
+
+  <div class="hero">
+    <h1>Workflow Marketing Auto</h1>
+    <p class="sub">Tu signup un marchand → tu reçois un mail avec le visuel + caption · zéro effort</p>
+  </div>
+
+  <!-- 2 TRIGGERS -->
+  <div class="triggers">
+    <div class="trigger welcome">
+      <span class="badge">👋 TRIGGER 1</span>
+      <h3>Nouveau marchand FREE</h3>
+      <div class="file">src/app/api/quick-register/route.ts</div>
+      <p>Quand un commerçant remplit le formulaire d'inscription rapide et choisit son secteur, le système déclenche immédiatement la génération d'un visuel Welcome.</p>
+      <div class="arrow">↓</div>
+      <div class="result">
+        📧 <strong>Tu reçois un email</strong> avec :<br/>
+        • Visuel généré avec photo Unsplash secteur<br/>
+        • Caption pré-remplie pour Story IG<br/>
+        • Lien direct pour télécharger PNG<br/>
+        • Hashtags optimisés
+      </div>
+    </div>
+
+    <div class="trigger upgrade">
+      <span class="badge">🚀 TRIGGER 2</span>
+      <h3>Upgrade PRO confirmé</h3>
+      <div class="file">src/app/api/payzen/ipn/route.ts</div>
+      <p>Quand PayZen confirme un paiement Pro (statut AUTHORISED ou CAPTURED), le système génère un visuel premium avec la VRAIE photo du marchand.</p>
+      <div class="arrow">↓</div>
+      <div class="result">
+        📧 <strong>Tu reçois un email PREMIUM</strong> avec :<br/>
+        • Visuel avec photo authentique du marchand<br/>
+        • Caption Pro avec call-to-action SEO/GEO<br/>
+        • Recommandation BOOST 5-10k XPF<br/>
+        • Liens Insta + FB + TikTok
+      </div>
+    </div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="pipeline">
+    <h2>Pipeline complète</h2>
+    <p class="desc">De l'événement marchand à la publication sur les réseaux</p>
+    <div class="steps">
+      <div class="step">
+        <div class="num">// 01</div>
+        <h4>Événement</h4>
+        <p>Signup ou upgrade Pro déclenché</p>
+      </div>
+      <div class="step">
+        <div class="num">// 02</div>
+        <h4>Notify</h4>
+        <p>notifyAdminMarketingEvent() appelé fire-and-forget</p>
+      </div>
+      <div class="step">
+        <div class="num">// 03</div>
+        <h4>Génération</h4>
+        <p>Email HTML embed les URLs API /og avec photo merchant</p>
+      </div>
+      <div class="step">
+        <div class="num">// 04</div>
+        <h4>Validation</h4>
+        <p>Tu reçois mail, tu valides ou ajustes la caption</p>
+      </div>
+      <div class="step">
+        <div class="num">// 05</div>
+        <h4>Publication</h4>
+        <p>Tu télécharges + postes ou push vers Buffer/Hootsuite</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEST PANEL -->
+  <div class="test-panel">
+    <h2>🧪 Tester maintenant</h2>
+    <p class="desc">
+      Déclenche manuellement une notification pour tester le pipeline sans créer de vrai signup.
+      <br/>L'endpoint POST <code style="color: #00f0d4;">/api/marketing/notify-test</code> est protégé par <code style="color: #00f0d4;">NEXTAUTH_SECRET</code>.
+    </p>
+
+    <label>Merchant ID (existant en DB)</label>
+    <input id="mid" type="text" placeholder="cl... ou cuid" />
+
+    <div class="row">
+      <div>
+        <label>Type d'événement</label>
+        <select id="event">
+          <option value="welcome">👋 Welcome Free</option>
+          <option value="upgrade">🚀 Upgrade Pro</option>
+        </select>
+      </div>
+      <div>
+        <label>Admin Key (NEXTAUTH_SECRET)</label>
+        <input id="key" type="password" placeholder="********" />
+      </div>
+    </div>
+
+    <label>Base URL</label>
+    <select id="base">
+      <option value="http://localhost:3000">http://localhost:3000 (dev)</option>
+      <option value="https://bookeasy.me">https://bookeasy.me (prod)</option>
+    </select>
+
+    <button onclick="sendTest()">📧 Envoyer l'email de test</button>
+    <div class="result-msg" id="result"></div>
+  </div>
+
+  <!-- ENV -->
+  <div class="env-block">
+    <h4>⚙️ Variables d'environnement</h4>
+    <span class="com"># Email destinataire des notifications marketing (Mara)</span><br/>
+    <span class="key">MARKETING_ADMIN_EMAIL</span>=bookeasy.pf@gmail.com <span class="com"># ou ton email perso</span><br/>
+    <br/>
+    <span class="com"># Déjà configurés :</span><br/>
+    <span class="key">RESEND_API_KEY</span>=...<br/>
+    <span class="key">EMAIL_FROM</span>=BookEasy &lt;noreply@bookeasy.me&gt;<br/>
+    <span class="key">NEXTAUTH_URL</span>=https://bookeasy.me <span class="com"># utilisé pour générer les URLs preview</span><br/>
+    <span class="key">NEXTAUTH_SECRET</span>=... <span class="com"># clé pour le endpoint de test admin</span>
+  </div>
+
+<script>
+  async function sendTest() {
+    const mid = document.getElementById('mid').value;
+    const event = document.getElementById('event').value;
+    const key = document.getElementById('key').value;
+    const base = document.getElementById('base').value;
+    const result = document.getElementById('result');
+
+    if (!mid || !key) {
+      result.className = 'result-msg error';
+      result.textContent = '⚠️ Merchant ID et Admin Key requis';
+      return;
+    }
+
+    try {
+      const r = await fetch(`${base}/api/marketing/notify-test`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-key': key },
+        body: JSON.stringify({ merchantId: mid, event }),
+      });
+      const data = await r.json();
+      if (r.ok) {
+        result.className = 'result-msg success';
+        result.innerHTML = `✅ Email envoyé ! Vérifie ta boîte de réception <strong>(${event})</strong> pour le marchand <code>${mid}</code>.`;
+      } else {
+        result.className = 'result-msg error';
+        result.textContent = `❌ ${data.error || 'Erreur inconnue'} ${data.message ? '· ' + data.message : ''}`;
+      }
+    } catch (e) {
+      result.className = 'result-msg error';
+      result.textContent = `❌ Erreur réseau : ${e.message}`;
+    }
+  }
+</script>
+</body>
+</html>

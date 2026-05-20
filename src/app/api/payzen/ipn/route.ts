@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { verifySignature, parseIPNData } from "@/lib/payzen";
 import { onBookingConfirmed } from "@/lib/booking-confirm";
 import { sendGiftCardEmail } from "@/lib/email";
+import { notifyAdminMarketingEvent } from "@/lib/marketing/notify";
 
 export async function POST(req: NextRequest) {
   try {
@@ -75,6 +76,11 @@ async function handleProSubscription(ipnData: ReturnType<typeof parseIPNData>) {
             title: "Abonnement Pro activé !",
             message: "Votre abonnement Pro est maintenant actif. Profitez de tous les avantages !",
           },
+        });
+
+        // Marketing : génère visuel premium + alerte Mara pour boost réseaux
+        notifyAdminMarketingEvent({ event: "upgrade", merchantId: ipnData.merchantId }).catch((err) => {
+          console.error("[PAYZEN-IPN] Marketing notify upgrade failed:", err instanceof Error ? err.message : err);
         });
       }
       break;
