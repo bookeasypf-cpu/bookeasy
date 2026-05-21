@@ -1,6 +1,6 @@
 # 📇 Base Prospects BookEasy — Polynésie Française
 
-**593 prospects** identifiés à travers **14 secteurs** sur l'ensemble de la Polynésie Française (Tahiti, Moorea, Bora Bora, Raiatea, Tahaa, Huahine, Rangiroa, Tubuai, Hiva Oa, Nuku Hiva, Rurutu, Ua Pou, Tikehau, Raivavae...).
+**631 prospects** identifiés à travers **16 secteurs** sur l'ensemble de la Polynésie Française (Tahiti, Moorea, Bora Bora, Raiatea, Tahaa, Huahine, Rangiroa, Tubuai, Hiva Oa, Nuku Hiva, Rurutu, Ua Pou, Tikehau, Raivavae...).
 
 ## 📊 Répartition par secteur
 
@@ -13,13 +13,15 @@
 | 💅 Institut de beauté | **44** | Rendez-vous.pf | Téléphone ✅ |
 | 🌿 Ostéopathe | **40** | Rendez-vous.pf + sites perso | Tél + email pour top 10 |
 | 🦷 Dentiste | **36** | CPS + Lemedecin.fr | Tél + adresse CPS ✅ |
-| 👨‍⚕️ Médecin généraliste (BONUS) | **22** | CPS conventionnés | Tél + adresse ✅ |
+| 👨‍⚕️ Médecin généraliste | **22** | CPS conventionnés | Tél + adresse ✅ |
+| 📸 Photographe (NEW) | **20** | Rendez-vous.pf + Tahiti Tourisme | Tél + sites ✅ |
+| 🤱 Sage-femme (NEW) | **18** | Rendez-vous.pf + Ordre CO | Tél + email pour HP ✅ |
 | 🧖 Spa | **13** | Hôtels 5* + indépendants | Tél + email ✅ |
 | 💪 Coach sportif | **11** | Web + Fenua Wellness | Tél + email pour top |
 | 💈 Barber | **11** | Recherche web + Fresha | Tél + FB/Insta |
 | 💄 Maquilleuse pro | **10** | Rendez-vous.pf | Tél direct |
 | 💅 Onglerie / Manucure | **10** | Tahiti Pass + Insta | Tél + FB/Insta |
-| 🦶 Pédicure-podologue (BONUS) | **6** | CPS conventionnés | Tél + vini ✅ |
+| 🦶 Pédicure-podologue | **6** | CPS conventionnés | Tél + vini ✅ |
 
 ## 📂 Structure des données
 
