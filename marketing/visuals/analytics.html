@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Dashboard Analytics Marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 40px 20px 80px; }
+  .toolbar { position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; gap: 8px; }
+  .toolbar a, .toolbar button { background: rgba(255,255,255,.08); backdrop-filter: blur(20px); color: #fff; padding: 8px 14px; border-radius: 100px; text-decoration: none; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,.15); cursor: pointer; font-family: inherit; }
+
+  .hero { text-align: center; margin-bottom: 32px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900; margin-bottom: 8px; background: linear-gradient(135deg, #00f0d4, #A855F7, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; }
+  .sub { color: #aaa; font-size: 16px; font-style: italic; }
+
+  /* AUTH */
+  .auth-row { max-width: 800px; margin: 0 auto 30px; display: flex; gap: 12px; align-items: center; background: #14141d; border: 1px solid #2a2a3a; border-radius: 14px; padding: 16px; }
+  .auth-row input { flex: 1; background: #0a0a0f; border: 1px solid #2a2a3a; color: #fff; padding: 10px 14px; border-radius: 10px; font-size: 14px; font-family: inherit; }
+  .auth-row select { background: #0a0a0f; border: 1px solid #2a2a3a; color: #fff; padding: 10px 14px; border-radius: 10px; font-size: 14px; font-family: inherit; }
+  .auth-row button { background: #fff; color: #000; padding: 10px 20px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+  /* KPI ROW */
+  .kpi-row { max-width: 1400px; margin: 0 auto 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .kpi { background: #14141d; border: 1px solid #2a2a3a; border-radius: 14px; padding: 18px; transition: all .2s; }
+  .kpi:hover { transform: translateY(-2px); border-color: rgba(0,240,212,.3); }
+  .kpi .lab { font-size: 10px; color: #888; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+  .kpi .val { font-size: 28px; font-weight: 900; line-height: 1; }
+  .kpi .delta { font-size: 11px; color: #6EE7B7; margin-top: 6px; }
+  .kpi.accent .val { background: linear-gradient(135deg, #00f0d4, #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+  /* BY TYPE */
+  .by-type { max-width: 1400px; margin: 0 auto 32px; }
+  .by-type h2 { font-size: 18px; margin-bottom: 12px; color: #aaa; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .type-row { background: #14141d; border: 1px solid #2a2a3a; border-radius: 14px; padding: 16px; display: grid; grid-template-columns: 180px 1fr auto auto auto; gap: 16px; align-items: center; margin-bottom: 8px; }
+  @media (max-width: 700px) { .type-row { grid-template-columns: 1fr; } }
+  .type-row .name { font-weight: 700; font-size: 14px; }
+  .type-row .bar { background: #0a0a0f; border-radius: 100px; height: 8px; overflow: hidden; }
+  .type-row .bar-fill { height: 100%; background: linear-gradient(90deg, #00f0d4, #A855F7); border-radius: 100px; transition: width .6s; }
+  .type-row .count { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #00f0d4; }
+  .type-row .stat-cell { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #ccc; }
+  .type-row .stat-cell span { color: #666; }
+
+  /* POSTS TABLE */
+  .posts-section { max-width: 1400px; margin: 0 auto; }
+  .posts-section .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .posts-section h2 { font-size: 18px; color: #aaa; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .new-post-btn { background: linear-gradient(135deg, #00f0d4, #A855F7); color: #000; padding: 10px 18px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; font-family: inherit; font-size: 13px; }
+
+  .posts-grid { display: grid; gap: 10px; }
+  .post-card { background: #14141d; border: 1px solid #2a2a3a; border-radius: 14px; padding: 16px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+  .post-card .info { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .post-card .info-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .post-card .type-badge { padding: 3px 8px; border-radius: 100px; font-size: 10px; font-weight: 800; letter-spacing: 1px; }
+  .post-card .platforms { font-size: 11px; color: #888; }
+  .post-card .date { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #666; }
+  .post-card .caption-preview { color: #ccc; font-size: 13px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .post-card .kpis { display: flex; gap: 12px; }
+  .post-card .kpis .k { text-align: center; }
+  .post-card .kpis .k .v { font-size: 16px; font-weight: 800; line-height: 1; }
+  .post-card .kpis .k .l { font-size: 9px; color: #888; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .post-card .actions { display: flex; gap: 6px; }
+  .post-card .actions button { background: rgba(255,255,255,.06); color: #ddd; padding: 6px 10px; border-radius: 8px; border: none; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .post-card .actions button:hover { background: rgba(255,255,255,.12); }
+  .post-card .actions button.delete:hover { background: rgba(248,113,113,.2); color: #f87171; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(20px); z-index: 1000; display: none; align-items: flex-start; justify-content: center; padding: 60px 20px; overflow-y: auto; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: #14141d; border: 1px solid #2a2a3a; border-radius: 20px; padding: 28px; max-width: 640px; width: 100%; }
+  .modal h3 { margin-bottom: 16px; font-size: 20px; }
+  .modal label { display: block; font-size: 11px; color: #aaa; margin: 12px 0 5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .modal input, .modal select, .modal textarea { width: 100%; background: #0a0a0f; border: 1px solid #2a2a3a; color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 13px; font-family: inherit; }
+  .modal textarea { min-height: 80px; resize: vertical; }
+  .modal .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .modal .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+  .modal .actions { display: flex; gap: 8px; margin-top: 20px; }
+  .modal .actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .modal .actions .cancel { background: rgba(255,255,255,.08); color: #fff; }
+  .modal .actions .save { background: linear-gradient(135deg, #00f0d4, #A855F7); color: #000; }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: #666; }
+  .empty-state .icon { font-size: 60px; margin-bottom: 16px; opacity: 0.5; }
+
+  .info-banner { max-width: 1400px; margin: 0 auto 24px; background: rgba(0,240,212,.06); border: 1px solid rgba(0,240,212,.25); border-radius: 14px; padding: 14px 18px; font-size: 13px; color: #ddd; line-height: 1.5; }
+  .info-banner code { color: #00f0d4; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="index.html">← Hub</a>
+    <a href="calendar.html">📅 Calendrier</a>
+  </div>
+
+  <div class="hero">
+    <h1>Analytics Marketing</h1>
+    <p class="sub">Tracker tes posts publiés et leurs KPIs · base de données vivante</p>
+  </div>
+
+  <div class="info-banner">
+    ℹ️ <strong>Setup nécessaire :</strong> Une migration Prisma doit créer la table <code>marketing_posts</code>. Lance <code>npx prisma migrate dev --name add_marketing_posts</code> côté projet bookeasy avant d'utiliser cette page.
+  </div>
+
+  <!-- AUTH -->
+  <div class="auth-row">
+    <div style="flex:1;">
+      <label style="display:block;font-size:10px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;font-weight:700;">Base URL</label>
+      <select id="baseUrl" style="width:100%;">
+        <option value="http://localhost:3000">http://localhost:3000 (dev)</option>
+        <option value="https://bookeasy.me">https://bookeasy.me (prod)</option>
+      </select>
+    </div>
+    <div style="flex:2;">
+      <label style="display:block;font-size:10px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;font-weight:700;">Admin Key (NEXTAUTH_SECRET)</label>
+      <input id="adminKey" type="password" placeholder="********" />
+    </div>
+    <button onclick="loadData()" style="align-self: end;">🔄 Charger</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row" id="kpis"></div>
+
+  <!-- BY TYPE -->
+  <div class="by-type">
+    <h2>📊 Performance par type de post</h2>
+    <div id="byType"></div>
+  </div>
+
+  <!-- POSTS -->
+  <div class="posts-section">
+    <div class="head">
+      <h2>📝 Posts publiés</h2>
+      <button class="new-post-btn" onclick="openModal()">+ Nouveau post</button>
+    </div>
+    <div class="posts-grid" id="posts"></div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3 id="modalTitle">Nouveau post publié</h3>
+      <input type="hidden" id="editId" />
+
+      <label>Type</label>
+      <select id="m-type">
+        <option value="hero">🎨 Hero Magazine</option>
+        <option value="ui">📱 UI Showcase</option>
+        <option value="testimonial">💬 Témoignage</option>
+        <option value="welcome">👋 Welcome Free</option>
+        <option value="upgrade">🚀 Upgrade Pro</option>
+        <option value="educational">📚 Éducatif</option>
+        <option value="signature">⚡ Tech Néon</option>
+      </select>
+
+      <label>Plateformes (comma-separated)</label>
+      <input id="m-platforms" type="text" value="instagram,facebook" />
+
+      <label>Caption</label>
+      <textarea id="m-caption" placeholder="Caption publiée..."></textarea>
+
+      <label>Merchant ID (optionnel)</label>
+      <input id="m-merchantId" type="text" placeholder="cuid d'un merchant" />
+
+      <label>Image URL (optionnel)</label>
+      <input id="m-imageUrl" type="text" placeholder="https://bookeasy.me/api/marketing/og?..." />
+
+      <label>KPIs (renseigne après quelques jours)</label>
+      <div class="grid-4">
+        <div><input id="m-reach" type="number" placeholder="Reach" /></div>
+        <div><input id="m-impressions" type="number" placeholder="Impressions" /></div>
+        <div><input id="m-likes" type="number" placeholder="Likes" /></div>
+        <div><input id="m-comments" type="number" placeholder="Comments" /></div>
+      </div>
+      <div class="grid-4" style="margin-top:6px;">
+        <div><input id="m-shares" type="number" placeholder="Shares" /></div>
+        <div><input id="m-saves" type="number" placeholder="Saves" /></div>
+        <div><input id="m-clicks" type="number" placeholder="Clicks" /></div>
+        <div><input id="m-bookings" type="number" placeholder="Bookings" /></div>
+      </div>
+
+      <label>Boost</label>
+      <div class="grid-3">
+        <div><input id="m-boostBudget" type="number" placeholder="Budget XPF" /></div>
+        <div><input id="m-boostSpent" type="number" placeholder="Dépensé XPF" /></div>
+        <div></div>
+      </div>
+
+      <label>Notes</label>
+      <textarea id="m-notes" placeholder="Observations, ce qui a marché ou pas..."></textarea>
+
+      <div class="actions">
+        <button class="cancel" onclick="closeModal()">Annuler</button>
+        <button class="save" onclick="savePost()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const TYPE_COLORS = {
+    hero: '#0EA5A0', ui: '#A855F7', testimonial: '#F59E0B',
+    welcome: '#10B981', upgrade: '#EC4899', educational: '#3B82F6', signature: '#00F0D4',
+  };
+  const TYPE_LABELS = {
+    hero: '🎨 Hero', ui: '📱 UI', testimonial: '💬 Témoignage',
+    welcome: '👋 Welcome', upgrade: '🚀 Upgrade Pro', educational: '📚 Éducatif', signature: '⚡ Signature',
+  };
+
+  function getAuthHeaders() {
+    const key = document.getElementById('adminKey').value;
+    return { 'Content-Type': 'application/json', 'x-admin-key': key };
+  }
+
+  function getBaseUrl() { return document.getElementById('baseUrl').value; }
+
+  async function loadData() {
+    const r = await fetch(`${getBaseUrl()}/api/marketing/posts?limit=200`, { headers: getAuthHeaders() });
+    if (!r.ok) {
+      alert('Erreur ' + r.status + ' — vérifie l\'admin key et que la table marketing_posts existe');
+      return;
+    }
+    const data = await r.json();
+    renderKPIs(data.stats);
+    renderByType(data.byType);
+    renderPosts(data.posts);
+  }
+
+  function renderKPIs(s) {
+    const kpis = [
+      { lab: 'Posts publiés', val: s.totalPosts, accent: true },
+      { lab: 'Reach total', val: s.totalReach.toLocaleString('fr') },
+      { lab: 'Impressions', val: s.totalImpressions.toLocaleString('fr') },
+      { lab: 'Likes', val: s.totalLikes.toLocaleString('fr') },
+      { lab: 'Commentaires', val: s.totalComments.toLocaleString('fr') },
+      { lab: 'Partages', val: s.totalShares.toLocaleString('fr') },
+      { lab: 'Saves', val: s.totalSaves.toLocaleString('fr') },
+      { lab: 'Clicks → site', val: s.totalClicks.toLocaleString('fr'), accent: true },
+      { lab: 'Réservations', val: s.totalBookings.toLocaleString('fr'), accent: true },
+      { lab: 'Boost dépensé XPF', val: (s.totalBoostSpent ?? 0).toLocaleString('fr') },
+    ];
+    document.getElementById('kpis').innerHTML = kpis.map(k =>
+      `<div class="kpi ${k.accent ? 'accent' : ''}">
+        <div class="lab">${k.lab}</div>
+        <div class="val">${k.val}</div>
+      </div>`
+    ).join('');
+  }
+
+  function renderByType(arr) {
+    if (!arr.length) { document.getElementById('byType').innerHTML = '<div class="empty-state"><div class="icon">📊</div>Aucune donnée pour le moment</div>'; return; }
+    const max = Math.max(...arr.map(a => a._count.id));
+    document.getElementById('byType').innerHTML = arr.map(a => {
+      const pct = (a._count.id / max) * 100;
+      const col = TYPE_COLORS[a.type] || '#888';
+      return `<div class="type-row">
+        <div class="name" style="color:${col}">${TYPE_LABELS[a.type] || a.type}</div>
+        <div class="bar"><div class="bar-fill" style="width:${pct}%; background: linear-gradient(90deg, ${col}, ${col}aa);"></div></div>
+        <div class="count">${a._count.id} posts</div>
+        <div class="stat-cell"><span>Reach :</span> ${(a._sum.reach ?? 0).toLocaleString('fr')}</div>
+        <div class="stat-cell"><span>Clicks :</span> ${(a._sum.clicks ?? 0).toLocaleString('fr')}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderPosts(posts) {
+    if (!posts.length) {
+      document.getElementById('posts').innerHTML = '<div class="empty-state"><div class="icon">📝</div>Aucun post enregistré. Clique sur "+ Nouveau post" pour commencer.</div>';
+      return;
+    }
+    document.getElementById('posts').innerHTML = posts.map(p => {
+      const col = TYPE_COLORS[p.type] || '#888';
+      const date = new Date(p.publishedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+      return `<div class="post-card">
+        <div class="info">
+          <div class="info-row">
+            <span class="type-badge" style="background:${col}22;color:${col};">${TYPE_LABELS[p.type] || p.type}</span>
+            <span class="date">${date}</span>
+            <span class="platforms">${p.platforms}</span>
+            ${p.merchant ? `<span class="platforms">· ${p.merchant.businessName} (${p.merchant.plan})</span>` : ''}
+          </div>
+          <div class="caption-preview">${p.caption.slice(0, 120)}${p.caption.length > 120 ? '…' : ''}</div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center;">
+          <div class="kpis">
+            <div class="k"><div class="v">${p.reach.toLocaleString('fr')}</div><div class="l">Reach</div></div>
+            <div class="k"><div class="v">${p.likes.toLocaleString('fr')}</div><div class="l">Likes</div></div>
+            <div class="k"><div class="v">${p.clicks.toLocaleString('fr')}</div><div class="l">Clicks</div></div>
+            <div class="k"><div class="v" style="color:${col}">${p.bookings}</div><div class="l">Réservations</div></div>
+          </div>
+          <div class="actions">
+            <button onclick='editPost(${JSON.stringify(p).replace(/'/g, "\\'")})'>✏️</button>
+            <button class="delete" onclick="deletePost('${p.id}')">🗑️</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function openModal() {
+    document.getElementById('modal').classList.add('active');
+    document.getElementById('modalTitle').textContent = 'Nouveau post publié';
+    document.getElementById('editId').value = '';
+    ['type','platforms','caption','merchantId','imageUrl','reach','impressions','likes','comments','shares','saves','clicks','bookings','boostBudget','boostSpent','notes'].forEach(k => {
+      const el = document.getElementById('m-' + k);
+      if (el) el.value = k === 'type' ? 'hero' : (k === 'platforms' ? 'instagram,facebook' : '');
+    });
+  }
+
+  function editPost(p) {
+    document.getElementById('modal').classList.add('active');
+    document.getElementById('modalTitle').textContent = 'Éditer post';
+    document.getElementById('editId').value = p.id;
+    document.getElementById('m-type').value = p.type;
+    document.getElementById('m-platforms').value = p.platforms;
+    document.getElementById('m-caption').value = p.caption;
+    document.getElementById('m-merchantId').value = p.merchantId || '';
+    document.getElementById('m-imageUrl').value = p.imageUrl || '';
+    ['reach','impressions','likes','comments','shares','saves','clicks','bookings'].forEach(k => {
+      document.getElementById('m-' + k).value = p[k] || '';
+    });
+    document.getElementById('m-boostBudget').value = p.boostBudget ?? '';
+    document.getElementById('m-boostSpent').value = p.boostSpent ?? '';
+    document.getElementById('m-notes').value = p.notes || '';
+  }
+
+  function closeModal() { document.getElementById('modal').classList.remove('active'); }
+
+  async function savePost() {
+    const id = document.getElementById('editId').value;
+    const data = {
+      type: document.getElementById('m-type').value,
+      platforms: document.getElementById('m-platforms').value,
+      caption: document.getElementById('m-caption').value,
+      merchantId: document.getElementById('m-merchantId').value || null,
+      imageUrl: document.getElementById('m-imageUrl').value || null,
+      reach: document.getElementById('m-reach').value || 0,
+      impressions: document.getElementById('m-impressions').value || 0,
+      likes: document.getElementById('m-likes').value || 0,
+      comments: document.getElementById('m-comments').value || 0,
+      shares: document.getElementById('m-shares').value || 0,
+      saves: document.getElementById('m-saves').value || 0,
+      clicks: document.getElementById('m-clicks').value || 0,
+      bookings: document.getElementById('m-bookings').value || 0,
+      boostBudget: document.getElementById('m-boostBudget').value || null,
+      boostSpent: document.getElementById('m-boostSpent').value || null,
+      notes: document.getElementById('m-notes').value || null,
+    };
+
+    const url = id ? `${getBaseUrl()}/api/marketing/posts?id=${id}` : `${getBaseUrl()}/api/marketing/posts`;
+    const method = id ? 'PATCH' : 'POST';
+    const r = await fetch(url, { method, headers: getAuthHeaders(), body: JSON.stringify(data) });
+    if (!r.ok) { alert('Erreur ' + r.status); return; }
+    closeModal();
+    loadData();
+  }
+
+  async function deletePost(id) {
+    if (!confirm('Supprimer ce post ?')) return;
+    const r = await fetch(`${getBaseUrl()}/api/marketing/posts?id=${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+    if (!r.ok) { alert('Erreur ' + r.status); return; }
+    loadData();
+  }
+</script>
+</body>
+</html>

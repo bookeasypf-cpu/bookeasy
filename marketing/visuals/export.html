@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Export Calendrier Buffer / Hootsuite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 40px 20px 80px; }
+  .toolbar { position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; gap: 8px; }
+  .toolbar a { background: rgba(255,255,255,.08); backdrop-filter: blur(20px); color: #fff; padding: 8px 14px; border-radius: 100px; text-decoration: none; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,.15); }
+
+  .hero { text-align: center; margin-bottom: 40px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900; margin-bottom: 8px; background: linear-gradient(135deg, #F59E0B, #EC4899, #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; }
+  .sub { color: #aaa; font-size: 16px; font-style: italic; }
+
+  .formats { max-width: 1100px; margin: 0 auto 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 800px) { .formats { grid-template-columns: 1fr; } }
+  .format { background: #14141d; border: 2px solid #2a2a3a; border-radius: 16px; padding: 22px; cursor: pointer; transition: all .2s; }
+  .format:hover { border-color: rgba(255,255,255,.3); transform: translateY(-2px); }
+  .format.active { border-color: #F59E0B; box-shadow: 0 0 30px rgba(245,158,11,.2); }
+  .format .head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .format .head .icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .format.buffer .icon { background: linear-gradient(135deg, #168EEA, #0D5BB0); }
+  .format.hootsuite .icon { background: linear-gradient(135deg, #143059, #0E1F3E); }
+  .format.generic .icon { background: linear-gradient(135deg, #888, #555); }
+  .format h3 { font-size: 16px; font-weight: 800; }
+  .format p { color: #aaa; font-size: 12px; line-height: 1.5; margin-top: 6px; }
+
+  .controls { max-width: 1100px; margin: 0 auto 24px; background: #14141d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 22px; display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: end; }
+  @media (max-width: 700px) { .controls { grid-template-columns: 1fr; } }
+  .controls label { display: block; font-size: 11px; color: #aaa; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .controls input, .controls select { width: 100%; background: #0a0a0f; border: 1px solid #2a2a3a; color: #fff; padding: 12px 14px; border-radius: 10px; font-size: 14px; font-family: inherit; }
+  .controls .download-btn { background: linear-gradient(135deg, #F59E0B, #EC4899); color: #fff; padding: 14px 24px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; font-family: inherit; letter-spacing: 1px; white-space: nowrap; }
+
+  .preview { max-width: 1100px; margin: 0 auto 32px; background: #050507; border: 1px solid #2a2a3a; border-radius: 16px; overflow: hidden; }
+  .preview-header { background: #14141d; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #aaa; }
+  .preview-header .stat { font-family: 'JetBrains Mono', monospace; }
+  .preview-table { overflow-x: auto; max-height: 560px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+  thead { background: #14141d; position: sticky; top: 0; }
+  th { padding: 12px 14px; text-align: left; font-size: 10px; color: #00f0d4; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+  td { padding: 10px 14px; border-top: 1px solid #2a2a3a; color: #ddd; vertical-align: top; white-space: pre-wrap; max-width: 320px; word-break: break-word; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+
+  .tips { max-width: 1100px; margin: 0 auto; background: linear-gradient(135deg, rgba(245,158,11,.06), rgba(236,72,153,.06)); border: 1px solid rgba(245,158,11,.25); border-radius: 20px; padding: 28px; }
+  .tips h3 { margin-bottom: 14px; font-size: 18px; }
+  .tips .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 700px) { .tips .grid { grid-template-columns: 1fr; } }
+  .tips h4 { font-size: 13px; color: #fbbf24; margin-bottom: 10px; }
+  .tips ol, .tips ul { padding-left: 20px; color: #ddd; font-size: 13px; line-height: 1.7; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="index.html">← Hub</a>
+    <a href="calendar.html">📅 Calendrier</a>
+  </div>
+
+  <div class="hero">
+    <h1>Export Programmation</h1>
+    <p class="sub">Pousse ton calendrier vers Buffer, Hootsuite ou tout planificateur</p>
+  </div>
+
+  <!-- FORMAT SELECTORS -->
+  <div class="formats">
+    <div class="format buffer active" data-fmt="buffer" onclick="selectFormat('buffer')">
+      <div class="head"><div class="icon">📅</div><h3>Buffer</h3></div>
+      <p>Format CSV Buffer Publish — colonnes Date, Time, Text, Image URL, Channels.</p>
+    </div>
+    <div class="format hootsuite" data-fmt="hootsuite" onclick="selectFormat('hootsuite')">
+      <div class="head"><div class="icon">🦉</div><h3>Hootsuite</h3></div>
+      <p>Format CSV Hootsuite Bulk Composer — Date YYYY-MM-DD, Time HH:MM, Message.</p>
+    </div>
+    <div class="format generic" data-fmt="generic" onclick="selectFormat('generic')">
+      <div class="head"><div class="icon">📋</div><h3>Generic CSV</h3></div>
+      <p>Format universel — toutes les colonnes pour import dans n'importe quel outil.</p>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div>
+      <label>Base URL des visuels</label>
+      <select id="baseUrl">
+        <option value="https://bookeasy.me">https://bookeasy.me (prod)</option>
+        <option value="http://localhost:3000">http://localhost:3000 (dev)</option>
+      </select>
+    </div>
+    <div>
+      <label>Merchant ID par défaut (pour preview URL)</label>
+      <input id="merchantId" type="text" placeholder="cuid d'un merchant existant" />
+    </div>
+    <button class="download-btn" onclick="downloadCSV()">⬇ Télécharger CSV</button>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview">
+    <div class="preview-header">
+      <span>Aperçu du CSV</span>
+      <span class="stat" id="rows-count">— posts</span>
+    </div>
+    <div class="preview-table" id="preview-table"></div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="tips">
+    <h3>📖 Comment utiliser ces fichiers</h3>
+    <div class="grid">
+      <div>
+        <h4>📅 Sur Buffer</h4>
+        <ol>
+          <li>Publish → Queue → ⚙ → Bulk Upload</li>
+          <li>Glisse-dépose le CSV téléchargé</li>
+          <li>Map les colonnes (auto-détection souvent OK)</li>
+          <li>Review chaque post avant validation</li>
+          <li>Buffer programme automatiquement aux dates/heures du CSV</li>
+        </ol>
+      </div>
+      <div>
+        <h4>🦉 Sur Hootsuite</h4>
+        <ol>
+          <li>Planificateur → Bulk Composer</li>
+          <li>Upload CSV (format Hootsuite obligatoire)</li>
+          <li>Sélectionne les comptes sociaux cibles</li>
+          <li>Programme en 1 clic</li>
+          <li>⚠️ Hootsuite ne supporte pas les images via URL — il faut joindre manuellement après upload</li>
+        </ol>
+      </div>
+    </div>
+    <p style="margin-top: 18px; padding: 14px; background: rgba(0,240,212,.08); border: 1px solid rgba(0,240,212,.3); border-radius: 10px; color: #ddd; font-size: 13px; line-height: 1.6;">
+      💡 <strong>Workflow recommandé :</strong> Utilise Buffer (gère bien les URLs d'images). Lance le serveur Next.js + l'API <code style="color:#00f0d4;">/api/marketing/og</code> pour que les URLs preview résolvent vers de vraies images au moment de la programmation.
+    </p>
+  </div>
+
+<script type="module">
+  import { CALENDAR, TYPE_INFO } from './data/calendar.js';
+  import { SECTORS } from './data/sectors.js';
+
+  let currentFormat = 'buffer';
+
+  window.selectFormat = (fmt) => {
+    currentFormat = fmt;
+    document.querySelectorAll('.format').forEach(el => el.classList.remove('active'));
+    document.querySelector(`[data-fmt="${fmt}"]`).classList.add('active');
+    renderPreview();
+  };
+
+  function getImageUrl(post) {
+    const base = document.getElementById('baseUrl').value;
+    const mid = document.getElementById('merchantId').value || 'EXAMPLE_MERCHANT_ID';
+    const template = post.type === 'ui' ? 'ui' : (post.type === 'testimonial' ? 'testimonial' : 'hero');
+    return `${base}/api/marketing/og?merchantId=${mid}&template=${template}&format=square`;
+  }
+
+  function buildCaption(post) {
+    return (post.caption + '\n\n' + post.hashtags).trim();
+  }
+
+  function getPlatformsString(post, fmt) {
+    if (fmt === 'buffer') {
+      const map = { instagram: 'instagram', facebook: 'facebook', tiktok: 'tiktok', 'instagram-story': 'instagram' };
+      return [...new Set(post.platforms.map(p => map[p] || p))].join(',');
+    }
+    return post.platforms.join(',');
+  }
+
+  function rowForFormat(post, fmt) {
+    const caption = buildCaption(post);
+    const image = getImageUrl(post);
+
+    if (fmt === 'buffer') {
+      return {
+        Date: post.date,
+        Time: post.time,
+        Text: caption,
+        'Image URL': image,
+        Channels: getPlatformsString(post, fmt),
+      };
+    }
+    if (fmt === 'hootsuite') {
+      return {
+        Date: post.date,
+        Time: post.time,
+        Message: caption,
+        'Image URL': image,
+        Platform: getPlatformsString(post, fmt),
+      };
+    }
+    // generic
+    return {
+      date: post.date,
+      time: post.time,
+      day: post.day,
+      week: post.week,
+      type: post.type,
+      sector: post.sector || '',
+      title: post.title,
+      caption: caption,
+      hashtags: post.hashtags,
+      image_url: image,
+      platforms: post.platforms.join(','),
+      notes: post.notes || '',
+    };
+  }
+
+  function renderPreview() {
+    const rows = CALENDAR.map(p => rowForFormat(p, currentFormat));
+    if (!rows.length) return;
+    const headers = Object.keys(rows[0]);
+    let html = '<table><thead><tr>';
+    headers.forEach(h => html += `<th>${h}</th>`);
+    html += '</tr></thead><tbody>';
+    rows.forEach(r => {
+      html += '<tr>';
+      headers.forEach(h => html += `<td>${(r[h] || '').toString().slice(0, 200)}</td>`);
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('preview-table').innerHTML = html;
+    document.getElementById('rows-count').textContent = `${rows.length} posts · format ${currentFormat.toUpperCase()}`;
+  }
+
+  function csvEscape(v) {
+    const s = String(v ?? '');
+    if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  window.downloadCSV = () => {
+    const rows = CALENDAR.map(p => rowForFormat(p, currentFormat));
+    if (!rows.length) return;
+    const headers = Object.keys(rows[0]);
+    const lines = [headers.join(',')];
+    rows.forEach(r => {
+      lines.push(headers.map(h => csvEscape(r[h])).join(','));
+    });
+    const csv = lines.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bookeasy-calendar-${currentFormat}-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  document.getElementById('baseUrl').addEventListener('change', renderPreview);
+  document.getElementById('merchantId').addEventListener('input', renderPreview);
+  renderPreview();
+</script>
+</body>
+</html>

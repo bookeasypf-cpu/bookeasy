@@ -136,6 +136,7 @@ model Merchant {
   giftCards      GiftCard[]
   favorites      Favorite[]
   patientNotes   PatientNote[]
+  marketingPosts MarketingPost[]
 
   // Merchant-to-merchant referral tracking (K-factor metric).
   // SET NULL on parent delete so a referred merchant survives a deleted
@@ -500,4 +501,52 @@ model Referral {
   @@unique([refereeId])
   @@index([referrerId])
   @@map("referrals")
+}
+
+// ─────────────────────────────────────────────
+// MARKETING ANALYTICS — track des posts publiés
+// ─────────────────────────────────────────────
+
+model MarketingPost {
+  id          String   @id @default(cuid())
+  // Quand le post a été publié
+  publishedAt DateTime @default(now())
+  // Référence au calendrier (date du calendrier éditorial source)
+  scheduledFor DateTime?
+  // Lié au marchand mis en avant (nullable pour posts génériques/éducatifs)
+  merchantId  String?
+  // Type de post : hero, ui, testimonial, welcome, upgrade, educational, signature
+  type        String
+  // Plateformes ciblées : "instagram,facebook,tiktok"
+  platforms   String
+  // Caption publiée (snapshot pour historique)
+  caption     String   @db.Text
+  // URL du visuel utilisé
+  imageUrl    String?
+  // Notes internes
+  notes       String?  @db.Text
+
+  // KPIs renseignés manuellement par l'admin après publication
+  reach       Int      @default(0) // Portée
+  impressions Int      @default(0) // Impressions
+  likes       Int      @default(0)
+  comments    Int      @default(0)
+  shares      Int      @default(0)
+  saves       Int      @default(0)
+  clicks      Int      @default(0) // Clics vers bookeasy.me
+  bookings    Int      @default(0) // Réservations attribuées
+
+  // Boost / pub payée
+  boostBudget Float?   // En XPF
+  boostSpent  Float?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  merchant    Merchant? @relation(fields: [merchantId], references: [id], onDelete: SetNull)
+
+  @@index([publishedAt])
+  @@index([type])
+  @@index([merchantId])
+  @@map("marketing_posts")
 }

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BookEasy — Brief Photographe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; padding: 40px 20px 80px; }
+  .toolbar { position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; gap: 8px; }
+  .toolbar a, .toolbar button { background: rgba(255,255,255,.08); backdrop-filter: blur(20px); color: #fff; padding: 8px 14px; border-radius: 100px; text-decoration: none; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,.15); cursor: pointer; font-family: inherit; }
+
+  .hero { text-align: center; margin-bottom: 50px; max-width: 900px; margin-left: auto; margin-right: auto; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 900; margin-bottom: 12px; background: linear-gradient(135deg, #F4E4C1, #E76F51, #0EA5A0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; }
+  .sub { color: #aaa; font-size: 18px; font-style: italic; }
+  .hero-meta { display: flex; justify-content: center; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
+  .hero-meta span { background: rgba(255,255,255,.06); padding: 6px 14px; border-radius: 100px; font-size: 12px; color: #ccc; }
+
+  .section { max-width: 1100px; margin: 0 auto 60px; }
+  .section h2 { font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 8px; }
+  .section .section-sub { color: #888; margin-bottom: 24px; font-size: 14px; }
+  .card { background: #14141d; border: 1px solid #2a2a3a; border-radius: 18px; padding: 28px; }
+
+  /* PRINCIPES */
+  .principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .principles { grid-template-columns: 1fr; } }
+  .principle { padding: 22px; background: #14141d; border: 1px solid #2a2a3a; border-radius: 16px; position: relative; overflow: hidden; }
+  .principle::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, #F4E4C1, #E76F51); }
+  .principle .emoji { font-size: 28px; margin-bottom: 8px; }
+  .principle h4 { font-size: 15px; margin-bottom: 6px; }
+  .principle p { color: #bbb; font-size: 13px; line-height: 1.55; }
+
+  /* SHOTS LIST */
+  .sectors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+  .sector-card { background: #14141d; border: 1px solid #2a2a3a; border-radius: 14px; padding: 18px; transition: all .2s; }
+  .sector-card:hover { border-color: rgba(255,255,255,.2); }
+  .sector-card .head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .sector-card .emoji { font-size: 24px; }
+  .sector-card h4 { font-size: 15px; font-weight: 800; }
+  .sector-card .count { font-size: 11px; color: #888; margin-left: auto; font-family: 'JetBrains Mono', monospace; }
+  .sector-card ul { padding-left: 18px; color: #bbb; font-size: 12px; line-height: 1.7; }
+  .sector-card .palette { display: flex; gap: 4px; margin-top: 10px; }
+  .sector-card .palette span { width: 16px; height: 16px; border-radius: 4px; }
+
+  /* SPECS */
+  .specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .specs-grid { grid-template-columns: 1fr; } }
+  .spec-card { padding: 20px; background: #14141d; border: 1px solid #2a2a3a; border-radius: 14px; }
+  .spec-card h4 { font-size: 13px; color: #00f0d4; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; font-weight: 700; }
+  .spec-card ul { padding-left: 18px; color: #ddd; font-size: 13px; line-height: 1.7; }
+
+  /* DEVIS */
+  .quote { background: linear-gradient(135deg, rgba(244,228,193,.06), rgba(231,111,81,.06)); border: 1px solid rgba(244,228,193,.25); border-radius: 20px; padding: 32px; }
+  .quote h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 16px; }
+  .quote-rows { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+  .quote-row { display: contents; }
+  .quote-row > div { padding: 12px 14px; background: rgba(255,255,255,.03); }
+  .quote-row.h > div { background: transparent; font-size: 11px; color: #aaa; letter-spacing: 1px; text-transform: uppercase; padding-bottom: 4px; padding-top: 0; }
+  .quote-row.total > div { background: rgba(244,228,193,.15); font-weight: 800; font-size: 16px; color: #FBBF24; }
+  .quote-note { margin-top: 16px; padding: 14px; background: rgba(255,255,255,.04); border-radius: 10px; font-size: 13px; color: #bbb; line-height: 1.6; }
+
+  /* CHECKLIST */
+  .checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .checklist-grid { grid-template-columns: 1fr; } }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 14px; background: #14141d; border: 1px solid #2a2a3a; border-radius: 12px; font-size: 13px; color: #ddd; line-height: 1.5; }
+  .check-item input[type="checkbox"] { margin-top: 3px; accent-color: #00f0d4; }
+  .check-item label { cursor: pointer; }
+  .check-item input:checked + label { color: #888; text-decoration: line-through; }
+
+  @media print {
+    .toolbar { display: none; }
+    body { background: #fff; color: #000; padding: 20px; }
+    h1, h2 { color: #000; -webkit-text-fill-color: #000; background: none; }
+    .card, .principle, .sector-card, .spec-card { background: #fff; border-color: #ddd; color: #000; }
+  }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="index.html">← Hub</a>
+    <button onclick="window.print()">🖨️ Imprimer / PDF</button>
+  </div>
+
+  <div class="hero">
+    <h1>Brief Photographe</h1>
+    <p class="sub">Phase 3 — Photos pro authentiques Polynésie pour remplacer Unsplash</p>
+    <div class="hero-meta">
+      <span>📅 14 secteurs</span>
+      <span>📸 ~50 photos par session</span>
+      <span>💰 50-100k XPF / session</span>
+      <span>🕐 1 mois de prod estimée</span>
+    </div>
+  </div>
+
+  <!-- PRINCIPES -->
+  <div class="section">
+    <h2>1 · Principes créatifs</h2>
+    <p class="section-sub">À respecter pour cohérence de marque BookEasy</p>
+    <div class="principles">
+      <div class="principle">
+        <div class="emoji">☀️</div>
+        <h4>Lumière naturelle</h4>
+        <p>Golden hour matin/soir privilégié. Jamais de flash agressif. Lumière fenêtre OK pour intérieur.</p>
+      </div>
+      <div class="principle">
+        <div class="emoji">🌺</div>
+        <h4>Ancrage local</h4>
+        <p>Inclure éléments PF discrets : tiaré, monoi, vue lagon en fond, palmes. Authenticité &gt; cliché touristique.</p>
+      </div>
+      <div class="principle">
+        <div class="emoji">🎨</div>
+        <h4>Espace négatif 30%</h4>
+        <p>Garder 30% du cadre dégagé pour overlay texte ensuite (titre, prix, CTA). Centrer le sujet vers un bord.</p>
+      </div>
+      <div class="principle">
+        <div class="emoji">👤</div>
+        <h4>Action, pas pose</h4>
+        <p>Mouvement réel, geste métier, regard de côté. Éviter la pose figée face caméra qui fait stock photo.</p>
+      </div>
+      <div class="principle">
+        <div class="emoji">🎬</div>
+        <h4>Cinematic mood</h4>
+        <p>Profondeur de champ marquée (f/2.8 à f/4). Bokeh propre. Couleurs chaudes, contraste +15%.</p>
+      </div>
+      <div class="principle">
+        <div class="emoji">📐</div>
+        <h4>Variété de cadres</h4>
+        <p>3 formats par scène : carré 1:1 (post), vertical 9:16 (story/reel), paysage 16:9 (cover FB).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOTS LIST BY SECTOR -->
+  <div class="section">
+    <h2>2 · Liste de shots par secteur</h2>
+    <p class="section-sub">Minimum 5-8 photos exploitables par secteur · 14 secteurs au total</p>
+    <div class="sectors-grid" id="shots-grid"></div>
+  </div>
+
+  <!-- TECHNICAL SPECS -->
+  <div class="section">
+    <h2>3 · Spécifications techniques</h2>
+    <p class="section-sub">À fournir au photographe avec le contrat</p>
+    <div class="specs-grid">
+      <div class="spec-card">
+        <h4>📸 Format & qualité</h4>
+        <ul>
+          <li>Boîtier plein format ou APS-C (Sony α, Canon R, Fuji X-T5 OK)</li>
+          <li>Fichiers RAW + JPEG livrés</li>
+          <li>Résolution min 24 Mpx</li>
+          <li>3 formats par sujet : 1:1, 9:16, 16:9</li>
+          <li>Export AVIF + JPEG haute qualité pour web</li>
+        </ul>
+      </div>
+      <div class="spec-card">
+        <h4>🎨 Post-traitement</h4>
+        <ul>
+          <li>LUT cohérente sur toute la série</li>
+          <li>Saturation +10%, contraste +15%</li>
+          <li>Légère teinte chaude (golden hour vibe)</li>
+          <li>Lissage peau minimaliste (rester authentique)</li>
+          <li>Pas de fond changé / pas de manip lourde</li>
+        </ul>
+      </div>
+      <div class="spec-card">
+        <h4>📁 Livraison</h4>
+        <ul>
+          <li>Cloud Drive partagé (Google Drive ou WeTransfer)</li>
+          <li>Nommage : <code style="color:#00f0d4;">[secteur]-[scene]-[variant].avif</code></li>
+          <li>Sous-dossiers par secteur</li>
+          <li>Délai max 7 jours après shoot</li>
+          <li>Backup remis sur disque physique</li>
+        </ul>
+      </div>
+      <div class="spec-card">
+        <h4>⚖️ Droits & contrat</h4>
+        <ul>
+          <li>Cession complète usage commercial BookEasy</li>
+          <li>Multi-supports (web, réseaux, print, affichage)</li>
+          <li>Pas de limite temporelle</li>
+          <li>Modèles : décharge image signée par chaque personne</li>
+          <li>Crédit photographe optionnel mais valorisé</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVIS TYPE -->
+  <div class="section">
+    <h2>4 · Devis type Polynésie</h2>
+    <p class="section-sub">Estimation pour 1 session de 5h sur Tahiti · à ajuster selon photographe</p>
+    <div class="quote">
+      <h3>💰 Estimation budgétaire</h3>
+      <div class="quote-rows">
+        <div class="quote-row h">
+          <div>Prestation</div>
+          <div>Durée</div>
+          <div>Tarif (XPF)</div>
+        </div>
+        <div class="quote-row">
+          <div>Session photo (préparation + shoot)</div>
+          <div>5h</div>
+          <div>40 000</div>
+        </div>
+        <div class="quote-row">
+          <div>Post-traitement + sélection (50 photos)</div>
+          <div>~6h</div>
+          <div>25 000</div>
+        </div>
+        <div class="quote-row">
+          <div>Cession droits multi-supports</div>
+          <div>Permanent</div>
+          <div>15 000</div>
+        </div>
+        <div class="quote-row">
+          <div>Déplacement local (Papeete et environs)</div>
+          <div>Forfait</div>
+          <div>5 000</div>
+        </div>
+        <div class="quote-row total">
+          <div>TOTAL HT par session</div>
+          <div>—</div>
+          <div>85 000 XPF</div>
+        </div>
+      </div>
+      <div class="quote-note">
+        💡 <strong>Optimisation budget :</strong> Une seule session de 5h peut couvrir 3-4 secteurs si les lieux sont proches (ex : 1 spa + 1 barber + 1 institut + 1 onglerie dans le même quartier). 4 sessions = couverture quasi totale des 14 secteurs pour environ <strong>340 000 XPF</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="section">
+    <h2>5 · Checklist tournage</h2>
+    <p class="section-sub">À cocher avant chaque session</p>
+    <div class="checklist-grid">
+      <div class="check-item"><input type="checkbox" id="c1" /><label for="c1">Repérage du lieu effectué 48h avant</label></div>
+      <div class="check-item"><input type="checkbox" id="c2" /><label for="c2">Brief partagé avec le marchand (tenue, accessoires)</label></div>
+      <div class="check-item"><input type="checkbox" id="c3" /><label for="c3">Décharges image signées avant shoot</label></div>
+      <div class="check-item"><input type="checkbox" id="c4" /><label for="c4">Météo vérifiée (golden hour confirmé)</label></div>
+      <div class="check-item"><input type="checkbox" id="c5" /><label for="c5">Liste shots imprimée pour le photographe</label></div>
+      <div class="check-item"><input type="checkbox" id="c6" /><label for="c6">Éléments locaux PF préparés (tiaré, monoi, etc.)</label></div>
+      <div class="check-item"><input type="checkbox" id="c7" /><label for="c7">Story Insta "behind the scenes" planifiée</label></div>
+      <div class="check-item"><input type="checkbox" id="c8" /><label for="c8">Backup batteries + cartes mémoire chargées</label></div>
+      <div class="check-item"><input type="checkbox" id="c9" /><label for="c9">Modèle de cession droits prêt à signer</label></div>
+      <div class="check-item"><input type="checkbox" id="c10" /><label for="c10">Date livraison fichiers convenue (max J+7)</label></div>
+    </div>
+  </div>
+
+  <!-- CONTACT REFS -->
+  <div class="section">
+    <h2>6 · Recherche photographes locaux</h2>
+    <p class="section-sub">Mots-clés et plateformes pour trouver des pros PF</p>
+    <div class="card">
+      <h4 style="color: #00f0d4; margin-bottom: 12px; font-size: 14px;">🔍 Pistes de recherche</h4>
+      <ul style="padding-left: 20px; color: #ddd; line-height: 1.8; font-size: 14px;">
+        <li><strong>Instagram</strong> : recherche hashtags #photographetahiti #photographepf #tahitiphotographer</li>
+        <li><strong>Facebook</strong> : groupes "Photographes Polynésie française", marketplace</li>
+        <li><strong>Tahiti Tourisme</strong> : annuaire pros référencés</li>
+        <li><strong>Bouche-à-oreille</strong> : demande aux marchands inscrits BookEasy s'ils ont déjà bossé avec un photographe</li>
+        <li><strong>Écoles</strong> : étudiants ESMA Polynésie pour budget plus serré</li>
+      </ul>
+      <h4 style="color: #00f0d4; margin: 18px 0 12px; font-size: 14px;">💬 Pitch initial à envoyer</h4>
+      <div style="background: #050507; border: 1px solid #2a2a3a; border-radius: 10px; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #ddd; line-height: 1.7; white-space: pre-line;">Bonjour [Photographe],
+
+Je lance BookEasy, plateforme de réservation polynésienne (bookeasy.me).
+Je recherche un photographe pour 4 sessions sur 2 mois — environ 200 photos
+de commerces locaux (spa, barber, médical, beauté).
+
+Style recherché : authentique, lumière naturelle, mood polynésien moderne.
+Budget : ~85 000 XPF / session (5h shoot + post-prod + cession droits).
+
+Disponible pour appeler cette semaine ?
+
+— Mara · BookEasy</div>
+    </div>
+  </div>
+
+<script type="module">
+  import { SECTORS, SECTOR_KEYS } from './data/sectors.js';
+
+  // Shots list par secteur — généré dynamiquement
+  const SHOTS_BY_SECTOR = {
+    spa: ['Mains avec huile monoi', 'Pierres chaudes sur dos', 'Bougie + fleur tiaré', 'Cabine à travers rideau', 'Détail produit'],
+    institut: ['Soin visage en cours', 'Mains gantées + produits', 'Cabine lumière douce', 'Vue de dos avec serviette', 'Produits cosmétiques'],
+    massage: ['Mains qui massent dos', 'Huile qui coule', 'Table en bois + serviettes', 'Pieds reflexologie', 'Ambiance bougies'],
+    manucure: ['Mains nail art en cours', 'Vernis colorés exposés', 'Détail ongles finis', 'Poste de travail moderne', 'Cliente détente'],
+    maquillage: ['Pinceau sur joue mariée', 'Palette + outils', 'Yeux maquillés détail', 'Mariée couronne tiaré', 'Mise en miroir'],
+    tatoueur: ['Aiguille sur peau detail', 'Esquisse motif polynésien', 'Artiste concentré', 'Tatouage fini sur épaule', 'Studio mood sombre'],
+    barber: ['Tondeuse en action', 'Coupe au peigne', 'Barbe taille au rasoir', 'Salon vintage chair', 'Détail produits coiffure'],
+    coiffeur: ['Brushing en cours', 'Coloration application', 'Mèche en flou + ciseaux', 'Vue salon élégant', 'Cliente sourire miroir'],
+    coach: ['Coach + élève en action', 'Séance plage sunrise', 'Détail équipement', 'Stretching plage', 'Coach démonstration'],
+    medecin: ['Stéthoscope main médecin', 'Cabinet propre lumineux', 'Consultation discrète', 'Détail prescription', 'Façade cabinet'],
+    dentiste: ['Cabinet moderne propre', 'Outil + miroir bouche', 'Patient sourire confiance', 'Détail technologie', 'Hygiène mains'],
+    osteopathe: ['Mains sur épaule patient', 'Table osteo bois clair', 'Détail manipulation', 'Salle calme zen', 'Praticien concentré'],
+    kine: ['Rééducation main', 'Patient + ballon', 'Table kiné + tapis', 'Étirement guidé', 'Détail élastique'],
+    infirmier: ['Mains avec seringue stérile', 'Visite à domicile chez senior', 'Préparation soin propre', 'Sourire rassurant', 'Détail tensiomètre'],
+  };
+
+  const grid = document.getElementById('shots-grid');
+  let html = '';
+  SECTOR_KEYS.forEach(key => {
+    const s = SECTORS[key];
+    const shots = SHOTS_BY_SECTOR[key] || ['(shots à définir)'];
+    html += `<div class="sector-card">
+      <div class="head">
+        <span class="emoji">${s.emoji}</span>
+        <h4>${s.name}</h4>
+        <span class="count">${shots.length} shots</span>
+      </div>
+      <ul>${shots.map(sh => `<li>${sh}</li>`).join('')}</ul>
+      <div class="palette">
+        <span style="background:${s.palette.primary}"></span>
+        <span style="background:${s.palette.accent}"></span>
+        <span style="background:${s.palette.deep}"></span>
+      </div>
+    </div>`;
+  });
+  grid.innerHTML = html;
+</script>
+</body>
+</html>
