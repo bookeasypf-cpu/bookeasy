@@ -137,11 +137,19 @@ model Merchant {
   favorites      Favorite[]
   patientNotes   PatientNote[]
 
+  // Merchant-to-merchant referral tracking (K-factor metric).
+  // SET NULL on parent delete so a referred merchant survives a deleted
+  // referrer (RGPD: deleting a user must not cascade-delete others).
+  referredByMerchantId String?
+  referredBy           Merchant?  @relation("MerchantReferrals", fields: [referredByMerchantId], references: [id], onDelete: SetNull)
+  referrals            Merchant[] @relation("MerchantReferrals")
+
   @@index([city])
   @@index([sectorId])
   @@index([isActive])
   @@index([isActive, sectorId])
   @@index([plan, planExpiresAt])
+  @@index([referredByMerchantId])
   @@map("merchants")
 }
 
