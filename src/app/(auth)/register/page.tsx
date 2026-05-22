@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Card, CardContent } from "@/components/ui/Card";
 import { registerUser } from "@/actions/auth";
+import { trackEvent } from "@/lib/analytics";
 import { Store, Gift } from "lucide-react";
 
 export default function RegisterPage() {
@@ -69,6 +70,11 @@ function RegisterForm() {
     }
   }, [refCodeFromUrl]);
 
+  // Funnel: signup started (form viewed). Once per mount.
+  useEffect(() => {
+    trackEvent("signup_started", { role: "CLIENT" });
+  }, []);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -101,6 +107,10 @@ function RegisterForm() {
       setLoading(false);
       return;
     }
+
+    // Funnel: signup completed. Tracked BEFORE the redirect so the
+    // event is captured even if navigation aborts it (rare but real).
+    trackEvent("signup_completed", { role: "CLIENT" });
 
     // Auto sign-in after registration
     const signInResult = await signIn("credentials", {

@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
+import { trackEvent } from "@/lib/analytics";
 
 interface Sector {
   id: string;
@@ -33,6 +34,8 @@ export function QuickRegisterForm() {
       .then((res) => res.ok ? res.json() : [])
       .then((data: Sector[]) => setSectors(Array.isArray(data) ? data : []))
       .catch(() => setSectors([]));
+    // Funnel: pro signup form viewed.
+    trackEvent("signup_started", { role: "MERCHANT" });
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -77,6 +80,9 @@ export function QuickRegisterForm() {
         setLoading(false);
         return;
       }
+
+      // Funnel: pro signup completed. sectorId is non-PII (just a category).
+      trackEvent("signup_completed", { role: "MERCHANT", sectorId: form.sectorId });
 
       // Auto sign-in. We retry once after a short pause because the user
       // row was just committed and a serverless Prisma client on another

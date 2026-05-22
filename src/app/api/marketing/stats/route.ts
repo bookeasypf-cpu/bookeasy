@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { PRO_PRICE_XPF } from "@/lib/payzen";
 import { getResendMetrics, type EmailMetrics } from "@/lib/resend-metrics";
+import { getPostHogFunnel, type FunnelData } from "@/lib/posthog-metrics";
 
 /**
  * Marketing stats endpoint consumed by the personal command-center
@@ -31,7 +32,7 @@ interface MarketingStatsResponse {
   weeklyBookingsTrend: number;
   weeklyRevenueXPF: number;
 
-  funnel: null;
+  funnel: FunnelData | null;
   topPost: null;
   scheduledThisWeek: null;
   email: EmailMetrics | null;
@@ -84,6 +85,7 @@ export async function GET(request: Request) {
       activeMerchantsCount,
       recentReferrals,
       emailMetrics,
+      funnelData,
     ] = await Promise.all([
       prisma.booking.count({
         where: {
@@ -127,6 +129,10 @@ export async function GET(request: Request) {
       // Resend list — open/click/sent counts for the current month.
       // Returns null on auth error or network failure → dashboard shows "—".
       getResendMetrics(),
+      // PostHog funnel — visits → signups → first booking → repeat,
+      // last 30 days. Returns null if POSTHOG_API_KEY is absent (local
+      // dev or analytics not yet wired) → dashboard shows "—".
+      getPostHogFunnel(),
     ]);
 
     // Trend: pure % change. 0 last-week base = "new", returned as 0
@@ -154,7 +160,7 @@ export async function GET(request: Request) {
       weeklyBookingsTrend,
       weeklyRevenueXPF,
 
-      funnel: null,
+      funnel: funnelData,
       topPost: null,
       scheduledThisWeek: null,
       email: emailMetrics,

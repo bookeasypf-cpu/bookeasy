@@ -9,6 +9,7 @@ import { CookieBanner } from "@/components/ui/CookieBanner";
 import { ServiceWorkerProvider } from "@/components/providers/ServiceWorkerProvider";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
+import { AnalyticsProvider } from "@/components/providers/AnalyticsProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -121,6 +122,7 @@ export default function RootLayout({
           <ScrollProgress />
           {children}
           <ServiceWorkerProvider />
+          <AnalyticsProvider />
           <InstallBanner />
           <CookieBanner />
           <Toaster

@@ -15,15 +15,20 @@ export function CookieBanner() {
     }
   }, []);
 
-  function accept() {
-    localStorage.setItem("cookie-consent", "accepted");
+  // Persist + notify the AnalyticsProvider in the same tab. Native
+  // `storage` events only fire across tabs, so we dispatch a custom
+  // event for same-tab listeners (PostHog needs to boot/teardown the
+  // instant consent changes — no page reload).
+  function persistConsent(value: "accepted" | "refused") {
+    localStorage.setItem("cookie-consent", value);
+    window.dispatchEvent(
+      new CustomEvent("cookie-consent-change", { detail: { value } })
+    );
     setVisible(false);
   }
 
-  function refuse() {
-    localStorage.setItem("cookie-consent", "refused");
-    setVisible(false);
-  }
+  function accept() { persistConsent("accepted"); }
+  function refuse() { persistConsent("refused"); }
 
   if (!visible) return null;
 
@@ -39,8 +44,9 @@ export function CookieBanner() {
               Cookies
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
-              Ce site utilise des cookies essentiels au fonctionnement (authentification, préférences).
-              Aucun cookie publicitaire n&apos;est utilisé.{" "}
+              Ce site utilise des cookies essentiels (authentification, préférences) et —
+              avec votre accord — des cookies d&apos;analyse anonymisée (PostHog, hébergé en UE)
+              pour comprendre comment améliorer le service. Aucun cookie publicitaire.{" "}
               <Link
                 href="/legal/confidentialite"
                 className="text-[#0066FF] hover:underline"

@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { isMedicalSectorClient } from "@/lib/medical-client";
+import { trackEvent } from "@/lib/analytics";
 
 interface Service {
   id: string;
@@ -168,6 +169,11 @@ export default function BookingFlow({ merchantId, initialMerchant }: BookingFlow
   const [isPending, startTransition] = useTransition();
   const [optimisticSlot, setOptimisticSlot] = useOptimistic(state.selectedSlot);
 
+  // Funnel: user landed on the booking flow (step 1 visible).
+  useEffect(() => {
+    trackEvent("booking_started", { merchantId });
+  }, [merchantId]);
+
   // Fetch available slots when date changes
   useEffect(() => {
     if (!state.selectedDate || !state.selectedService) return;
@@ -272,6 +278,14 @@ export default function BookingFlow({ merchantId, initialMerchant }: BookingFlow
       }
 
       if (result.bookingId) {
+        // Funnel: booking completed. We track BOTH free-flow and the
+        // post-payment redirect path is tracked separately via the
+        // confirmation page (since the PayZen redirect leaves the SPA).
+        trackEvent("booking_completed", {
+          merchantId,
+          serviceId: state.selectedService!.id,
+          paid: !!result.requiresPayment,
+        });
         toast.success("Rendez-vous confirmé !");
         router.push(`/booking/confirmation/${result.bookingId}`);
       }
