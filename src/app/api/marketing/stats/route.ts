@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { PRO_PRICE_XPF } from "@/lib/payzen";
+import { getResendMetrics, type EmailMetrics } from "@/lib/resend-metrics";
 
 /**
  * Marketing stats endpoint consumed by the personal command-center
@@ -33,7 +34,7 @@ interface MarketingStatsResponse {
   funnel: null;
   topPost: null;
   scheduledThisWeek: null;
-  email: null;
+  email: EmailMetrics | null;
   prMentionsThisMonth: null;
 
   kFactorMerchant: number;
@@ -73,7 +74,8 @@ export async function GET(request: Request) {
     const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    // Parallel queries — these don't depend on each other.
+    // Parallel queries — DB calls + the Resend API call all start at the
+    // same time so the slowest one defines the total latency, not the sum.
     const [
       thisWeekCount,
       lastWeekCount,
@@ -81,6 +83,7 @@ export async function GET(request: Request) {
       proActiveCount,
       activeMerchantsCount,
       recentReferrals,
+      emailMetrics,
     ] = await Promise.all([
       prisma.booking.count({
         where: {
@@ -121,6 +124,9 @@ export async function GET(request: Request) {
         },
         select: { referredByMerchantId: true },
       }),
+      // Resend list — open/click/sent counts for the current month.
+      // Returns null on auth error or network failure → dashboard shows "—".
+      getResendMetrics(),
     ]);
 
     // Trend: pure % change. 0 last-week base = "new", returned as 0
@@ -151,7 +157,7 @@ export async function GET(request: Request) {
       funnel: null,
       topPost: null,
       scheduledThisWeek: null,
-      email: null,
+      email: emailMetrics,
       prMentionsThisMonth: null,
 
       kFactorMerchant,
