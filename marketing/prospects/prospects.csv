@@ -16,7 +16,7 @@ tatoueur,Tiki Tatau,Papeete,Tahiti,+689 87 77 19 18,,,,TIKI TATAU TAEREA TAHITI,
 tatoueur,Tini Ura Tatau,Papeete,Tahiti,+689 89 57 55 30,,,,FIRMIN TATOO,"Quartier Temaire Paofai, Papeete","Firmin Vanaa"
 tatoueur,Tuhuka Tatoo,Papeete,Tahiti,+689 87 21 20 30,,,,TUTEA BARSINAS RAIOHA,"Immeuble Lévy, Papeete","Étienne Tutea Itae-Tetaa"
 tatoueur,Hautai Tatoo Papeete,Papeete,Tahiti,+689 40 82 68 19,,,,HAUTANA HAUTAI,"Avenue Régent Paraita, Papeete","Hautana Tetuamanuhiri"
-tatoueur,Maunga Tattoo Tahiti,Punaauia,Tahiti,+689 87 78 32 35,,https://maungatattootahiti.com/,,,"Entrée Punaauia, proche InterContinental Tahiti",
+tatoueur,Maunga Tattoo Tahiti,Punaauia,Tahiti,+689 87 78 32 35,contact@maungatattootahiti.com,https://maungatattootahiti.com/,,,"Entrée Punaauia, proche InterContinental Tahiti",
 tatoueur,Hotu Tatoo,Punaauia,Tahiti,+689 87 24 79 52,hendricktaraihau@gmail.com,,,HOTU TATOO,"Centre Tamanu Iti, Punaauia","Hendrick Teihotu Taraihau"
 tatoueur,Moanaarii Tatau,Punaauia,Tahiti,+689 87 22 32 80,,,,MOANAARII TATAU,"Centre Tamanu Iti, Punaauia",
 tatoueur,Pirato Heiri Thierry,Punaauia,Tahiti,+689 87 79 79 21,,,,,"PK 8.200, Punaauia","Thierry Heiri Pirato"
@@ -123,20 +123,20 @@ coiffeur,Hair'Anna (domicile),Taravao,Tahiti,+689 87 31 19 30,,,,,"Taravao","Coi
 spa,Algotherm Dermo Ocean Spa,Faa'a,Tahiti,+689 40 86 51 51,reservation.tahitiregion@ihg.com,https://tahiti.intercontinental.com/spa-and-wellness/dermo-ocean-spa,,,"InterContinental Tahiti Resort & Spa, Faa'a","Spa hôtel 5*"
 spa,Tavai Spa - Le Tahiti,Arue,Tahiti,+689 40 48 88 21,tavai.spa@letahiti.com,https://www.letahiti.com/fr-fr/spa,,Tavaispa,"Hôtel Le Tahiti by Pearl Resorts, Arue","Spa Pearl Resorts — 10h-18h"
 spa,Manea Spa Papeete,Papeete,Tahiti,+689 40 50 84 63,marketing@spmhotels.pf,https://www.spmhotels.com/en/manea-spa/,,,"52 rue Paul Gauguin, Papeete","Spa SPM Hotels"
-spa,Tavai Spa - Le Bora Bora,Bora Bora,Bora Bora,+689 40 60 30 00,,https://www.leborabora.com/en-gb/spa,,,"Le Bora Bora by Pearl Resorts, Bora Bora","Monoï, hot stone, hammam, sauna"
-spa,Iridium Spa St Regis,Bora Bora,Bora Bora,,,https://www.marriott.com/en-us/hotels/bobxr-the-st-regis-bora-bora-resort/spa/,,,"St Regis Bora Bora Resort","Spa 13 000 m² luxe"
-spa,Te Mahana Spa Four Seasons,Bora Bora,Bora Bora,,,https://www.fourseasons.com/borabora/spa/,,,"Four Seasons Resort Bora Bora","Suite spa avec hammam sauna vue Otemanu"
-spa,Hina Spa Conrad,Bora Bora,Bora Bora,,,https://conradhotels3.hilton.com,,,"Conrad Bora Bora Nui","Hydrothérapie, produits polynésiens"
+spa,Tavai Spa - Le Bora Bora,Bora Bora,Bora Bora,+689 40 60 52 31,tavai.spa@leborabora.com,https://www.leborabora.com/en-gb/spa,,,"Le Bora Bora by Pearl Resorts, Bora Bora","Monoï, hot stone, hammam, sauna"
+spa,Iridium Spa St Regis,Bora Bora,Bora Bora,+689 40 60 78 88,reservations1@stregis.com,https://www.marriott.com/en-us/hotels/bobxr-the-st-regis-bora-bora-resort/spa/,,,"St Regis Bora Bora Resort","Spa 13 000 m² luxe"
+spa,Te Mahana Spa Four Seasons,Bora Bora,Bora Bora,+689 40 60 31 70,,https://www.fourseasons.com/borabora/spa/,,,"Four Seasons Resort Bora Bora","Suite spa avec hammam sauna vue Otemanu"
+spa,Hina Spa Conrad,Bora Bora,Bora Bora,,PPTBN_spa@hilton.com,https://conradhotels3.hilton.com,,,"Conrad Bora Bora Nui","Hydrothérapie, produits polynésiens"
 spa,InterContinental Thalasso Spa,Bora Bora,Bora Bora,+689 40 60 76 00,gsc.boraboraspa@ihg.com,https://thalasso.intercontinental.com/spa-wellness,,,"InterContinental Bora Bora Resort & Thalasso Spa","Thalasso unique en Polynésie"
-spa,Le Jardin Spa & Beauty Sofitel,Moorea,Moorea,+689 89 35 81 39,,https://www.onesoulspa.com/moorea-spa/,,,"Sofitel Moorea Ia Ora Beach Resort","Spa hôtel 5*"
+spa,Le Jardin Spa & Beauty Sofitel,Moorea,Moorea,+689 40 55 12 24,lejardin@onesoulspa.com,https://www.onesoulspa.com/moorea-spa/,,,"Sofitel Moorea Ia Ora Beach Resort","Spa hôtel 5*"
 spa,Manea Spa Pearl Beach Bora Bora,Bora Bora,Bora Bora,,,https://www.spmhotels.com/en/manea-spa/,,,"Pearl Beach Resort Motu Tevairoa, Bora Bora","Spa Pearl Resorts"
 spa,Villa Spa Tahiti,Papeete,Tahiti,+689 40 82 58 25,,,,,"Papeete",
 spa,Dermoorea,Moorea,Moorea,+689 89 34 56 02,,,,,"Moorea",
 spa,Vahine Purotu,Papeete,Tahiti,+689 87 76 66 02,,,,,"Papeete","Spa/institut Papeete"
 institut_beaute,Jonaroc Tahiti,Papeete,Tahiti,+689 87 71 47 13,,,,,"Papeete",
 institut_beaute,Vainaiki Nail's & Beauty,Mahina,Tahiti,+689 40 42 52 52,,,,,"Mahina","Nails + beauty"
-institut_beaute,B Zen Esthétique,Pirae,Tahiti,+689 87 74 84 01,,https://www.bzenesthetique.com/,,,"Pirae","Depuis 2015"
-institut_beaute,Beauty Success Institut,Papeete,Tahiti,+689 40 50 85 85,,https://www.beautysuccess.fr/nos-points-de-vente/papeete/404/,,,"Papeete","Marque internationale"
+institut_beaute,B Zen Esthétique,Pirae,Tahiti,+689 87 74 84 01,contact@bzenesthetique.com,https://www.bzenesthetique.com/,,,"Pirae","Depuis 2015"
+institut_beaute,Beauty Success Institut,Papeete,Tahiti,+689 40 50 85 85,tahitibeautysuccess@gmail.com,https://www.beautysuccess.fr/nos-points-de-vente/papeete/404/,,,"Papeete","Marque internationale"
 institut_beaute,Bella's Beauty,Faa'a,Tahiti,+689 89 76 75 90,,,,,"Faa'a",
 institut_beaute,Bonardi Vaireva S't'tik,Punaauia,Tahiti,+689 87 38 38 39,,,,,"Punaauia",
 institut_beaute,Derm Art Fenua,Faa'a,Tahiti,+689 89 36 06 36,,,,,"Faa'a",
@@ -165,18 +165,18 @@ institut_beaute,Mako,Papeete,Tahiti,+689 87 72 35 99,,,,,"Papeete",
 institut_beaute,Maru Iti,Tahaa,Tahaa,+689 87 20 37 25,,,,,"Tahaa",
 institut_beaute,Moeiti Institut,Punaauia,Tahiti,+689 89 51 27 32,,,,,"Punaauia",
 institut_beaute,My Esthetic Faa'a,Faa'a,Tahiti,+689 87 75 90 87,,,,,"Faa'a",
-institut_beaute,O'Beauty Tahiti,Papeete,Tahiti,+689 87 75 97 50,,https://www.obeauty.pf/,,,"Papeete","Massages + bien-être + esthétique"
+institut_beaute,O'Beauty Tahiti,Papeete,Tahiti,+689 87 75 97 50,obeautytahiti@gmail.com,https://www.obeauty.pf/,,,"Papeete","Massages + bien-être + esthétique"
 institut_beaute,O'Hina Esthétique et Taurumi,Papeete,Tahiti,+689 40 83 46 11,,,,,"Papeete","Massage traditionnel polynésien"
 institut_beaute,Rose Beauty Tahiti,Papeete,Tahiti,+689 87 33 30 01,,,,,"Papeete",
 institut_beaute,Senso by Elo,Papeete,Tahiti,+689 40 83 41 42,,,,,"Papeete",
-institut_beaute,Soleil Sucré Tahiti,Punaauia,Tahiti,+689 40 83 58 35,,,,,"Centre Commercial du Lotus, Punaauia","Vini 87 76 87 95"
+institut_beaute,Soleil Sucré Tahiti,Punaauia,Tahiti,+689 40 83 58 35,soleilsucredetahiti@mail.pf,,,,"Centre Commercial du Lotus, Punaauia","Vini 87 76 87 95"
 institut_beaute,Sublim'Institut Tahiti,Faa'a,Tahiti,+689 89 50 03 26,,,,,"Faa'a",
 institut_beaute,The Secret Place Tahiti Sugaring,Faa'a,Tahiti,+689 89 35 03 38,,,,,"Faa'a","Spécialiste épilation au sucre"
 institut_beaute,Vahine Minceur,Taravao,Tahiti,+689 87 24 56 44,,,,,"Taravao","Spécialiste minceur"
 institut_beaute,Vaiteani Institut de Beauté,Taravao,Tahiti,+689 87 72 97 13,,,,,"Taravao",
-institut_beaute,Y de Aura Tahiti,Pirae,Tahiti,,,https://ydeaura.com/,,,"Av. Ariipaea Pomare, Pirae",
+institut_beaute,Y de Aura Tahiti,Pirae,Tahiti,+689 89 77 07 55,,https://ydeaura.com/,,,"Av. Ariipaea Pomare, Pirae",
 institut_beaute,Aroma Fenua Tahiti (domicile),Punaauia,Tahiti,,,,,,"Punaauia","Esthéticienne à domicile"
-institut_beaute,Symbio's Salon & Institut,Papeete,Tahiti,+689 40 45 07 12,,https://www.symbiostahiti.com/,,,"Papeete","Salon coiffure + institut"
+institut_beaute,Symbio's Salon & Institut,Papeete,Tahiti,+689 40 45 07 12,symbios@hotmail.fr,https://www.symbiostahiti.com/,,,"Papeete","Salon coiffure + institut"
 onglerie,Polynesianails,Papeete,Tahiti,+689 87 76 12 67,,http://www.polynesianails.sitew.com/,,POLYNESIANAILS-126034250770730,"Rond-point Chirac, Immeuble Charles Lévy, Papeete","Mar-Ven 8h30-17h, Sam 8h30-12h30"
 onglerie,K.rol Nail Bar & Beauty,Papeete,Tahiti,+689 40 42 19 00,,https://www.nailbar.fr/k-rol-nail-bar-beauty-2/,,,"Pacific Plaza Tahiti carrefour Auae, Papeete","Lun 12-19h, Mar-Sam 9-19h, Dim 9-12h"
 onglerie,Rock Nails by Heitu,Papeete,Tahiti,,,https://www.fenuawellness.com/partenaires/rock-nails-by-heitu/,,,"Fare Tony 2e étage porte 210, Papeete","Fenua Wellness partenaire"
