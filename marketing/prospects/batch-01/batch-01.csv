@@ -1,0 +1,31 @@
+id,prospect_name,sector,city,island,email,phone,instagram,template_to_use,personalization_hook,priority
+B01-001,Mana'o Tattoo Studio Tahiti,tatoueur,Papeete,Tahiti,manaotattootahiti@gmail.com,+689 40 42 45 00,@manaotattootahiti,01-beaute-body,"Studio référence fondé 2003 — 7 tatoueurs — 24K Insta",P1
+B01-002,Tattoo by Patu,tatoueur,Papeete,Tahiti,tattoobypatu@gmail.com,+689 87 75 31 73,,01-beaute-body,"Patu primé internationalement — Mar-Ven 9h-17h",P1
+B01-003,Tahiti Needles Tattoo,tatoueur,Papeete,Tahiti,contact@tahitineedlestattoo.com,+689 87 31 27 45,@tahitineedles,01-beaute-body,"5 tatoueurs spécialisés polynésien",P1
+B01-004,NK Tattoo Tahiti,tatoueur,Papeete,Tahiti,nktattoo@ymail.com,+689 87 75 53 55,,01-beaute-body,"Front de mer face Place Vaiete",P2
+B01-005,Tagaloa Tattoo,tatoueur,Papeete,Tahiti,taglaloatattoo@gmail.com,+689 40 83 36 09,,01-beaute-body,"Makalio Folituu et Philippe Aukara",P2
+B01-006,Taaroa Tattoo Shop,tatoueur,Papeete,Tahiti,taaroatattoo@mail.pf,+689 40 45 05 06,,01-beaute-body,"Bruno Tupuai — arrêt bus front de mer",P2
+B01-007,Pioro Tattoo,tatoueur,Papeete,Tahiti,piorotatoo@yahoo.fr,+689 87 74 72 38,,01-beaute-body,"Vetea et Varii — marché municipal",P2
+B01-008,Tikahiri Tatoo Shop,tatoueur,Papeete,Tahiti,tikahiritattooshop@gmail.com,+689 87 70 95 73,,01-beaute-body,"Boulevard Pomare — équipe 7 tatoueurs",P2
+B01-009,Marama Tattoo Bora Bora,tatoueur,Bora Bora,Bora Bora,warrentkc@hotmail.fr,+689 87 72 22 46,,01-beaute-body,"Warren Teng — figure emblématique Matira",P1
+B01-010,Mate Tattoo Moorea,tatoueur,Moorea,Moorea,info@matetattoo.com,+689 87 21 01 35,,01-beaute-body,"Steven Mate Michalik — Haapiti",P1
+B01-011,Ahi Tattoo Raiatea,tatoueur,Uturoa,Raiatea,ahitattoo@gmail.com,+689 87 72 13 22,,01-beaute-body,"Heiarii Dangel — Tevaitoa près aéroport",P2
+B01-012,Iridium Spa St Regis,spa,Bora Bora,Bora Bora,reservations1@stregis.com,+689 40 60 78 88,,02-bien-etre-premium,"Spa 13 000 m² luxe — produits Sothys",P1
+B01-013,Hina Spa Conrad Bora Bora Nui,spa,Bora Bora,Bora Bora,PPTBN_spa@hilton.com,,,02-bien-etre-premium,"Hydrothérapie + produits polynésiens",P1
+B01-014,Tavai Spa Le Bora Bora,spa,Bora Bora,Bora Bora,tavai.spa@leborabora.com,+689 40 60 52 31,,02-bien-etre-premium,"Le Bora Bora by Pearl Resorts — 10h-19h tous les jours",P1
+B01-015,Le Jardin Spa Sofitel Moorea,spa,Moorea,Moorea,lejardin@onesoulspa.com,+689 40 55 12 24,,02-bien-etre-premium,"Sofitel Ia Ora Beach Resort 5*",P1
+B01-016,InterContinental Thalasso Spa Bora Bora,spa,Bora Bora,Bora Bora,gsc.boraboraspa@ihg.com,+689 40 60 76 00,,02-bien-etre-premium,"Thalasso unique en Polynésie",P1
+B01-017,Algotherm Dermo Ocean Spa,spa,Faa'a,Tahiti,reservation.tahitiregion@ihg.com,+689 40 86 51 51,,02-bien-etre-premium,"InterContinental Tahiti — produits Algotherm marin",P1
+B01-018,Tavai Spa Le Tahiti,spa,Arue,Tahiti,tavai.spa@letahiti.com,+689 40 48 88 21,Tavaispa,02-bien-etre-premium,"Pearl Resorts Arue — Mer-Dim 10h-18h",P2
+B01-019,Manea Spa Papeete,spa,Papeete,Tahiti,marketing@spmhotels.pf,+689 40 50 84 63,,02-bien-etre-premium,"52 rue Paul Gauguin — SPM Hotels signature",P2
+B01-020,B Zen Esthétique,institut_beaute,Pirae,Tahiti,contact@bzenesthetique.com,+689 87 74 84 01,,02-bien-etre-premium,"Brenda — depuis 2015, Sothys authorized",P1
+B01-021,Beauty Success Institut,institut_beaute,Papeete,Tahiti,tahitibeautysuccess@gmail.com,+689 40 50 85 85,beautysuccesstahiti,02-bien-etre-premium,"Centre Vaima — marque internationale + MAC",P1
+B01-022,O'Beauty Tahiti,institut_beaute,Papeete,Tahiti,obeautytahiti@gmail.com,+689 87 75 97 50,,02-bien-etre-premium,"Quartier du Commerce face Vaiete",P2
+B01-023,Soleil Sucré Tahiti,institut_beaute,Punaauia,Tahiti,soleilsucredetahiti@mail.pf,+689 40 83 58 35,,02-bien-etre-premium,"Centre Lotus — massage, minceur, ongles",P2
+B01-024,Symbio's Salon & Institut,institut_beaute,Papeete,Tahiti,symbios@hotmail.fr,+689 40 45 07 12,symbios.tahiti,02-bien-etre-premium,"33 bis Av Clémenceau — salon coiffure + institut",P1
+B01-025,Cabinet Sages-Femmes Aua'e,sage_femme,Faa'a,Tahiti,sagefemmefaaa@gmail.com,+689 87 74 04 34,,03-sante-liberal,"Caroline Rigollet + Amandine Virag — Centre Aua'e face Hilton",P1
+B01-026,Cabinet Amel Kebdani Kiné,kine,Papeete,Tahiti,amelkebdani.mk@gmail.com,+689 87 78 47 33,,03-sante-liberal,"Foyer Jeunes Filles 4e étage — Lun-Sam 7-19h",P1
+B01-027,Manon et Quentin Ostéopathe,osteopathe,Papeete,Tahiti,mq.osteopathie@gmail.com,+689 89 60 32 55,MetQosteoPPT,03-sante-liberal,"2 praticiens — Immeuble Te Ava-Paofai",P1
+B01-028,WeSport Tamanu Coach,coach_sportif,Punaauia,Tahiti,wesporttamanu@gmail.com,+689 89 42 77 77,,02-bien-etre-premium,"Henere Barff — Bas Centre Tamanu 1er étage — Lun-Ven 6-20h",P1
+B01-029,My Nails Tahiti,onglerie,Papeete,Tahiti,mynailstahiti@gmail.com,+689 88 81 99 65,mynailstahiti,01-beaute-body,"Au-dessus pharmacie Mama'o",P2
+B01-030,Un Coiffeur Barbier à Tahiti,barber,Papeete,Tahiti,uncoiffeurbarbieratahiti@gmail.com,+689 89 56 21 98,uncoiffeurbarbieratahiti,01-beaute-body,"6 passage Cardella — Mar-Sam",P2
