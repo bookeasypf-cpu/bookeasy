@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { waitUntil } from "@vercel/functions";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { signupLimiter, formatRateLimitError } from "@/lib/ratelimit";
@@ -88,16 +89,20 @@ export async function POST(req: NextRequest) {
 
     // Welcome email — no longer contains a password. If it fails, the user
     // still has their account and can log in immediately with their own
-    // chosen password. Sent fire-and-forget AFTER unawaited because the
-    // signup must not block on email delivery (we now know the user has
-    // their credentials).
-    sendMerchantWelcome(email, name).catch((err) => {
-      console.error("[QUICK-REGISTER] Welcome email failed:", err instanceof Error ? err.message : err);
-    });
+    // chosen password. waitUntil guarantees Vercel keeps the worker alive
+    // until delivery completes under Fluid Compute (previous bare promise
+    // could be killed mid-send when the worker is reused).
+    waitUntil(
+      sendMerchantWelcome(email, name).catch((err) => {
+        console.error("[QUICK-REGISTER] Welcome email failed:", err instanceof Error ? err.message : err);
+      })
+    );
 
-    notifyAdminMarketingEvent({ event: "welcome", merchantId }).catch((err) => {
-      console.error("[QUICK-REGISTER] Marketing notify failed:", err instanceof Error ? err.message : err);
-    });
+    waitUntil(
+      notifyAdminMarketingEvent({ event: "welcome", merchantId }).catch((err) => {
+        console.error("[QUICK-REGISTER] Marketing notify failed:", err instanceof Error ? err.message : err);
+      })
+    );
 
     return NextResponse.json({
       success: true,
