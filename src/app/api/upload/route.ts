@@ -41,10 +41,14 @@ export async function POST(request: Request) {
       body,
       request,
       onBeforeGenerateToken: async (pathname) => {
-        // Validate the upload before generating a token
+        // @vercel/blob v2 changed the default of addRandomSuffix to false.
+        // Without this, two users uploading IMG_0001.jpg (iPhone default
+        // filename) collide and the 2nd upload fails with "blob already
+        // exists". Force a random suffix so every blob path is unique.
         return {
           allowedContentTypes: ALLOWED_TYPES,
           maximumSizeInBytes: MAX_SIZE,
+          addRandomSuffix: true,
           tokenPayload: JSON.stringify({
             userId: session.user.id,
             pathname,
