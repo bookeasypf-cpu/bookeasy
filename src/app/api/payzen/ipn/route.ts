@@ -79,10 +79,14 @@ async function handleProSubscription(ipnData: ReturnType<typeof parseIPNData>) {
           },
         });
 
-        // Marketing : génère visuel premium + alerte Mara pour boost réseaux
-        notifyAdminMarketingEvent({ event: "upgrade", merchantId: ipnData.merchantId }).catch((err) => {
-          console.error("[PAYZEN-IPN] Marketing notify upgrade failed:", err instanceof Error ? err.message : err);
-        });
+        // Marketing : génère visuel premium + alerte Mara pour boost réseaux.
+        // waitUntil ensures Vercel doesn't kill the worker before the notify
+        // hook finishes (visual generation + admin alert can take 1-2s).
+        waitUntil(
+          notifyAdminMarketingEvent({ event: "upgrade", merchantId: ipnData.merchantId }).catch((err) => {
+            console.error("[PAYZEN-IPN] Marketing notify upgrade failed:", err instanceof Error ? err.message : err);
+          })
+        );
       }
       break;
     }
