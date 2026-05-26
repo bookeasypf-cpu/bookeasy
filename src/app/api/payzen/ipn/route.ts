@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { waitUntil } from "@vercel/functions";
 import { prisma } from "@/lib/prisma";
 import { verifySignature, parseIPNData } from "@/lib/payzen";
 import { onBookingConfirmed } from "@/lib/booking-confirm";
@@ -252,17 +253,22 @@ async function handleGiftCardPayment(ipnData: ReturnType<typeof parseIPNData>) {
         }
       });
 
-      // Send gift card email to recipient (async, non-blocking) — CGU promise
-      sendGiftCardEmail({
-        recipientEmail: card.recipientEmail,
-        recipientName: card.recipientName,
-        senderName: card.senderName,
-        code: card.code,
-        amountXPF: card.amount,
-        message: card.message,
-        expiresAt: card.expiresAt,
-        merchantName: card.merchant?.businessName,
-      }).catch(() => {});
+      // Send gift card email to recipient — CGU promise. waitUntil keeps the
+      // worker alive past the response so Vercel can't kill delivery mid-send.
+      waitUntil(
+        sendGiftCardEmail({
+          recipientEmail: card.recipientEmail,
+          recipientName: card.recipientName,
+          senderName: card.senderName,
+          code: card.code,
+          amountXPF: card.amount,
+          message: card.message,
+          expiresAt: card.expiresAt,
+          merchantName: card.merchant?.businessName,
+        }).catch((err) =>
+          console.error("[IPN-GIFT] email failed:", err instanceof Error ? err.message : err)
+        )
+      );
       break;
     }
 
