@@ -1,3 +1,4 @@
+import { waitUntil } from "@vercel/functions";
 import { prisma } from "@/lib/prisma";
 import { sendBookingConfirmation, sendNewBookingMerchant } from "@/lib/email";
 import { sendPushNotification } from "@/lib/push";
@@ -75,41 +76,55 @@ export async function onBookingConfirmed(bookingId: string) {
     },
   });
 
-  // Push notification to merchant
-  sendPushNotification(booking.merchant.userId, {
-    title: "Nouveau rendez-vous",
-    body: `${booking.client.name || "Un client"} a réservé ${booking.service.name} le ${booking.date} à ${booking.startTime}`,
-    url: "/dashboard/bookings",
-  }).catch(() => {});
+  // Push notification to merchant — waitUntil guarantees worker stays alive
+  // until completion. Previous .catch(()=>{}) could be killed by Vercel
+  // before delivery under Fluid Compute concurrency.
+  waitUntil(
+    sendPushNotification(booking.merchant.userId, {
+      title: "Nouveau rendez-vous",
+      body: `${booking.client.name || "Un client"} a réservé ${booking.service.name} le ${booking.date} à ${booking.startTime}`,
+      url: "/dashboard/bookings",
+    }).catch((err) =>
+      console.error("[BOOKING-CONFIRM] push merchant failed:", err instanceof Error ? err.message : err)
+    )
+  );
 
   // Confirmation email to client
   if (booking.client.email) {
-    sendBookingConfirmation({
-      clientName: booking.client.name || "Client",
-      clientEmail: booking.client.email,
-      serviceName: booking.service.name,
-      merchantName: booking.merchant.businessName,
-      date: booking.date,
-      startTime: booking.startTime,
-      endTime: booking.endTime,
-      price: booking.totalPrice,
-      address: booking.merchant.address,
-      city: booking.merchant.city,
-    }).catch(() => {});
+    waitUntil(
+      sendBookingConfirmation({
+        clientName: booking.client.name || "Client",
+        clientEmail: booking.client.email,
+        serviceName: booking.service.name,
+        merchantName: booking.merchant.businessName,
+        date: booking.date,
+        startTime: booking.startTime,
+        endTime: booking.endTime,
+        price: booking.totalPrice,
+        address: booking.merchant.address,
+        city: booking.merchant.city,
+      }).catch((err) =>
+        console.error("[BOOKING-CONFIRM] client email failed:", err instanceof Error ? err.message : err)
+      )
+    );
   }
 
   // Notification email to merchant (in addition to push/in-app)
   if (booking.merchant.user?.email) {
-    sendNewBookingMerchant({
-      merchantEmail: booking.merchant.user.email,
-      merchantName: booking.merchant.businessName,
-      clientName: booking.client.name || "Un client",
-      serviceName: booking.service.name,
-      date: booking.date,
-      startTime: booking.startTime,
-      endTime: booking.endTime,
-      price: booking.totalPrice,
-    }).catch(() => {});
+    waitUntil(
+      sendNewBookingMerchant({
+        merchantEmail: booking.merchant.user.email,
+        merchantName: booking.merchant.businessName,
+        clientName: booking.client.name || "Un client",
+        serviceName: booking.service.name,
+        date: booking.date,
+        startTime: booking.startTime,
+        endTime: booking.endTime,
+        price: booking.totalPrice,
+      }).catch((err) =>
+        console.error("[BOOKING-CONFIRM] merchant email failed:", err instanceof Error ? err.message : err)
+      )
+    );
   }
 
   // Referral bonus (first booking)
@@ -148,12 +163,16 @@ export async function onBookingConfirmed(bookingId: string) {
       await checkAndAwardMilestoneBonus(referral.referrerId);
 
       if (referral.referrer.email) {
-        sendReferralRewardEmail(
-          referral.referrer.email,
-          referral.referrer.name || "Parrain",
-          REFERRAL_XP_FIRST_BOOKING,
-          `${booking.client.name || "Votre filleul"} a fait sa première réservation`
-        ).catch(() => {});
+        waitUntil(
+          sendReferralRewardEmail(
+            referral.referrer.email,
+            referral.referrer.name || "Parrain",
+            REFERRAL_XP_FIRST_BOOKING,
+            `${booking.client.name || "Votre filleul"} a fait sa première réservation`
+          ).catch((err) =>
+            console.error("[BOOKING-CONFIRM] referral email failed:", err instanceof Error ? err.message : err)
+          )
+        );
       }
     }
   } catch {

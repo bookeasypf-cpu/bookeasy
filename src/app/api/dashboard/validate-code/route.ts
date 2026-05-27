@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { waitUntil } from "@vercel/functions";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendPushNotification } from "@/lib/push";
@@ -88,7 +89,9 @@ export async function POST(request: Request) {
       },
     });
 
-    // Notify client: their reward has been validated
+    // Notify client: their reward has been validated. In-app notification
+    // is still awaited (UI dashboard reads it on next load) but errors are
+    // now logged instead of silently swallowed.
     await prisma.notification.create({
       data: {
         userId: redemption.userId,
@@ -100,13 +103,21 @@ export async function POST(request: Request) {
           rewardId: redemption.rewardId,
         }),
       },
-    }).catch(() => {});
+    }).catch((err) =>
+      console.error("[VALIDATE-CODE] notification.create failed:", err instanceof Error ? err.message : err)
+    );
 
-    sendPushNotification(redemption.userId, {
-      title: "Récompense validée !",
-      body: `Votre ${redemption.reward.name} a été appliqué.`,
-      url: "/my-rewards",
-    }).catch(() => {});
+    // Push delivery to web-push endpoint can take 200-400ms. waitUntil keeps
+    // the worker alive so Vercel can't kill the send before completion.
+    waitUntil(
+      sendPushNotification(redemption.userId, {
+        title: "Récompense validée !",
+        body: `Votre ${redemption.reward.name} a été appliqué.`,
+        url: "/my-rewards",
+      }).catch((err) =>
+        console.error("[VALIDATE-CODE] push failed:", err instanceof Error ? err.message : err)
+      )
+    );
 
     return NextResponse.json({
       success: true,

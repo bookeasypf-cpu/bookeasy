@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { waitUntil } from "@vercel/functions";
 import { prisma } from "@/lib/prisma";
 import { verifySignature, parseIPNData } from "@/lib/payzen";
 import { onBookingConfirmed } from "@/lib/booking-confirm";
@@ -78,10 +79,14 @@ async function handleProSubscription(ipnData: ReturnType<typeof parseIPNData>) {
           },
         });
 
-        // Marketing : génère visuel premium + alerte Mara pour boost réseaux
-        notifyAdminMarketingEvent({ event: "upgrade", merchantId: ipnData.merchantId }).catch((err) => {
-          console.error("[PAYZEN-IPN] Marketing notify upgrade failed:", err instanceof Error ? err.message : err);
-        });
+        // Marketing : génère visuel premium + alerte Mara pour boost réseaux.
+        // waitUntil ensures Vercel doesn't kill the worker before the notify
+        // hook finishes (visual generation + admin alert can take 1-2s).
+        waitUntil(
+          notifyAdminMarketingEvent({ event: "upgrade", merchantId: ipnData.merchantId }).catch((err) => {
+            console.error("[PAYZEN-IPN] Marketing notify upgrade failed:", err instanceof Error ? err.message : err);
+          })
+        );
       }
       break;
     }
@@ -252,17 +257,22 @@ async function handleGiftCardPayment(ipnData: ReturnType<typeof parseIPNData>) {
         }
       });
 
-      // Send gift card email to recipient (async, non-blocking) — CGU promise
-      sendGiftCardEmail({
-        recipientEmail: card.recipientEmail,
-        recipientName: card.recipientName,
-        senderName: card.senderName,
-        code: card.code,
-        amountXPF: card.amount,
-        message: card.message,
-        expiresAt: card.expiresAt,
-        merchantName: card.merchant?.businessName,
-      }).catch(() => {});
+      // Send gift card email to recipient — CGU promise. waitUntil keeps the
+      // worker alive past the response so Vercel can't kill delivery mid-send.
+      waitUntil(
+        sendGiftCardEmail({
+          recipientEmail: card.recipientEmail,
+          recipientName: card.recipientName,
+          senderName: card.senderName,
+          code: card.code,
+          amountXPF: card.amount,
+          message: card.message,
+          expiresAt: card.expiresAt,
+          merchantName: card.merchant?.businessName,
+        }).catch((err) =>
+          console.error("[IPN-GIFT] email failed:", err instanceof Error ? err.message : err)
+        )
+      );
       break;
     }
 
