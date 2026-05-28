@@ -43,123 +43,142 @@ export default async function PatientsPage() {
     );
   }
 
-  // Récupérer les bookings récents (3 ans max — RGPD retention)
+  // 3 ans max — RGPD retention
   const threeYearsAgo = new Date();
   threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
   const dateFloor = threeYearsAgo.toISOString().slice(0, 10);
+  const today = new Date().toISOString().split("T")[0];
 
-  const allBookings = await prisma.booking.findMany({
-    where: { merchantId: merchant.id, date: { gte: dateFloor } },
-    include: {
-      client: {
-        select: { id: true, name: true, email: true, phone: true, image: true },
-      },
-      service: { select: { name: true } },
-    },
-    orderBy: { date: "desc" },
-    take: 5000,
-  });
-
-  // Grouper par patient
-  const patientsMap = new Map<string, {
-    id: string;
-    name: string | null;
-    email: string;
-    phone: string | null;
-    image: string | null;
-    totalBookings: number;
-    completedBookings: number;
-    cancelledBookings: number;
-    lastVisit: string | null;
+  // Agrégations par patient (DB-side, une seule query)
+  type PatientStatRow = {
+    clientId: string;
+    totalBookings: bigint;
+    completedBookings: bigint;
+    cancelledBookings: bigint;
+    totalSpent: number | null;
     firstVisit: string;
-    totalSpent: number;
-    bookings: {
-      id: string;
-      date: string;
-      startTime: string;
-      status: string;
-      serviceName: string;
-      notes: string | null;
-    }[];
-  }>();
+    lastVisit: string | null;
+  };
 
-  allBookings.forEach((booking) => {
-    const clientId = booking.client.id;
-    if (!patientsMap.has(clientId)) {
-      patientsMap.set(clientId, {
-        id: clientId,
-        name: booking.client.name,
-        email: booking.client.email,
-        phone: booking.client.phone,
-        image: booking.client.image,
-        totalBookings: 0,
-        completedBookings: 0,
-        cancelledBookings: 0,
-        lastVisit: null,
-        firstVisit: booking.date,
-        totalSpent: 0,
-        bookings: [],
-      });
-    }
+  // 5 derniers bookings par patient via window function — bornage explicite
+  type RecentBookingRow = {
+    clientId: string;
+    id: string;
+    date: string;
+    startTime: string;
+    status: string;
+    notes: string | null;
+    serviceName: string;
+  };
 
-    const patient = patientsMap.get(clientId)!;
-    patient.totalBookings++;
+  type GlobalStatRow = {
+    todayBookings: bigint;
+    totalBookings: bigint;
+    cancelledBookings: bigint;
+  };
 
-    if (booking.status === "COMPLETED") {
-      patient.completedBookings++;
-      patient.totalSpent += booking.totalPrice;
-    }
-    if (
-      booking.status === "CANCELLED_BY_CLIENT" ||
-      booking.status === "CANCELLED_BY_MERCHANT"
-    ) {
-      patient.cancelledBookings++;
-    }
+  const [patientStats, recentBookingsRows, globalStatsRows] = await Promise.all([
+    prisma.$queryRaw<PatientStatRow[]>`
+      SELECT
+        "clientId",
+        COUNT(*)::bigint AS "totalBookings",
+        COUNT(*) FILTER (WHERE status = 'COMPLETED')::bigint AS "completedBookings",
+        COUNT(*) FILTER (WHERE status IN ('CANCELLED_BY_CLIENT', 'CANCELLED_BY_MERCHANT'))::bigint AS "cancelledBookings",
+        COALESCE(SUM("totalPrice") FILTER (WHERE status = 'COMPLETED'), 0)::float AS "totalSpent",
+        MIN(date) AS "firstVisit",
+        MAX(date) FILTER (WHERE status = 'COMPLETED') AS "lastVisit"
+      FROM bookings
+      WHERE "merchantId" = ${merchant.id}
+        AND date >= ${dateFloor}
+      GROUP BY "clientId"
+    `,
+    prisma.$queryRaw<RecentBookingRow[]>`
+      SELECT "clientId", id, date, "startTime", status, notes, "serviceName"
+      FROM (
+        SELECT
+          b."clientId", b.id, b.date, b."startTime", b.status, b.notes,
+          s.name AS "serviceName",
+          ROW_NUMBER() OVER (
+            PARTITION BY b."clientId"
+            ORDER BY b.date DESC, b."startTime" DESC
+          ) AS rn
+        FROM bookings b
+        JOIN services s ON s.id = b."serviceId"
+        WHERE b."merchantId" = ${merchant.id}
+          AND b.date >= ${dateFloor}
+      ) ranked
+      WHERE rn <= 5
+    `,
+    prisma.$queryRaw<GlobalStatRow[]>`
+      SELECT
+        COUNT(*) FILTER (
+          WHERE date = ${today}
+            AND status NOT IN ('CANCELLED_BY_CLIENT', 'CANCELLED_BY_MERCHANT')
+        )::bigint AS "todayBookings",
+        COUNT(*)::bigint AS "totalBookings",
+        COUNT(*) FILTER (
+          WHERE status IN ('CANCELLED_BY_CLIENT', 'CANCELLED_BY_MERCHANT')
+        )::bigint AS "cancelledBookings"
+      FROM bookings
+      WHERE "merchantId" = ${merchant.id}
+        AND date >= ${dateFloor}
+    `,
+  ]);
 
-    if (!patient.lastVisit || booking.date > patient.lastVisit) {
-      if (booking.status === "COMPLETED") {
-        patient.lastVisit = booking.date;
-      }
-    }
-    if (booking.date < patient.firstVisit) {
-      patient.firstVisit = booking.date;
-    }
+  const clientIds = patientStats.map((p) => p.clientId);
+  const users = clientIds.length
+    ? await prisma.user.findMany({
+        where: { id: { in: clientIds } },
+        select: { id: true, name: true, email: true, phone: true, image: true },
+      })
+    : [];
+  const userById = new Map(users.map((u) => [u.id, u]));
 
-    if (patient.bookings.length < 5) {
-      patient.bookings.push({
-        id: booking.id,
-        date: booking.date,
-        startTime: booking.startTime,
-        status: booking.status,
-        serviceName: booking.service.name,
-        notes: booking.notes,
-      });
-    }
-  });
+  // Index recent bookings par clientId
+  const recentByClient = new Map<string, RecentBookingRow[]>();
+  for (const row of recentBookingsRows) {
+    const arr = recentByClient.get(row.clientId) ?? [];
+    arr.push(row);
+    recentByClient.set(row.clientId, arr);
+  }
 
-  const patients = Array.from(patientsMap.values()).sort(
-    (a, b) => b.totalBookings - a.totalBookings
-  );
+  const patients = patientStats
+    .map((p) => {
+      const user = userById.get(p.clientId);
+      const recent = recentByClient.get(p.clientId) ?? [];
+      return {
+        id: p.clientId,
+        name: user?.name ?? null,
+        email: user?.email ?? "",
+        phone: user?.phone ?? null,
+        image: user?.image ?? null,
+        totalBookings: Number(p.totalBookings),
+        completedBookings: Number(p.completedBookings),
+        cancelledBookings: Number(p.cancelledBookings),
+        lastVisit: p.lastVisit,
+        firstVisit: p.firstVisit,
+        totalSpent: p.totalSpent ?? 0,
+        bookings: recent.map((r) => ({
+          id: r.id,
+          date: r.date,
+          startTime: r.startTime,
+          status: r.status,
+          serviceName: r.serviceName,
+          notes: r.notes,
+        })),
+      };
+    })
+    .sort((a, b) => b.totalBookings - a.totalBookings);
 
-  // Stats globales
   const totalPatients = patients.length;
   const regularPatients = patients.filter((p) => p.totalBookings >= 3).length;
-  const today = new Date().toISOString().split("T")[0];
-  const todayBookings = allBookings.filter(
-    (b) => b.date === today && b.status !== "CANCELLED_BY_CLIENT" && b.status !== "CANCELLED_BY_MERCHANT"
-  ).length;
-  const noShowRate =
-    allBookings.length > 0
-      ? Math.round(
-          (allBookings.filter(
-            (b) =>
-              b.status === "CANCELLED_BY_CLIENT" ||
-              b.status === "CANCELLED_BY_MERCHANT"
-          ).length /
-            allBookings.length) *
-            100
-        )
-      : 0;
+  const globalRow = globalStatsRows[0];
+  const todayBookings = Number(globalRow?.todayBookings ?? 0);
+  const globalTotal = Number(globalRow?.totalBookings ?? 0);
+  const globalCancelled = Number(globalRow?.cancelledBookings ?? 0);
+  const noShowRate = globalTotal > 0
+    ? Math.round((globalCancelled / globalTotal) * 100)
+    : 0;
 
   return (
     <div className="page-transition">

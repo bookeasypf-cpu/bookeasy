@@ -34,74 +34,141 @@ export default async function DashboardAnalyticsPage() {
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
   const dateFloor = oneYearAgo.toISOString().slice(0, 10);
 
-  const allBookings = await prisma.booking.findMany({
-    where: { merchantId: merchant.id, date: { gte: dateFloor } },
-    include: {
-      service: { select: { name: true } },
-      client: { select: { id: true, name: true } },
-    },
-    orderBy: { date: "desc" },
-    take: 5000,
-  });
-
-  const nonCancelledBookings = allBookings.filter(
-    (b) => b.status !== "CANCELLED_BY_CLIENT" && b.status !== "CANCELLED_BY_MERCHANT"
-  );
-  const cancelledBookings = allBookings.filter(
-    (b) => b.status === "CANCELLED_BY_CLIENT" || b.status === "CANCELLED_BY_MERCHANT"
-  );
-
-  const totalRevenue = nonCancelledBookings.reduce((s, b) => s + b.totalPrice, 0);
-  const totalBookings = allBookings.length;
-  const completedBookings = allBookings.filter(
-    (b) => b.status === "COMPLETED"
-  ).length;
-
-  const uniqueClients = new Set(allBookings.map((b) => b.client.id)).size;
-
-  const honorationRate =
-    totalBookings > 0
-      ? Math.round(((totalBookings - cancelledBookings.length) / totalBookings) * 100)
-      : 100;
-
-  const serviceCounts: Record<string, number> = {};
-  nonCancelledBookings.forEach((b) => {
-    serviceCounts[b.service.name] =
-      (serviceCounts[b.service.name] || 0) + 1;
-  });
-  const topServices = Object.entries(serviceCounts)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5);
-
   const tahitiNow = new Date(
-    new Date().toLocaleString('en-US', { timeZone: 'Pacific/Tahiti' })
+    new Date().toLocaleString("en-US", { timeZone: "Pacific/Tahiti" })
   );
   const last30Days = new Date(tahitiNow);
   last30Days.setDate(last30Days.getDate() - 30);
-  const last30Str = last30Days.toLocaleDateString('en-CA', { timeZone: 'Pacific/Tahiti' });
-  const recentBookings = nonCancelledBookings.filter((b) => b.date >= last30Str);
-  const recentRevenue = recentBookings.reduce((s, b) => s + b.totalPrice, 0);
+  const last30Str = last30Days.toLocaleDateString("en-CA", { timeZone: "Pacific/Tahiti" });
 
-  const newPatientsLast30 = new Set(
-    recentBookings.map((b) => b.client.id)
-  ).size;
+  const CANCELLED = ["CANCELLED_BY_CLIENT", "CANCELLED_BY_MERCHANT"];
+  const nonCancelledWhere = {
+    merchantId: merchant.id,
+    date: { gte: dateFloor },
+    status: { notIn: CANCELLED },
+  };
 
-  const monthlyStats: { month: string; count: number; revenue: number }[] = [];
+  // 6 derniers mois — calculé en JS, utilisé pour le SQL et le label affichage
+  const months: { key: string; label: string }[] = [];
   for (let i = 5; i >= 0; i--) {
     const d = new Date();
     d.setMonth(d.getMonth() - i);
-    const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const monthLabel = d.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
-    const monthBookings = nonCancelledBookings.filter((b) => b.date.startsWith(monthStr));
-    monthlyStats.push({
-      month: monthLabel,
-      count: monthBookings.length,
-      revenue: monthBookings.reduce((s, b) => s + b.totalPrice, 0),
+    months.push({
+      key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
+      label: d.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" }),
     });
   }
+  const monthlyFloor = months[0].key + "-01";
 
-  const cancelledByClient = allBookings.filter((b) => b.status === "CANCELLED_BY_CLIENT").length;
-  const cancelledByMerchant = allBookings.filter((b) => b.status === "CANCELLED_BY_MERCHANT").length;
+  // Toutes les agrégations DB-side, en parallèle
+  const [
+    statusGroups,
+    totalRevenueAgg,
+    recentRevenueAgg,
+    uniqueClientsRows,
+    recentClientsRows,
+    topServiceGroups,
+    monthlyRows,
+  ] = await Promise.all([
+    // Status counts (total + per-status)
+    prisma.booking.groupBy({
+      by: ["status"],
+      where: { merchantId: merchant.id, date: { gte: dateFloor } },
+      _count: { _all: true },
+    }),
+    // Total revenue (non-cancelled, 12 mois)
+    prisma.booking.aggregate({
+      where: nonCancelledWhere,
+      _sum: { totalPrice: true },
+    }),
+    // Recent 30j revenue
+    prisma.booking.aggregate({
+      where: {
+        merchantId: merchant.id,
+        date: { gte: last30Str },
+        status: { notIn: CANCELLED },
+      },
+      _sum: { totalPrice: true },
+    }),
+    // Unique clients (12 mois)
+    prisma.booking.groupBy({
+      by: ["clientId"],
+      where: { merchantId: merchant.id, date: { gte: dateFloor } },
+    }),
+    // Unique clients (30j)
+    prisma.booking.groupBy({
+      by: ["clientId"],
+      where: {
+        merchantId: merchant.id,
+        date: { gte: last30Str },
+        status: { notIn: CANCELLED },
+      },
+    }),
+    // Top 5 services (12 mois, non-cancelled)
+    prisma.booking.groupBy({
+      by: ["serviceId"],
+      where: nonCancelledWhere,
+      _count: { _all: true },
+      orderBy: { _count: { serviceId: "desc" } },
+      take: 5,
+    }),
+    // Monthly stats (6 mois) via SQL — date est une String, on agrège sur substring
+    prisma.$queryRaw<{ month: string; count: bigint; revenue: number | null }[]>`
+      SELECT
+        SUBSTRING(date, 1, 7) AS month,
+        COUNT(*)::bigint AS count,
+        COALESCE(SUM("totalPrice"), 0)::float AS revenue
+      FROM bookings
+      WHERE "merchantId" = ${merchant.id}
+        AND date >= ${monthlyFloor}
+        AND status NOT IN ('CANCELLED_BY_CLIENT', 'CANCELLED_BY_MERCHANT')
+      GROUP BY SUBSTRING(date, 1, 7)
+    `,
+  ]);
+
+  // Derive counts from statusGroups
+  let totalBookings = 0;
+  let completedBookings = 0;
+  let cancelledByClient = 0;
+  let cancelledByMerchant = 0;
+  for (const g of statusGroups) {
+    totalBookings += g._count._all;
+    if (g.status === "COMPLETED") completedBookings = g._count._all;
+    else if (g.status === "CANCELLED_BY_CLIENT") cancelledByClient = g._count._all;
+    else if (g.status === "CANCELLED_BY_MERCHANT") cancelledByMerchant = g._count._all;
+  }
+  const totalRevenue = totalRevenueAgg._sum.totalPrice ?? 0;
+  const recentRevenue = recentRevenueAgg._sum.totalPrice ?? 0;
+  const uniqueClients = uniqueClientsRows.length;
+  const newPatientsLast30 = recentClientsRows.length;
+  const honorationRate =
+    totalBookings > 0
+      ? Math.round(((totalBookings - cancelledByClient - cancelledByMerchant) / totalBookings) * 100)
+      : 100;
+
+  // Top services: hydrate names en une query
+  const serviceIds = topServiceGroups.map((g) => g.serviceId);
+  const serviceNames = serviceIds.length
+    ? await prisma.service.findMany({
+        where: { id: { in: serviceIds } },
+        select: { id: true, name: true },
+      })
+    : [];
+  const nameById = new Map(serviceNames.map((s) => [s.id, s.name]));
+  const topServices: [string, number][] = topServiceGroups.map((g) => [
+    nameById.get(g.serviceId) ?? "?",
+    g._count._all,
+  ]);
+
+  // Monthly stats: index par mois pour combler les mois vides
+  const monthlyByKey = new Map(
+    monthlyRows.map((r) => [r.month, { count: Number(r.count), revenue: r.revenue ?? 0 }])
+  );
+  const monthlyStats = months.map((m) => ({
+    month: m.label,
+    count: monthlyByKey.get(m.key)?.count ?? 0,
+    revenue: monthlyByKey.get(m.key)?.revenue ?? 0,
+  }));
 
   if (isMedical) {
     return (

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { decryptPatientNote } from "@/lib/patient-notes-crypto";
 
 export async function GET() {
   const session = await getSession();
@@ -42,7 +43,9 @@ export async function GET() {
       }),
       prisma.giftCard.findMany({
         where: { senderEmail: userEmail },
-        select: { code: true, amount: true, balance: true, status: true, recipientName: true, createdAt: true },
+        // RGPD art. 20: le code est un secret cryptographique actif, hors scope portabilité.
+        // On retourne un id + métadonnées, jamais le code.
+        select: { id: true, amount: true, balance: true, status: true, recipientName: true, createdAt: true },
       }),
       prisma.favorite.findMany({
         where: { userId },
@@ -93,7 +96,7 @@ export async function GET() {
     referrals,
     notifications,
     patientNotes: patientNotes.map((p) => ({
-      content: p.content,
+      content: decryptPatientNote(p.content),
       merchant: p.merchant.businessName,
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,

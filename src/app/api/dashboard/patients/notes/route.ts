@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createPatientNoteSchema, zodFirstError } from "@/lib/validations";
+import { decryptPatientNote, encryptPatientNote } from "@/lib/patient-notes-crypto";
 
 // GET — Récupérer les notes d'un patient
 export async function GET(request: NextRequest) {
@@ -22,10 +23,15 @@ export async function GET(request: NextRequest) {
     if (!clientId)
       return NextResponse.json({ error: "clientId requis" }, { status: 400 });
 
-    const notes = await prisma.patientNote.findMany({
+    const rows = await prisma.patientNote.findMany({
       where: { merchantId: merchant.id, clientId },
       orderBy: { createdAt: "desc" },
     });
+
+    const notes = rows.map((n) => ({
+      ...n,
+      content: decryptPatientNote(n.content),
+    }));
 
     return NextResponse.json({ notes });
   } catch {
@@ -63,14 +69,17 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
 
-    const note = await prisma.patientNote.create({
+    const trimmed = content.trim();
+    const created = await prisma.patientNote.create({
       data: {
         merchantId: merchant.id,
         clientId,
-        content: content.trim(),
+        content: encryptPatientNote(trimmed),
       },
     });
 
+    // Return decrypted content so the client doesn't see ciphertext
+    const note = { ...created, content: trimmed };
     return NextResponse.json({ note });
   } catch {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });

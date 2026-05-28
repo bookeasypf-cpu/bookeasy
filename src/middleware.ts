@@ -32,5 +32,7 @@ export const config = {
     "/my-rewards/:path*",
     "/profile/:path*",
     "/booking/:path*",
+    "/favorites/:path*",
+    "/referrals/:path*",
   ],
 };

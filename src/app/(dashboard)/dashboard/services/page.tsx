@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { formatPrice, formatDuration } from "@/lib/utils";
 import { Plus, Pencil, Trash2, Clock, Star, Lock } from "lucide-react";
 import toast from "react-hot-toast";
@@ -30,6 +31,8 @@ export default function DashboardServicesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -100,15 +103,24 @@ export default function DashboardServicesPage() {
     setSaving(false);
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm(isMedical ? "Supprimer cette consultation ?" : "Supprimer ce service ?")) return;
-    const res = await fetch(`/api/dashboard/services?id=${id}`, {
+  function handleDelete(id: string) {
+    setPendingDeleteId(id);
+  }
+
+  async function confirmDelete() {
+    if (!pendingDeleteId) return;
+    setDeleting(true);
+    const res = await fetch(`/api/dashboard/services?id=${pendingDeleteId}`, {
       method: "DELETE",
     });
     if (res.ok) {
       toast.success(isMedical ? "Consultation supprimée" : "Service supprimé");
       fetchServices();
+    } else {
+      toast.error("Erreur lors de la suppression");
     }
+    setDeleting(false);
+    setPendingDeleteId(null);
   }
 
   // Colors
@@ -340,6 +352,17 @@ export default function DashboardServicesPage() {
           </p>
         )}
       </div>
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        title={isMedical ? "Supprimer cette consultation ?" : "Supprimer ce service ?"}
+        description="Cette action est définitive."
+        confirmLabel="Supprimer"
+        variant="danger"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteId(null)}
+      />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   Star,
   Plus,
@@ -95,6 +96,8 @@ export default function DashboardLoyaltyPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [xpPerBooking, setXpPerBooking] = useState("10");
   const [savingSettings, setSavingSettings] = useState(false);
   const [pendingRedemptions, setPendingRedemptions] = useState<
@@ -193,15 +196,24 @@ export default function DashboardLoyaltyPage() {
     setSaving(false);
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("Supprimer cette récompense ?")) return;
-    const res = await fetch(`/api/dashboard/xp-rewards?id=${id}`, {
+  function handleDelete(id: string) {
+    setPendingDeleteId(id);
+  }
+
+  async function confirmDelete() {
+    if (!pendingDeleteId) return;
+    setDeleting(true);
+    const res = await fetch(`/api/dashboard/xp-rewards?id=${pendingDeleteId}`, {
       method: "DELETE",
     });
     if (res.ok) {
       toast.success("Récompense supprimée");
       fetchData();
+    } else {
+      toast.error("Erreur lors de la suppression");
     }
+    setDeleting(false);
+    setPendingDeleteId(null);
   }
 
   async function handleToggle(reward: Reward) {
@@ -818,6 +830,17 @@ export default function DashboardLoyaltyPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        title="Supprimer cette récompense ?"
+        description="Cette action est définitive. Les clients ne pourront plus l'échanger."
+        confirmLabel="Supprimer"
+        variant="danger"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteId(null)}
+      />
     </div>
   );
 }
