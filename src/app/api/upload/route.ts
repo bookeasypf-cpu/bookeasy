@@ -1,15 +1,20 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import { put } from "@vercel/blob";
 import { uploadLimiter, formatRateLimitError } from "@/lib/ratelimit";
 
-// JPEG/PNG/WebP are the canonical web formats. HEIC/HEIF arrive only after
-// client-side conversion via heic2any (see src/lib/image-compress.ts), so
-// the server never has to deal with them directly.
+// Server-side direct upload. We deliberately moved away from
+// @vercel/blob/client `handleUpload` (token-based client-direct flow):
+// the v2 client was hanging silently on certain network paths, no
+// recoverable error — just a 90s timeout. Server-side `put()` is one
+// round-trip, fully observable. Our images are always compressed under
+// 4 MB by processImageForUpload before they reach this route, so the
+// 4.5 MB Vercel function body cap is never hit.
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-// 25 MB lets a 4K photo from a recent phone go through even after a light
-// quality bump. Vercel Blob itself supports up to 5 GB — this is our policy.
-const MAX_SIZE = 25 * 1024 * 1024;
+const MAX_SIZE = 4 * 1024 * 1024;
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
@@ -21,7 +26,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Rate limiting (fail-open)
     try {
       const { success, reset } = await uploadLimiter.limit(`upload-${session.user.id}`);
       if (!success) {
@@ -35,34 +39,35 @@ export async function POST(request: Request) {
       console.warn("Rate limiter unavailable, allowing upload:", e);
     }
 
-    const body = (await request.json()) as HandleUploadBody;
+    const formData = await request.formData();
+    const file = formData.get("file");
 
-    const jsonResponse = await handleUpload({
-      body,
-      request,
-      onBeforeGenerateToken: async (pathname) => {
-        // @vercel/blob v2 changed the default of addRandomSuffix to false.
-        // Without this, two users uploading IMG_0001.jpg (iPhone default
-        // filename) collide and the 2nd upload fails with "blob already
-        // exists". Force a random suffix so every blob path is unique.
-        return {
-          allowedContentTypes: ALLOWED_TYPES,
-          maximumSizeInBytes: MAX_SIZE,
-          addRandomSuffix: true,
-          tokenPayload: JSON.stringify({
-            userId: session.user.id,
-            pathname,
-          }),
-        };
-      },
-      onUploadCompleted: async () => {
-        // Upload completed — URL is in the response, no need to log it
-      },
+    if (!file || !(file instanceof File)) {
+      return NextResponse.json({ error: "Aucun fichier reçu" }, { status: 400 });
+    }
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: `Format non supporté (${file.type}). Utilisez JPG, PNG ou WebP.` },
+        { status: 400 }
+      );
+    }
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json(
+        { error: `Fichier trop volumineux (${(file.size / 1024 / 1024).toFixed(1)} MB). Max: 4 MB après compression.` },
+        { status: 413 }
+      );
+    }
+
+    // addRandomSuffix:true — two users uploading IMG_0001.jpg never
+    // collide (default changed to false in @vercel/blob v2).
+    const blob = await put(file.name, file, {
+      access: "public",
+      addRandomSuffix: true,
     });
 
-    return NextResponse.json(jsonResponse);
+    return NextResponse.json({ url: blob.url });
   } catch (error) {
-    console.error("Upload error:", error);
+    console.error("[upload] Error:", error);
     const message = error instanceof Error ? error.message : "Erreur inconnue";
     return NextResponse.json(
       { error: `Erreur lors de l'upload: ${message}` },

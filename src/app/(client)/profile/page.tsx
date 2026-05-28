@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { upload } from "@vercel/blob/client";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Mail, Phone, Pencil, Check, X, Upload, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -110,22 +109,34 @@ export default function ProfilePage() {
 
       setUploadStep("Upload en cours...");
 
-      // Client-direct upload to Vercel Blob (bypasses Next.js 4.5MB limit).
-      // 60s hard timeout on the upload call itself — slow PF mobile network
-      // safety net so the spinner never sits indefinitely.
+      // Server-side upload via FormData. 60s timeout via AbortController.
       let imageUrl: string;
       try {
-        const uploadPromise = upload(compressedFile.name, compressedFile, {
-          access: "public",
-          handleUploadUrl: "/api/upload",
-        });
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Upload trop long — vérifiez votre connexion")), 60000)
-        );
-        const blob = await Promise.race([uploadPromise, timeoutPromise]);
-        imageUrl = blob.url;
+        const formData = new FormData();
+        formData.append("file", compressedFile);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+          signal: controller.signal,
+        }).finally(() => clearTimeout(timeoutId));
+
+        const data = await res.json();
+        if (!res.ok) {
+          toast.error(data.error || `Erreur upload (HTTP ${res.status})`);
+          setLocalImagePreview(null);
+          setUploading(false);
+          setUploadStep("");
+          return;
+        }
+        imageUrl = data.url as string;
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Erreur inconnue";
+        const message = err instanceof Error
+          ? (err.name === "AbortError" ? "Upload trop long — vérifiez votre connexion" : err.message)
+          : "Erreur inconnue";
         toast.error(`Erreur d'upload : ${message}`);
         setLocalImagePreview(null);
         setUploading(false);

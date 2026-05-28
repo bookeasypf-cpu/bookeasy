@@ -16,7 +16,6 @@ import {
   ImageIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { upload } from "@vercel/blob/client";
 import { PushNotificationToggle } from "@/components/ui/PushNotificationToggle";
 import { UpgradeButton } from "@/components/ui/UpgradeButton";
 import Image from "next/image";
@@ -112,10 +111,12 @@ export default function DashboardProfilePage() {
       .catch(() => {});
   }, []);
 
-  // Upload helper — client-direct to Vercel Blob (bypasses Next 4.5 MB limit).
+  // Upload helper — server-side via FormData to /api/upload.
   // The preset chooses dimension + JPEG quality so cover banners stay sharp
   // while small avatars don't waste bandwidth. HEIC/HEIF from iPhone are
-  // auto-converted client-side before reaching the server.
+  // auto-converted client-side before reaching the server. After compression
+  // images are well under 4 MB, so we fit comfortably under Vercel's
+  // 4.5 MB function body cap.
   async function uploadFile(file: File, preset: ImagePreset): Promise<string | null> {
     if (isUnsupportedImageFormat(file)) {
       toast.error("Format non supporté (AVIF / TIFF). Convertissez en JPG ou PNG.");
@@ -125,21 +126,31 @@ export default function DashboardProfilePage() {
     try {
       const processed = await processImageForUpload(file, preset);
 
-      // 90s hard timeout on the upload itself — covers big files on slow PF
-      // mobile network without ever hanging the UI indefinitely.
-      const uploadPromise = upload(processed.name, processed, {
-        access: "public",
-        handleUploadUrl: "/api/upload",
-      });
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Upload trop long — vérifiez votre connexion")), 90000)
-      );
+      const formData = new FormData();
+      formData.append("file", processed);
 
-      const result = await Promise.race([uploadPromise, timeoutPromise]);
-      return result.url;
+      // 60s hard timeout via AbortController — slow PF mobile network
+      // safety net so the spinner never sits indefinitely.
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+        signal: controller.signal,
+      }).finally(() => clearTimeout(timeoutId));
+
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || `Erreur upload (HTTP ${res.status})`);
+        return null;
+      }
+      return data.url as string;
     } catch (err) {
       console.error("Upload failed:", err);
-      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      const message = err instanceof Error
+        ? (err.name === "AbortError" ? "Upload trop long — vérifiez votre connexion" : err.message)
+        : "Erreur inconnue";
       toast.error(`Erreur upload: ${message}`);
       return null;
     }
