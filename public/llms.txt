@@ -1,0 +1,38 @@
+# BookEasy
+
+> BookEasy is the online booking platform built for Polynesian businesses — salons, spas, doctors, sports coaches, and wellness pros. Clients book in two taps, pros get paid via PayZen (XPF), and a built-in loyalty XP system keeps customers coming back.
+
+BookEasy operates in French Polynesia (fr-PF, currency XPF). Bookings, gift cards, and payments are routed through PayZen / OSB Polynésie. Stripe handles only pro subscription billing. The platform serves both clients (search, book, review) and merchants (calendar, services, analytics, patient notes for medical pros).
+
+## Key pages
+
+- [Homepage](https://bookeasy.me/): pitch, featured merchants, FAQ
+- [Search](https://bookeasy.me/search): find a pro by sector, city, name
+- [Map](https://bookeasy.me/map): geo-localized merchant discovery
+- [Sectors](https://bookeasy.me/sectors): browse by activity (hair, spa, medical, sport…)
+- [Pricing](https://bookeasy.me/pricing): merchant plans — Free vs Pro
+- [Gift cards](https://bookeasy.me/gift-cards): buy and send digital gift cards in XPF
+
+## Sector-specific landing pages
+
+BookEasy auto-generates SEO landing pages for each sector × Polynesian city combination, e.g. coiffeur-papeete, medecin-faaa, spa-bora-bora. These live under `/reservation/[slug]` and cover Papeete, Faaa, Punaauia, Pirae, Mahina, Arue, Paea, Bora Bora, Moorea, Rangiroa, Nuku Hiva, Tahiti and other major islands.
+
+## Merchant fiches
+
+Each professional has a public page at `/merchants/[id]` with services, schedule, photos, reviews, and a direct booking flow. These pages expose structured data (LocalBusiness, AggregateRating, OfferCatalog, OpeningHoursSpecification) for rich-result eligibility.
+
+## Legal
+
+- [Mentions légales](https://bookeasy.me/legal/mentions-legales)
+- [Conditions générales d'utilisation](https://bookeasy.me/legal/cgu)
+- [Politique de confidentialité](https://bookeasy.me/legal/confidentialite)
+
+## Contact
+
+- Email: bookeasy.pf@gmail.com
+- Location: Punaauia, Polynésie française
+
+## Optional
+
+- The dashboard, profile pages, and account-management routes are disallowed for crawlers (no value for indexation, contain private user data).
+- BookEasy is a single-language (French) product targeted at French Polynesia residents and visitors.

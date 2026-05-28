@@ -164,6 +164,7 @@ model MerchantPhoto {
 
   merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
+  @@index([merchantId])
   @@map("merchant_photos")
 }
 
@@ -273,6 +274,8 @@ model Booking {
   // — fine at 50 bookings/day, slow at 500+, and the cron timeout on
   // Vercel Hobby is 300 s.
   @@index([date, status, reminderSentAt])
+  // Marketing/stats cron filters on createdAt windows + status.
+  @@index([createdAt, status])
   @@map("bookings")
 }
 
@@ -410,8 +413,12 @@ model GiftCard {
 
   merchant Merchant? @relation(fields: [merchantId], references: [id], onDelete: SetNull)
 
-  @@index([code])
+  // code is @unique → Postgres already creates a unique B-tree, no extra @@index needed.
   @@index([recipientEmail])
+  // status + expiresAt: createBooking/cancelBooking/IPN all filter on
+  // status = 'ACTIVE' + expiresAt > now(). Composite index keeps the
+  // gift-card validation O(log n) instead of a seq scan.
+  @@index([status, expiresAt])
   @@map("gift_cards")
 }
 
@@ -480,6 +487,10 @@ model WebhookEvent {
   createdAt DateTime @default(now())
 
   @@index([source])
+  // GDPR cleanup cron deletes events older than 90 days — without this,
+  // it does a seq scan on a table that grows by ~1 row per PayZen IPN
+  // and per Resend webhook.
+  @@index([createdAt])
   @@map("webhook_events")
 }
 

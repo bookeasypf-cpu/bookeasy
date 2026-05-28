@@ -27,7 +27,7 @@ import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { HeroTitle } from "@/components/ui/HeroTitle";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { CountUp } from "@/components/ui/CountUp";
-import ClientOnboardingWrapper from "@/components/onboarding/ClientOnboardingWrapper";
+import ClientOnboardingWrapper from "@/components/onboarding/ClientOnboardingWrapperLazy";
 import {
   Calendar,
   ArrowRight,

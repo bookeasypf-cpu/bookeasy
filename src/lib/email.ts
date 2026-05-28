@@ -51,6 +51,30 @@ function esc(s: string | null | undefined): string {
     .replace(/'/g, "&#39;");
 }
 
+// Cheap plain-text fallback for spam-score and accessibility.
+// Strips tags, decodes the few entities we emit via esc(), collapses
+// whitespace. Not a full HTML→text converter — our templates are simple.
+function htmlToText(html: string): string {
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|h[1-6]|tr)>/gi, "\n")
+    .replace(/<li[^>]*>/gi, "• ")
+    .replace(/<a [^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/gi, "$2 ($1)")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&mdash;/g, "—")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n\s*\n\s*\n+/g, "\n\n")
+    .trim();
+}
+
 // ─────────────────────────────────────────────
 // SHARED LAYOUT
 // ─────────────────────────────────────────────
@@ -172,6 +196,7 @@ export async function sendBookingConfirmation(data: BookingConfirmationData) {
       to: data.clientEmail,
       subject: `✅ RDV confirmé – ${esc(data.serviceName)} chez ${esc(data.merchantName)}`,
       html,
+      text: htmlToText(html),
     });
     console.log("[EMAIL] Confirmation sent");
   } catch (err) {
@@ -268,6 +293,7 @@ export async function sendBookingReminder(data: ReminderData) {
       to: data.clientEmail,
       subject: `⏰ Rappel : ${esc(data.serviceName)} demain à ${data.startTime.replace(":", "h")}`,
       html,
+      text: htmlToText(html),
     });
     console.log("[EMAIL] Reminder sent");
   } catch (err) {
@@ -347,6 +373,7 @@ export async function sendBookingCancellation(data: CancellationData) {
       to: data.recipientEmail,
       subject: `❌ RDV annulé – ${esc(data.serviceName)} le ${dateFormatted}`,
       html,
+      text: htmlToText(html),
     });
     console.log("[EMAIL] Cancellation sent");
   } catch (err) {
@@ -414,6 +441,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
       to,
       subject: "🎉 Bienvenue sur BookEasy !",
       html,
+      text: htmlToText(html),
       headers: {
         "List-Unsubscribe": `<mailto:${REPLY_TO}?subject=Unsubscribe>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
@@ -484,6 +512,7 @@ export async function sendMerchantWelcome(to: string, name: string) {
       to,
       subject: "🎉 Bienvenue sur BookEasy Pro",
       html,
+      text: htmlToText(html),
     });
     console.log("[EMAIL] Merchant welcome sent:", JSON.stringify({ to, id: result.data?.id, error: result.error?.message }));
   } catch (err) {
@@ -546,6 +575,7 @@ export async function sendMerchantCredentials(to: string, name: string, tempPass
       to,
       subject: "🎉 Bienvenue sur BookEasy Pro — vos identifiants",
       html,
+      text: htmlToText(html),
     });
     console.log("[EMAIL] Merchant welcome+credentials sent:", JSON.stringify({ to, id: result.data?.id, error: result.error?.message }));
   } catch (err) {
@@ -603,6 +633,7 @@ export async function sendReferralRewardEmail(
       to,
       subject: `🎁 +${xpEarned} XP – Parrainage BookEasy`,
       html,
+      text: htmlToText(html),
       headers: {
         "List-Unsubscribe": `<mailto:${REPLY_TO}?subject=Unsubscribe>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
@@ -663,6 +694,7 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
       to,
       subject: "🔐 Réinitialisation de votre mot de passe BookEasy",
       html,
+      text: htmlToText(html),
     });
     console.log("[EMAIL] Password reset email sent");
   } catch (err) {
@@ -728,6 +760,7 @@ export async function sendSupportMessage(data: SupportData) {
       replyTo: data.merchantEmail,
       subject: `${priority} ${esc(data.subject)} — ${esc(data.merchantName)}`,
       html,
+      text: htmlToText(html),
     });
     console.log("[EMAIL] Support message sent");
     return { success: true };
@@ -815,6 +848,7 @@ export async function sendNewBookingMerchant(data: NewBookingMerchantData) {
       to: data.merchantEmail,
       subject: `📅 Nouveau RDV — ${esc(data.serviceName)} le ${dateFormatted}`,
       html,
+      text: htmlToText(html),
     });
     console.log("[EMAIL] New booking notification sent to merchant");
   } catch (err) {
@@ -885,6 +919,7 @@ export async function sendGiftCardEmail(data: GiftCardEmailData) {
       replyTo: REPLY_TO,
       subject: `🎁 ${data.senderName} vous offre une carte cadeau BookEasy`,
       html,
+      text: htmlToText(html),
     });
     console.log("[EMAIL] Gift card sent");
   } catch (err) {

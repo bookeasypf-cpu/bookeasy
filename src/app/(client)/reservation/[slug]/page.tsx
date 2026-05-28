@@ -5,7 +5,7 @@ import { MerchantCard } from "@/components/search/MerchantCard";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { FAQ } from "@/components/ui/FAQ";
-import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/lib/jsonld";
+import { FAQPageJsonLd, BreadcrumbJsonLd, safeJsonLd } from "@/lib/jsonld";
 import { SearchBar } from "@/components/search/SearchBar";
 import { MapPin, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -185,7 +185,7 @@ export default async function ReservationSeoPage({ params }: PageProps) {
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
       <BreadcrumbJsonLd
         items={[

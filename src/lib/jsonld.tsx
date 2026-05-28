@@ -8,6 +8,19 @@ interface FAQItem {
   answer: string;
 }
 
+// JSON.stringify alone is NOT HTML-safe: a merchant string containing
+// "</script><script>" would break out of the <script> tag. Escape the
+// unicode of the chars that can terminate or open tags in HTML.
+// U+2028/U+2029 are JS line terminators that also break JSON-in-HTML parsing.
+export function safeJsonLd(schema: unknown): string {
+  return JSON.stringify(schema)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+
 /** Renders a FAQPage JSON-LD script tag */
 export function FAQPageJsonLd({ items }: { items: FAQItem[] }) {
   const schema = {
@@ -26,7 +39,7 @@ export function FAQPageJsonLd({ items }: { items: FAQItem[] }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
     />
   );
 }
@@ -51,7 +64,7 @@ export function BreadcrumbJsonLd({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
     />
   );
 }

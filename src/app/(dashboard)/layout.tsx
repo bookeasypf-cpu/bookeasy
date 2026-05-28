@@ -11,7 +11,7 @@ import {
   DashboardSidebar,
   DashboardMobileNav,
 } from "@/components/layout/DashboardSidebar";
-import MerchantOnboarding from "@/components/onboarding/MerchantOnboarding";
+import MerchantOnboarding from "@/components/onboarding/MerchantOnboardingLazy";
 import { MerchantProfileProvider } from "@/components/providers/MerchantProfileProvider";
 import { isMedicalSectorName } from "@/lib/medical";
 

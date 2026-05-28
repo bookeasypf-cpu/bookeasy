@@ -1,8 +1,10 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations";
+import { signupLimiter } from "@/lib/ratelimit";
 import { sendWelcomeEmail } from "@/lib/email";
 import {
   generateReferralCode,
@@ -12,6 +14,19 @@ import {
 } from "@/lib/referral";
 
 export async function registerUser(formData: FormData) {
+  // IP-based rate limit. Server Actions are public POST endpoints — without
+  // this an attacker can script thousands of signups. Server Actions don't
+  // pass through middleware so the check has to happen inline.
+  const h = await headers();
+  const ip =
+    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    h.get("x-real-ip") ||
+    "unknown";
+  const { success } = await signupLimiter.limit(`register-${ip}`);
+  if (!success) {
+    return { error: "Trop de tentatives. Réessayez dans quelques minutes." };
+  }
+
   const raw = {
     name: formData.get("name") as string,
     email: formData.get("email") as string,
