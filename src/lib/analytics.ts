@@ -54,6 +54,17 @@ async function ensurePostHog(): Promise<PostHog | null> {
           persistence: "localStorage",   // no third-party cookies
           autocapture: false,            // explicit events only (less noise)
           disable_session_recording: true, // RGPD: no replay until ROPA reviewed
+          // RGPD: ne crée des profils que pour les users identifiés (signup,
+          // login). Les visiteurs anonymes sont comptés en stats agrégées
+          // mais ne génèrent pas de profil PostHog.
+          person_profiles: "identified_only",
+          // RGPD: désactive la collecte d'IP côté serveur PostHog. CNIL
+          // recommande l'anonymisation pour l'analytics sans consentement
+          // explicite étendu.
+          ip: false,
+          // RGPD: ne stocke pas le referrer complet (peut contenir des
+          // query params identifiants type ?email=).
+          mask_personal_data_properties: true,
           loaded: () => {
             posthogInstance = posthog;
           },

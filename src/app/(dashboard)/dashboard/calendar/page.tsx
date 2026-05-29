@@ -2,13 +2,28 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, X, Clock, User, Phone, Stethoscope, Briefcase } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Clock, User, Phone, Stethoscope, Briefcase, Eye, EyeOff } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { formatTime, cn } from "@/lib/utils";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useMerchantProfile } from "@/components/providers/MerchantProfileProvider";
+
+// RGPD: les téléphones clients ne doivent pas s'afficher en clair sur
+// l'écran d'un cabinet médical où une personne tierce peut les lire.
+// On masque le milieu, on garde les 4 derniers chiffres pour identification,
+// et le tap <tel:> ouvre l'app téléphone (qui révèle le numéro complet).
+function maskPhone(phone: string): string {
+  const digits = phone.replace(/\s+/g, "");
+  if (digits.length <= 4) return phone;
+  const visible = digits.slice(-4);
+  const masked = "•• •• ••";
+  // Préserve les 2-4 premiers caractères si c'est un indicatif (+689)
+  const prefixMatch = phone.match(/^(\+\d{2,3})/);
+  const prefix = prefixMatch ? `${prefixMatch[1]} ` : "";
+  return `${prefix}${masked} ${visible.slice(0, 2)} ${visible.slice(2)}`;
+}
 
 // ── Types ──────────────────────────────────────────────
 
@@ -66,6 +81,15 @@ export default function DashboardCalendarPage() {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
+  // Set des bookingIds dont le téléphone est révélé (session-only).
+  // Reset automatique à la fermeture du panneau pour limiter l'exposition.
+  const [revealedPhones, setRevealedPhones] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!panelOpen && revealedPhones.size > 0) {
+      setRevealedPhones(new Set());
+    }
+  }, [panelOpen, revealedPhones.size]);
 
   // ── Theme colors ─────────────────────────────────────
   const accentMap = useMemo(() => {
@@ -462,11 +486,46 @@ export default function DashboardCalendarPage() {
                                 <span>{b.serviceName}</span>
                               </div>
 
-                              {/* Phone */}
+                              {/* Phone — masqué par défaut (RGPD cabinet médical).
+                                  Tap sur le numéro = ouvre l'app tel direct
+                                  (révèle dans l'app, pas à l'écran).
+                                  Bouton œil = reveal session-only. */}
                               {b.clientPhone && (
                                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                                  <Phone className="w-3.5 h-3.5" />
-                                  <span>{b.clientPhone}</span>
+                                  <Phone className="w-3.5 h-3.5 shrink-0" />
+                                  <a
+                                    href={`tel:${b.clientPhone}`}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="tabular-nums hover:text-[#0066FF] transition-colors"
+                                    aria-label="Appeler le client"
+                                  >
+                                    {revealedPhones.has(b.id) ? b.clientPhone : maskPhone(b.clientPhone)}
+                                  </a>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setRevealedPhones((prev) => {
+                                        const next = new Set(prev);
+                                        if (next.has(b.id)) next.delete(b.id);
+                                        else next.add(b.id);
+                                        return next;
+                                      });
+                                    }}
+                                    className="ml-auto p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                    aria-label={
+                                      revealedPhones.has(b.id)
+                                        ? "Masquer le numéro"
+                                        : "Afficher le numéro"
+                                    }
+                                  >
+                                    {revealedPhones.has(b.id) ? (
+                                      <EyeOff className="w-3.5 h-3.5 text-gray-400" />
+                                    ) : (
+                                      <Eye className="w-3.5 h-3.5 text-gray-400" />
+                                    )}
+                                  </button>
                                 </div>
                               )}
                             </div>
