@@ -25,16 +25,46 @@ const getMerchant = cache(async (merchantId: string) => {
     },
   });
 });
-import { MapPin, Phone, Star, Clock, ChevronRight, MessageSquare, Info, Briefcase, Calendar, Camera } from "lucide-react";
+import { MapPin, Phone, Star, Clock, ChevronRight, MessageSquare, Info, Briefcase, Calendar, Camera, Navigation } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { ProBadge } from "@/components/ui/ProBadge";
 import { BackButton } from "@/components/ui/BackButton";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import { StarRating } from "@/components/ui/StarRating";
 import { formatPrice, formatDuration } from "@/lib/utils";
+import { DAYS_OF_WEEK } from "@/lib/constants";
 import Link from "next/link";
 import { WriteReview } from "./WriteReview";
 import { PhotoLightbox } from "@/components/ui/PhotoLightbox";
+
+// Open/closed status computed at request time against Pacific/Tahiti
+// (no DST). Used in the hero info card to give visitors an immediate
+// signal that drives conversion on mobile.
+type Schedule = { dayOfWeek: number; startTime: string; endTime: string };
+function getOpenStatus(availability: Schedule[]) {
+  if (availability.length === 0) return { isOpen: false, today: [] as Schedule[] };
+  const now = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Pacific/Tahiti" })
+  );
+  const dayOfWeek = now.getDay();
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  const current = `${hh}:${mm}`;
+  const today = availability
+    .filter((a) => a.dayOfWeek === dayOfWeek)
+    .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const isOpen = today.some(
+    (s) => current >= s.startTime && current <= s.endTime
+  );
+  return { isOpen, today };
+}
+
+// Open the device's native maps app on tap. Google Maps URL works on iOS
+// (offers to switch to Apple Maps) and Android.
+function buildMapsUrl(address: string | null, city: string | null) {
+  const q = [address, city, "Polynésie française"].filter(Boolean).join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+}
 
 interface MerchantPageProps {
   params: Promise<{ merchantId: string }>;
@@ -107,6 +137,14 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
           100
         : 0,
   }));
+
+  const openStatus = getOpenStatus(merchant.availability);
+  const hasSchedule = merchant.availability.length > 0;
+  const todayDayName = DAYS_OF_WEEK[
+    new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Pacific/Tahiti" })
+    ).getDay()
+  ];
 
   // ── JSON-LD Structured Data (GEO optimized) ────────────────────────
   const DAY_MAP = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -316,23 +354,21 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
               <span className="font-medium">{merchant.phone}</span>
             </a>
           )}
-          {merchant.address && (
-            <div className="flex items-center gap-2.5 text-sm text-[#0C1B2A] dark:text-white">
-              <div className="w-9 h-9 rounded-xl bg-[#00B4D8]/10 flex items-center justify-center">
+          {(merchant.address || merchant.city) && (
+            <a
+              href={buildMapsUrl(merchant.address, merchant.city)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 text-sm text-[#0C1B2A] dark:text-white hover:text-[#00B4D8] transition-colors group"
+            >
+              <div className="w-9 h-9 rounded-xl bg-[#00B4D8]/10 flex items-center justify-center group-hover:bg-[#00B4D8]/20 transition-colors">
                 <MapPin className="h-4 w-4 text-[#00B4D8]" />
               </div>
               <span className="font-medium">
-                {merchant.address}{merchant.city ? `, ${merchant.city}` : ""}
+                {merchant.address ? `${merchant.address}${merchant.city ? `, ${merchant.city}` : ""}` : merchant.city}
               </span>
-            </div>
-          )}
-          {!merchant.address && merchant.city && (
-            <div className="flex items-center gap-2.5 text-sm text-[#0C1B2A] dark:text-white">
-              <div className="w-9 h-9 rounded-xl bg-[#00B4D8]/10 flex items-center justify-center">
-                <MapPin className="h-4 w-4 text-[#00B4D8]" />
-              </div>
-              <span className="font-medium">{merchant.city}</span>
-            </div>
+              <Navigation className="h-3.5 w-3.5 text-[#00B4D8] opacity-60 group-hover:opacity-100 transition-opacity" aria-label="Itinéraire" />
+            </a>
           )}
           {/* Book CTA (desktop) */}
           <div className="ml-auto hidden sm:block">
@@ -346,6 +382,79 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
           </div>
         </div>
       </div>
+
+      {/* At-a-glance: description teaser + opening hours / open-now status.
+          Surfaces the two highest-converting signals (proof of legitimacy
+          + availability) above the fold instead of burying them in tabs. */}
+      {(merchant.description || hasSchedule) && (
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {merchant.description && (
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4 sm:p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Info className="h-4 w-4 text-[#0066FF]" />
+                  <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    À propos
+                  </h2>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3">
+                  {merchant.description}
+                </p>
+                {merchant.description.length > 180 && (
+                  <a
+                    href="#infos"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#0066FF] hover:text-[#0052CC] mt-2"
+                  >
+                    Lire la suite
+                    <ChevronRight className="h-3 w-3" />
+                  </a>
+                )}
+              </div>
+            )}
+            {hasSchedule && (
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4 sm:p-5">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-[#0066FF]" />
+                    <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Horaires
+                    </h2>
+                  </div>
+                  <span
+                    className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${
+                      openStatus.isOpen
+                        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                        : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                    }`}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        openStatus.isOpen ? "bg-emerald-500 animate-pulse" : "bg-gray-400"
+                      }`}
+                    />
+                    {openStatus.isOpen ? "Ouvert" : "Fermé"}
+                  </span>
+                </div>
+                {openStatus.today.length > 0 ? (
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className="font-medium capitalize">{todayDayName}</span>
+                    {" — "}
+                    <span className="tabular-nums">
+                      {openStatus.today
+                        .map((s) => `${s.startTime} – ${s.endTime}`)
+                        .join(", ")}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Fermé aujourd&apos;hui
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Tab Navigation (anchor-based, no JS) */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
