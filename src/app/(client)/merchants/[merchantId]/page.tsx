@@ -25,7 +25,7 @@ const getMerchant = cache(async (merchantId: string) => {
     },
   });
 });
-import { MapPin, Phone, Star, Clock, ChevronRight, MessageSquare, Info, Briefcase, Calendar, Camera, Navigation } from "lucide-react";
+import { MapPin, Phone, Star, Clock, ChevronRight, MessageSquare, Info, Briefcase, Calendar, Camera, Navigation, BadgeCheck } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { ProBadge } from "@/components/ui/ProBadge";
 import { BackButton } from "@/components/ui/BackButton";
@@ -326,6 +326,14 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
                   </span>
                   <span className="text-white/60">
                     ({merchant._count.reviews} avis)
+                  </span>
+                </span>
+              )}
+              {merchant.plan === "PRO" && avgRating === 0 && (
+                <span className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                  <BadgeCheck className="h-3.5 w-3.5 text-emerald-300" />
+                  <span className="font-semibold text-white">
+                    Nouveau pro vérifié
                   </span>
                 </span>
               )}
