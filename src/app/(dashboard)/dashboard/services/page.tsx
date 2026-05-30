@@ -74,13 +74,16 @@ export default function DashboardServicesPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const payload = {
+    // Omettre les champs vides au lieu d'envoyer null — Zod côté serveur
+    // accepte `undefined`/absent mais pas `null` sur les String optional.
+    const payload: Record<string, string | number> = {
       name: form.name,
-      description: form.description || null,
       duration: Number(form.duration),
       price: Number(form.price),
-      xpAmount: form.xpAmount ? Number(form.xpAmount) : null,
     };
+    if (form.description.trim()) payload.description = form.description.trim();
+    if (form.xpAmount) payload.xpAmount = Number(form.xpAmount);
+
     const url = editingId
       ? `/api/dashboard/services?id=${editingId}`
       : "/api/dashboard/services";
@@ -98,7 +101,9 @@ export default function DashboardServicesPage() {
       resetForm();
       fetchServices();
     } else {
-      toast.error("Erreur");
+      // Surface l'erreur serveur réelle pour ne plus avoir d'« Erreur » opaque.
+      const data = await res.json().catch(() => ({}));
+      toast.error(data.error || "Erreur lors de l'enregistrement");
     }
     setSaving(false);
   }

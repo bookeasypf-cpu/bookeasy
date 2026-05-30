@@ -62,20 +62,39 @@ export type ReviewInput = z.infer<typeof reviewSchema>;
 // DASHBOARD — SERVICES
 // ─────────────────────────────────────────────
 
+// Defense in depth: les clients peuvent envoyer `null` pour les champs
+// optionnels (xpAmount vide, description vide). On accepte null + on
+// normalise vers undefined pour que Prisma reçoive du clean.
+const optionalServiceDescription = z
+  .string()
+  .max(500)
+  .nullable()
+  .optional()
+  .transform((v) => v ?? undefined);
+
+const optionalServiceXp = z.coerce
+  .number()
+  .int()
+  .min(1)
+  .max(100)
+  .nullable()
+  .optional()
+  .transform((v) => v ?? undefined);
+
 export const createServiceSchema = z.object({
   name: z.string().min(1, "Nom requis").max(100),
   duration: z.coerce.number().int().min(5, "Durée min. 5 min").max(480),
   price: z.coerce.number().min(0, "Prix invalide").max(10_000_000),
-  description: z.string().max(500).optional().default(""),
-  xpAmount: z.coerce.number().int().min(1).max(100).optional(),
+  description: optionalServiceDescription,
+  xpAmount: optionalServiceXp,
 });
 
 export const updateServiceSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   duration: z.coerce.number().int().min(5).max(480).optional(),
   price: z.coerce.number().min(0).max(10_000_000).optional(),
-  description: z.string().max(500).optional(),
-  xpAmount: z.coerce.number().int().min(1).max(100).optional(),
+  description: optionalServiceDescription,
+  xpAmount: optionalServiceXp,
 });
 
 // ─────────────────────────────────────────────
