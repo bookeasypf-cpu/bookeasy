@@ -3,8 +3,10 @@ import { waitUntil } from "@vercel/functions";
 import { prisma } from "@/lib/prisma";
 import { verifySignature, parseIPNData } from "@/lib/payzen";
 import { onBookingConfirmed } from "@/lib/booking-confirm";
-import { sendGiftCardEmail } from "@/lib/email";
+import { sendGiftCardEmail, sendProUpgradeConfirmation } from "@/lib/email";
 import { notifyAdminMarketingEvent } from "@/lib/marketing/notify";
+import { computePlanExpiresAt } from "@/lib/pricing";
+import { MAX_FOUNDER_SLOTS, type BillingCycle } from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
   try {
@@ -60,34 +62,97 @@ async function handleProSubscription(ipnData: ReturnType<typeof parseIPNData>) {
   switch (ipnData.transactionStatus) {
     case "AUTHORISED":
     case "CAPTURED": {
-      if (ipnData.merchantId) {
-        // Single update returns userId — eliminates redundant findUnique
-        const merchant = await prisma.merchant.update({
-          where: { id: ipnData.merchantId },
-          data: {
-            plan: "PRO",
-            planExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          },
-          select: { userId: true },
-        });
-        await prisma.notification.create({
-          data: {
-            userId: merchant.userId,
-            type: "SUBSCRIPTION",
-            title: "Abonnement Pro activé !",
-            message: "Votre abonnement Pro est maintenant actif. Profitez de tous les avantages !",
-          },
-        });
+      if (!ipnData.merchantId) break;
 
-        // Marketing : génère visuel premium + alerte Mara pour boost réseaux.
-        // waitUntil ensures Vercel doesn't kill the worker before the notify
-        // hook finishes (visual generation + admin alert can take 1-2s).
-        waitUntil(
-          notifyAdminMarketingEvent({ event: "upgrade", merchantId: ipnData.merchantId }).catch((err) => {
-            console.error("[PAYZEN-IPN] Marketing notify upgrade failed:", err instanceof Error ? err.message : err);
-          })
-        );
-      }
+      // Normalise le cycle reçu en métadonnée. Fallback MONTHLY pour la
+      // compat avec les anciens checkouts qui ne passaient pas le champ.
+      const cycle: BillingCycle =
+        ipnData.cycle === "YEARLY" ? "YEARLY" : "MONTHLY";
+      const planExpiresAt = computePlanExpiresAt(cycle);
+      const merchantId = ipnData.merchantId;
+
+      // Race-safe founder claim : la dernière place doit revenir au
+      // premier paiement IPN traité, pas au premier checkout initié.
+      // Transaction Serializable + recount empêche d'allouer une 11ème place.
+      let grantedFounder = false;
+      const result = await prisma.$transaction(
+        async (tx) => {
+          let isFounderPricing = false;
+          if (ipnData.founder) {
+            // L'IPN peut être rejouée; le merchant déjà fondateur reste fondateur,
+            // pas besoin de reclaim de place.
+            const current = await tx.merchant.findUnique({
+              where: { id: merchantId },
+              select: { isFounderPricing: true },
+            });
+            if (current?.isFounderPricing) {
+              isFounderPricing = true;
+            } else {
+              const taken = await tx.merchant.count({
+                where: { isFounderPricing: true },
+              });
+              if (taken < MAX_FOUNDER_SLOTS) {
+                isFounderPricing = true;
+              }
+            }
+          }
+          const updated = await tx.merchant.update({
+            where: { id: merchantId },
+            data: {
+              plan: "PRO",
+              planExpiresAt,
+              billingCycle: cycle,
+              ...(isFounderPricing ? { isFounderPricing: true } : {}),
+            },
+            select: { userId: true, isFounderPricing: true },
+          });
+          return updated;
+        },
+        { isolationLevel: "Serializable" }
+      );
+      grantedFounder = result.isFounderPricing && ipnData.founder;
+
+      await prisma.notification.create({
+        data: {
+          userId: result.userId,
+          type: "SUBSCRIPTION",
+          title: grantedFounder
+            ? "Abonnement Pro Fondateur activé !"
+            : "Abonnement Pro activé !",
+          message: grantedFounder
+            ? "Votre tarif Fondateur est bloqué à vie. Profitez de tous les avantages Pro !"
+            : "Votre abonnement Pro est maintenant actif. Profitez de tous les avantages !",
+        },
+      });
+
+      // Marketing : génère visuel premium + alerte Mara pour boost réseaux.
+      waitUntil(
+        notifyAdminMarketingEvent({ event: "upgrade", merchantId }).catch((err) => {
+          console.error("[PAYZEN-IPN] Marketing notify upgrade failed:", err instanceof Error ? err.message : err);
+        })
+      );
+
+      // Email confirmation Pro upgrade au marchand.
+      // Une query supplémentaire pour récupérer email + name —
+      // acceptable car uniquement à la confirmation paiement (rare).
+      waitUntil(
+        (async () => {
+          const m = await prisma.merchant.findUnique({
+            where: { id: merchantId },
+            select: { user: { select: { email: true, name: true } } },
+          });
+          if (!m?.user?.email) return;
+          await sendProUpgradeConfirmation({
+            to: m.user.email,
+            name: m.user.name ?? "",
+            cycle,
+            planExpiresAt,
+            isFounder: grantedFounder,
+          });
+        })().catch((err) => {
+          console.error("[PAYZEN-IPN] Pro upgrade email failed:", err instanceof Error ? err.message : err);
+        })
+      );
       break;
     }
     case "REFUSED":
@@ -99,7 +164,9 @@ async function handleProSubscription(ipnData: ReturnType<typeof parseIPNData>) {
       if (ipnData.merchantId) {
         await prisma.merchant.update({
           where: { id: ipnData.merchantId },
-          data: { plan: "FREE" },
+          // Ne touche pas isFounderPricing : le marchand fondateur garde
+          // son tarif bloqué à vie même après une expiration de plan.
+          data: { plan: "FREE", billingCycle: null },
         });
       }
       break;

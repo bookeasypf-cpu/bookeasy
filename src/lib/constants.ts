@@ -88,3 +88,35 @@ export const MAX_BOOKING_DAYS_AHEAD = 60;
 // PRO plan = unlimited. Used by the API guard, the dashboard UI,
 // and the pricing/CGU copy — keep these in sync.
 export const FREE_PLAN_MAX_SERVICES = 3;
+
+// ─────────────────────────────────────────────
+// PRO PRICING — source de vérité unique. Toute modif ici doit être
+// répercutée dans la copy CGU (article tarifs) et le mail outreach.
+// ─────────────────────────────────────────────
+
+/** Tarif Pro mensuel standard, en F CFP (XPF, entier — pas de centimes). */
+export const PRO_PRICE_MONTHLY_XPF = 8500;
+
+/** Tarif Pro annuel standard. Payez 10 mois, profitez 12 = 2 mois offerts. */
+export const PRO_PRICE_YEARLY_XPF = 85000;
+
+/**
+ * Remise tarif fondateur appliquée à vie aux 10 premiers commerçants Pro.
+ * 0.85 = -15%. Multiplie le prix standard au moment du checkout PayZen.
+ */
+export const FOUNDER_DISCOUNT_MULTIPLIER = 0.85;
+
+/** Nombre maximum de commerçants éligibles au tarif fondateur. */
+export const MAX_FOUNDER_SLOTS = 10;
+
+/** Tarif fondateur mensuel — déduit du standard. Affichage uniquement. */
+export const FOUNDER_PRICE_MONTHLY_XPF = Math.round(
+  PRO_PRICE_MONTHLY_XPF * FOUNDER_DISCOUNT_MULTIPLIER
+);
+
+/** Tarif fondateur annuel — déduit du standard. Affichage uniquement. */
+export const FOUNDER_PRICE_YEARLY_XPF = Math.round(
+  PRO_PRICE_YEARLY_XPF * FOUNDER_DISCOUNT_MULTIPLIER
+);
+
+export type BillingCycle = "MONTHLY" | "YEARLY";

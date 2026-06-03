@@ -116,6 +116,13 @@ model Merchant {
   coverImage   String?
   plan                  String   @default("FREE") // FREE or PRO
   planExpiresAt         DateTime?
+  // MONTHLY ou YEARLY — null pour FREE. Détermine la périodicité et le
+  // montant facturé à la prochaine échéance.
+  billingCycle          String?
+  // Tarif fondateur — bloqué à vie pour les 10 premiers commerçants Pro.
+  // Set à true par l'IPN PayZen uniquement si les slots sont encore
+  // dispos au moment du paiement. Garantit -15% à vie sur le cycle choisi.
+  isFounderPricing      Boolean  @default(false)
   paymentPolicy     String   @default("NONE") // NONE, FLEXIBLE, ONLINE_ONLY
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())

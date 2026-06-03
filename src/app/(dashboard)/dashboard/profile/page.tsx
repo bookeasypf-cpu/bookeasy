@@ -40,6 +40,8 @@ export default function DashboardProfilePage() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [plan, setPlan] = useState<string>("FREE");
   const [planExpiresAt, setPlanExpiresAt] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<"MONTHLY" | "YEARLY" | null>(null);
+  const [isFounderPricing, setIsFounderPricing] = useState(false);
   const [isMedical, setIsMedical] = useState(false);
   const [merchantId, setMerchantId] = useState<string | null>(null);
   const [paymentPolicy, setPaymentPolicy] = useState<string>("NONE");
@@ -80,6 +82,12 @@ export default function DashboardProfilePage() {
           });
           setPlan(profile.plan || "FREE");
           setPlanExpiresAt(profile.planExpiresAt || null);
+          setBillingCycle(
+            profile.billingCycle === "YEARLY" || profile.billingCycle === "MONTHLY"
+              ? profile.billingCycle
+              : null
+          );
+          setIsFounderPricing(profile.isFounderPricing === true);
           setIsMedical(profile.isMedical || false);
           setMerchantId(profile.id || null);
           setPaymentPolicy(profile.paymentPolicy || "NONE");
@@ -543,11 +551,21 @@ export default function DashboardProfilePage() {
                 )}
               </div>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-bold text-[#0C1B2A] dark:text-white">
                     Plan {plan === "PRO" ? "Pro" : "Gratuit"}
                   </h3>
                   {plan === "PRO" && <ProBadge size="sm" />}
+                  {plan === "PRO" && billingCycle && (
+                    <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#0066FF]/10 text-[#0066FF]">
+                      {billingCycle === "YEARLY" ? "Annuel" : "Mensuel"}
+                    </span>
+                  )}
+                  {plan === "PRO" && isFounderPricing && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-500/15 dark:to-orange-500/15 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
+                      🔥 Fondateur
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                   {plan === "PRO"
@@ -564,11 +582,16 @@ export default function DashboardProfilePage() {
               <div className="text-right shrink-0">
                 {planExpiresAt && (
                   <p className="text-xs text-gray-400">
-                    Valide jusqu&apos;au{" "}
+                    {billingCycle === "YEARLY" ? "Renouvellement annuel" : "Prochaine échéance"}
+                    {" "}
                     {new Date(planExpiresAt).toLocaleDateString("fr-FR")}
                   </p>
                 )}
-                <UpgradeButton className="!w-auto mt-1" />
+                {isFounderPricing && (
+                  <p className="text-[11px] text-amber-700 dark:text-amber-400 mt-0.5">
+                    Tarif -15% bloqué à vie
+                  </p>
+                )}
               </div>
             ) : (
               <UpgradeButton className="!w-auto" />

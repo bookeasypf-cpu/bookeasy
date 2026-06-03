@@ -23,9 +23,12 @@ if (!PAYZEN_CONFIGURED) {
   console.warn("⚠️ PayZen non configuré — paiement désactivé");
 }
 
-// Prix de l'abonnement Pro
-export const PRO_PRICE_XPF = 7800;
-export const PRO_PRICE_DISPLAY = "7 800 F CFP";
+// Prix standard mensuel Pro. Maintenu pour la compat avec
+// /api/marketing/stats (calcul MRR). La source de vérité tarifaire vit
+// dans @/lib/constants (PRO_PRICE_MONTHLY_XPF / PRO_PRICE_YEARLY_XPF)
+// et les calculs réels d'upgrade passent par @/lib/pricing.computeProPrice.
+export const PRO_PRICE_XPF = 8500;
+export const PRO_PRICE_DISPLAY = "8 500 F CFP";
 
 // URL de la plateforme PayZen by OSB
 const PAYZEN_URL = "https://secure.osb.pf/vads-payment/";
@@ -77,9 +80,14 @@ function generateTransId(): string {
 interface PaymentFormParams {
   merchantId: string;
   merchantEmail: string;
-  amount: number; // en XPF (ex: 7800)
+  amount: number; // en XPF (ex: 8500)
   orderId: string;
   isSubscription?: boolean;
+  /**
+   * Métadonnées sérialisées dans vads_ext_info_* et relues par l'IPN.
+   * Limite stricte PayZen : ~255 chars par champ, valeurs string seulement.
+   */
+  extra?: Record<string, string>;
 }
 
 interface BookingPaymentParams {
@@ -126,6 +134,14 @@ export function createPaymentForm(params: PaymentFormParams): {
     vads_ext_info_merchantId: params.merchantId,
     vads_ext_info_type: "PRO_SUBSCRIPTION",
   };
+
+  // Métadonnées additionnelles (cycle de facturation, tarif fondateur…)
+  // Préfixées vads_ext_info_ pour passer la signature PayZen.
+  if (params.extra) {
+    for (const [key, value] of Object.entries(params.extra)) {
+      fields[`vads_ext_info_${key}`] = value;
+    }
+  }
 
   // Pour les abonnements récurrents, PayZen utilise un mode spécial
   if (params.isSubscription) {
@@ -244,5 +260,8 @@ export function parseIPNData(body: Record<string, string>) {
     transId: body.vads_trans_id,
     authResult: body.vads_auth_result,
     paymentType: body.vads_payment_config,
+    // Pro subscription metadata (read in handleProSubscription)
+    cycle: body.vads_ext_info_cycle, // "MONTHLY" | "YEARLY" | undefined
+    founder: body.vads_ext_info_founder === "1",
   };
 }

@@ -3,8 +3,21 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import type { BillingCycle } from "@/lib/constants";
 
-export function UpgradeButton({ className = "" }: { className?: string }) {
+interface UpgradeButtonProps {
+  className?: string;
+  cycle?: BillingCycle;
+  applyFounderPricing?: boolean;
+  label?: string;
+}
+
+export function UpgradeButton({
+  className = "",
+  cycle = "MONTHLY",
+  applyFounderPricing = false,
+  label = "Choisir Pro",
+}: UpgradeButtonProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
@@ -12,7 +25,11 @@ export function UpgradeButton({ className = "" }: { className?: string }) {
   async function handleUpgrade() {
     setLoading(true);
     try {
-      const res = await fetch("/api/payzen/checkout", { method: "POST" });
+      const res = await fetch("/api/payzen/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cycle, applyFounderPricing }),
+      });
       const data = await res.json();
 
       if (data.actionUrl && data.fields) {
@@ -59,7 +76,7 @@ export function UpgradeButton({ className = "" }: { className?: string }) {
             Redirection...
           </>
         ) : (
-          "Choisir Pro"
+          label
         )}
       </button>
     </>

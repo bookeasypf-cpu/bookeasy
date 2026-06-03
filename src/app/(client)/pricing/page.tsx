@@ -1,11 +1,16 @@
-import Link from "next/link";
-import { Check, Star, Zap, ArrowRight } from "lucide-react";
+import { Check, Zap, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
-import { UpgradeButton } from "@/components/ui/UpgradeButton";
 import { QuickRegisterForm } from "@/components/ui/QuickRegisterForm";
 import { FAQ } from "@/components/ui/FAQ";
 import { FAQPageJsonLd } from "@/lib/jsonld";
 import { ROICalculator } from "@/components/ui/ROICalculator";
+import { PricingProCard } from "@/components/pricing/PricingProCard";
+import { getFounderSlotsLeft } from "@/lib/pricing";
+
+// Founder slots count + plan availability dépendent de la DB → revalider
+// à chaque visite (impossible de cacher statiquement sans afficher des
+// places fantômes après que le 10e slot soit pris).
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Tarifs - BookEasy",
@@ -13,59 +18,30 @@ export const metadata: Metadata = {
     "Découvrez les tarifs BookEasy pour les professionnels. Commencez gratuitement et évoluez selon vos besoins.",
 };
 
-const plans = [
-  {
-    name: "Gratuit",
-    price: "0",
-    period: "pour toujours",
-    description: "Parfait pour démarrer et tester la plateforme.",
-    icon: Zap,
-    color: "#0066FF",
-    features: [
-      "Profil professionnel complet",
-      "Jusqu'à 3 services",
-      "Gestion des réservations",
-      "Calendrier intégré",
-      "Notifications email",
-      "Visibilité sur la carte + Google",
-      "Notifications push (PWA mobile)",
-      "Réception de cartes cadeaux clients",
-    ],
-    cta: "Commencer gratuitement",
-    // /register only creates CLIENT accounts. Anchor jumps to the
-    // QuickRegisterForm below, which calls /api/quick-register (MERCHANT path).
-    href: "#inscription-pro",
-    popular: false,
-  },
-  {
-    name: "Pro",
-    price: "7 800",
-    period: "F CFP / mois",
-    description: "Pour les professionnels qui veulent se démarquer.",
-    icon: Star,
-    color: "#0066FF",
-    features: [
-      "Tout du plan Gratuit",
-      "Services illimités",
-      "Avis clients & notes étoiles affichés sur votre fiche",
-      "Mise en avant prioritaire dans les recherches",
-      "Badge « Pro vérifié » sur votre fiche",
-      "Visuel personnalisé au partage social (WhatsApp, Facebook)",
-      "Référencement enrichi Google & moteurs IA (ChatGPT, Perplexity)",
-      "Dashboard analytics complet (revenus, top services, fréquentation)",
-      "Rappels email automatiques aux clients (J-1)",
-      "Programme fidélité XP personnalisable",
-      "Multi-employés & agenda par collaborateur (bientôt)",
-      "Support prioritaire",
-    ],
-    cta: "Choisir Pro",
-    // All pro signups go through QuickRegisterForm on this same page —
-    // the user creates a FREE merchant account first, then upgrades
-    // from the dashboard. /register?role=MERCHANT was a dead URL
-    // (register/page.tsx ignores the param and creates a CLIENT).
-    href: "#inscription-pro",
-    popular: true,
-  },
+const proFeatures = [
+  "Tout du plan Gratuit",
+  "Services illimités",
+  "Avis clients & notes étoiles affichés sur votre fiche",
+  "Mise en avant prioritaire dans les recherches",
+  "Badge « Pro vérifié » sur votre fiche",
+  "Visuel personnalisé au partage social (WhatsApp, Facebook)",
+  "Référencement enrichi Google & moteurs IA (ChatGPT, Perplexity)",
+  "Dashboard analytics complet (revenus, top services, fréquentation)",
+  "Rappels email automatiques aux clients (J-1)",
+  "Programme fidélité XP personnalisable",
+  "Multi-employés & agenda par collaborateur (bientôt)",
+  "Support prioritaire",
+];
+
+const freeFeatures = [
+  "Profil professionnel complet",
+  "Jusqu'à 3 services",
+  "Gestion des réservations",
+  "Calendrier intégré",
+  "Notifications email",
+  "Visibilité sur la carte + Google",
+  "Notifications push (PWA mobile)",
+  "Réception de cartes cadeaux clients",
 ];
 
 const faqs = [
@@ -87,7 +63,8 @@ const faqs = [
   },
 ];
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const founderSlotsLeft = await getFounderSlotsLeft();
   return (
     <>
       {/* Hero */}
@@ -105,86 +82,51 @@ export default function PricingPage() {
 
       {/* Plans */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
-          {plans.map((plan) => {
-            const Icon = plan.icon;
-            return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto items-stretch">
+          {/* Free plan — static card */}
+          <div className="relative rounded-2xl bg-white dark:bg-gray-900 p-6 sm:p-8 flex flex-col border border-gray-200 dark:border-gray-800 shadow-md shadow-gray-200/40 dark:shadow-gray-900/50">
+            <div className="flex items-center gap-3 mb-4">
               <div
-                key={plan.name}
-                className={`relative rounded-2xl bg-white dark:bg-gray-900 p-6 sm:p-8 flex flex-col ${
-                  plan.popular
-                    ? "border-2 border-[#0066FF] shadow-xl shadow-[#0066FF]/10 scale-[1.02] md:scale-105"
-                    : "border border-gray-200 dark:border-gray-800 shadow-md shadow-gray-200/40 dark:shadow-gray-900/50"
-                }`}
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg, #0066FF15, #0066FF25)" }}
               >
-                {plan.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="bg-[#0066FF] text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
-                      Recommandé
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex items-center gap-3 mb-4">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{
-                      background: `linear-gradient(135deg, ${plan.color}15, ${plan.color}25)`,
-                    }}
-                  >
-                    <Icon
-                      className="h-5 w-5"
-                      style={{ color: plan.color }}
-                    />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                    {plan.name}
-                  </h3>
-                </div>
-
-                <div className="mb-2">
-                  <span className="text-4xl font-bold text-gray-900 dark:text-white">
-                    {plan.price}
-                  </span>
-                  <span className="text-gray-500 dark:text-gray-400 ml-1 text-sm">
-                    {plan.period}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                  {plan.description}
-                </p>
-
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300"
-                    >
-                      <Check
-                        className="h-4 w-4 shrink-0 mt-0.5"
-                        style={{ color: plan.color }}
-                      />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-
-                {plan.popular ? (
-                  <UpgradeButton />
-                ) : (
-                  // Native <a> for hash hrefs — Next.js <Link> on Next 16 does
-                  // not always trigger browser scroll-to-anchor when the path
-                  // is unchanged. <a href="#..."> reliably scrolls.
-                  <a
-                    href={plan.href}
-                    className="w-full py-3 px-4 rounded-xl text-center font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 block"
-                  >
-                    {plan.cta}
-                  </a>
-                )}
+                <Zap className="h-5 w-5 text-[#0066FF]" />
               </div>
-            );
-          })}
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Gratuit</h3>
+            </div>
+            <div className="mb-2">
+              <span className="text-4xl font-bold text-gray-900 dark:text-white">0</span>
+              <span className="text-gray-500 dark:text-gray-400 ml-1 text-sm">pour toujours</span>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              Parfait pour démarrer et tester la plateforme.
+            </p>
+            <ul className="space-y-3 mb-8 flex-1">
+              {freeFeatures.map((feature) => (
+                <li
+                  key={feature}
+                  className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300"
+                >
+                  <Check className="h-4 w-4 shrink-0 mt-0.5 text-[#0066FF]" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            {/* Native <a> for hash href — Next.js <Link> on Next 16 doesn't
+                always trigger browser scroll when path is unchanged. */}
+            <a
+              href="#inscription-pro"
+              className="w-full py-3 px-4 rounded-xl text-center font-semibold text-sm transition-all duration-200 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 block"
+            >
+              Commencer gratuitement
+            </a>
+          </div>
+
+          {/* Pro plan — client component (toggle Mensuel/Annuel + founder) */}
+          <PricingProCard
+            founderSlotsLeft={founderSlotsLeft}
+            features={proFeatures}
+          />
         </div>
       </div>
 
