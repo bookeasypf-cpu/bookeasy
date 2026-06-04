@@ -29,6 +29,32 @@ export function PricingProCard({
   const founderAvailable = founderSlotsLeft > 0;
   const applyFounderPricing = founderAvailable;
 
+  // Scarcité progressive — testée pour maximiser la conversion sans
+  // déclencher de "compte rond = pas urgent" ni "personne n'a acheté
+  // = produit pas validé". Source: A/B tests SaaS classiques sur le
+  // framing de la rareté.
+  //   10/10  → on cache le ratio, on annonce l'exclusivité
+  //   7-9    → ratio visible (urgence émergente)
+  //   1-6    → "X places !" avec animation pulse (peur de rater)
+  //   0      → bloc retiré (géré par founderAvailable au render)
+  function getFounderBanner(slotsLeft: number): {
+    text: string;
+    pulse: boolean;
+  } | null {
+    if (slotsLeft <= 0) return null;
+    if (slotsLeft === MAX_FOUNDER_SLOTS) {
+      return { text: "Tarif Fondateur — exclusif aux 10 premiers", pulse: false };
+    }
+    if (slotsLeft >= 7) {
+      return { text: `Tarif Fondateur — plus que ${slotsLeft}/${MAX_FOUNDER_SLOTS}`, pulse: false };
+    }
+    return {
+      text: `Tarif Fondateur — plus que ${slotsLeft} ${slotsLeft === 1 ? "place" : "places"} !`,
+      pulse: true,
+    };
+  }
+  const founderBanner = getFounderBanner(founderSlotsLeft);
+
   const standardPrice =
     cycle === "YEARLY" ? PRO_PRICE_YEARLY_XPF : PRO_PRICE_MONTHLY_XPF;
   const founderPrice =
@@ -85,11 +111,18 @@ export function PricingProCard({
         </button>
       </div>
 
-      {/* Founder banner — n'apparaît QUE si des places restent */}
-      {founderAvailable && (
-        <div className="mb-3 inline-flex items-center self-start gap-1.5 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-bold px-2.5 py-1 rounded-full">
+      {/* Founder banner — scarcité progressive (cf. getFounderBanner).
+          Disparait quand les 10 places sont prises. */}
+      {founderBanner && (
+        <div
+          className={`mb-3 inline-flex items-center self-start gap-1.5 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 border text-amber-800 dark:text-amber-300 text-xs font-bold px-2.5 py-1 rounded-full ${
+            founderBanner.pulse
+              ? "border-amber-400 dark:border-amber-400/50 shadow-sm shadow-amber-300/40 animate-pulse"
+              : "border-amber-200 dark:border-amber-500/20"
+          }`}
+        >
           <Flame className="h-3 w-3" />
-          Tarif Fondateur — plus que {founderSlotsLeft} / {MAX_FOUNDER_SLOTS} places
+          {founderBanner.text}
         </div>
       )}
 
