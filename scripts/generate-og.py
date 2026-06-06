@@ -1,6 +1,6 @@
 """Generate OG image for BookEasy — Pacific Precision philosophy.
 
-Output: public/og-default.jpg (1200x630, JPG, <200KB)
+Output: public/og-cover.jpg (1200x630, JPG, <200KB)
 """
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import os
@@ -12,7 +12,7 @@ import math
 W, H = 1200, 630
 FONTS = "/Users/maravai/.claude/skills/canvas-design/canvas-fonts"
 OUT_DIR = "/Users/maravai/Downloads/Claude-Projects/projects/bookeasy/public"
-OUT_JPG = f"{OUT_DIR}/og-default.jpg"
+OUT_JPG = f"{OUT_DIR}/og-cover.jpg"
 
 # Color palette — Pacific Precision
 INK_DEEP      = (10, 22, 42)        # abyssal blue (top)
