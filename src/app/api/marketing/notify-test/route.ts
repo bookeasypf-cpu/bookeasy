@@ -3,16 +3,14 @@
  * Usage : POST /api/marketing/notify-test
  *   Body JSON : { merchantId: string, event: "welcome" | "upgrade" }
  *
- * Protégé : nécessite NEXTAUTH_SECRET en header X-Admin-Key
- * À utiliser depuis l'admin marketing pour tester le pipeline sans
- * créer de vrai signup ou attendre un vrai upgrade.
+ * Protégé : nécessite ADMIN_API_KEY en header X-Admin-Key (timingSafeEqual).
  */
 import { NextRequest, NextResponse } from "next/server";
 import { notifyAdminMarketingEvent, type MarketingEvent } from "@/lib/marketing/notify";
+import { isValidAdminKey } from "@/lib/admin-auth";
 
 export async function POST(req: NextRequest) {
-  const adminKey = req.headers.get("x-admin-key");
-  if (!adminKey || adminKey !== process.env.NEXTAUTH_SECRET) {
+  if (!isValidAdminKey(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

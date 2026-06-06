@@ -424,7 +424,7 @@ export default function DashboardProfilePage() {
                 Photo de couverture
               </p>
               <p className="text-xs text-gray-300 mt-1">
-                Cliquez ou glissez-deposez une image
+                Cliquez ou glissez-déposez une image
               </p>
             </div>
           )}
@@ -705,7 +705,7 @@ export default function DashboardProfilePage() {
                 htmlFor="sectorId"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
-                {isMedical ? "Specialite" : "Secteur"}
+                {isMedical ? "Spécialité" : "Secteur"}
               </label>
               <select
                 id="sectorId"
@@ -745,14 +745,14 @@ export default function DashboardProfilePage() {
                 rows={4}
                 placeholder={
                   isMedical
-                    ? "Decrivez votre pratique, vos specialites..."
-                    : "Decrivez votre activite..."
+                    ? "Décrivez votre pratique, vos spécialités..."
+                    : "Décrivez votre activité..."
                 }
               />
             </div>
             <Input
               id="phone"
-              label="Telephone"
+              label="Téléphone"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />

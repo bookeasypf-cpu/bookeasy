@@ -11,6 +11,11 @@ import { ReviewForm } from "./ReviewForm";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Mes rendez-vous | BookEasy",
+  robots: { index: false, follow: false },
+};
+
 export default async function MyBookingsPage() {
   const session = await getSession();
   if (!session?.user) redirect("/login");

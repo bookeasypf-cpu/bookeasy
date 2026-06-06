@@ -228,17 +228,19 @@ export default async function BookingConfirmationPage({
         className="animate-fade-in-up flex flex-col sm:flex-row gap-3 mt-8 w-full max-w-md"
         style={{ animationDelay: "0.3s" }}
       >
-        <Link href="/my-bookings" className="flex-1">
-          <button className="btn-press w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white font-semibold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all text-sm">
-            <CalendarCheck className="h-4 w-4" />
-            Voir mes rendez-vous
-          </button>
+        <Link
+          href="/my-bookings"
+          className="btn-press flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#0066FF] to-[#00B4D8] text-white font-semibold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all text-sm"
+        >
+          <CalendarCheck className="h-4 w-4" />
+          Voir mes rendez-vous
         </Link>
-        <Link href="/" className="flex-1">
-          <button className="btn-press w-full inline-flex items-center justify-center gap-2 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-[#0C1B2A] dark:text-white font-semibold px-6 py-3.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 transition-all text-sm">
-            <Home className="h-4 w-4" />
-            Retour à l&apos;accueil
-          </button>
+        <Link
+          href="/"
+          className="btn-press flex-1 inline-flex items-center justify-center gap-2 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-[#0C1B2A] dark:text-white font-semibold px-6 py-3.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 transition-all text-sm"
+        >
+          <Home className="h-4 w-4" />
+          Retour à l&apos;accueil
         </Link>
       </div>
     </div>

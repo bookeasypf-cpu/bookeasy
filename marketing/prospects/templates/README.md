@@ -1,17 +1,23 @@
 # 📨 Templates Outreach BookEasy
 
-**6 templates** segmentés par cluster métier — couvrent les 16 secteurs de la base prospects (631 leads).
+**3 templates actifs** segmentés par cluster métier — couvrent les secteurs non-médicaux.
+**3 templates archivés** (santé) en attente certification HDS — voir [`_archive-medical/`](./_archive-medical/).
 
-## 🗂️ Index
+## 🗂️ Index — Actifs
 
 | # | Template | Cible | Volume | Angle |
 |---|---|---|---|---|
 | 01 | [Beauté / Body](./01-beaute-body.md) | Tatoueurs · Barbers · Coiffeurs · Ongleries · Maquilleuses | ~141 | Stop no-shows + acompte PayZen |
 | 02 | [Bien-être premium](./02-bien-etre-premium.md) | Spas · Instituts · Coachs | ~68 | Gift cards XPF + fidélité XP |
-| 03 | [Santé libéral](./03-sante-liberal.md) | Kinés · Ostéos · Sages-femmes · Podologues | ~180 | RGPD + rappels SMS + liste attente |
-| 04 | [Santé cabinet](./04-sante-cabinet.md) | Dentistes · Médecins gé | ~58 | Alternative Doctolib, forfait fixe |
-| 05 | [Infirmiers libéraux](./05-infirmiers-liberaux.md) | IDE libéraux (164 OIPF) | 164 | Tournée optimisée + facturation CPS |
 | 06 | [Créatifs / Photographes](./06-creatifs-photographes.md) | Photographes mariage/portrait | 20 | Acompte international + galerie privée |
+
+## 📦 Archivés — Santé (Art. L.1111-8 CSP — voir [`_archive-medical/README.md`](./_archive-medical/README.md))
+
+| # | Template | Cible | Statut |
+|---|---|---|---|
+| 03 | Santé libéral (Kinés · Ostéos · Sages-femmes · Podologues) | ARCHIVÉ — non démarché |
+| 04 | Santé cabinet (Dentistes · Médecins) | ARCHIVÉ — non démarché |
+| 05 | Infirmiers libéraux | ARCHIVÉ — non démarché |
 
 ## 📦 Chaque template contient
 

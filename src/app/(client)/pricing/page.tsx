@@ -13,9 +13,21 @@ import { getFounderSlotsLeft } from "@/lib/pricing";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Tarifs - BookEasy",
+  title: "Tarifs professionnels — Gratuit & Pro | BookEasy Polynésie",
   description:
-    "Découvrez les tarifs BookEasy pour les professionnels. Commencez gratuitement et évoluez selon vos besoins.",
+    "Tarifs BookEasy pour les professionnels en Polynésie française. Plan Gratuit pour démarrer, Plan Pro avec analytics, avis clients et mise en avant. Tarif fondateur disponible.",
+  alternates: { canonical: "https://bookeasy.me/pricing" },
+  openGraph: {
+    title: "Tarifs Pro — BookEasy Polynésie",
+    description:
+      "Plan Gratuit & Plan Pro pour professionnels en Polynésie française. Tarif fondateur en cours.",
+    url: "https://bookeasy.me/pricing",
+    siteName: "BookEasy",
+    locale: "fr_FR",
+    type: "website",
+    images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
+  },
+  twitter: { card: "summary_large_image", images: ["/og-default.jpg"] },
 };
 
 const proFeatures = [

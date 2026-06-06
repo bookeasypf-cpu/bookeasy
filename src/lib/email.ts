@@ -37,6 +37,19 @@ const BASE_URL = process.env.NEXTAUTH_URL || "https://bookeasy.me";
 const REPLY_TO = process.env.SUPPORT_EMAIL || "bookeasy.pf@gmail.com";
 
 /**
+ * Mask a recipient address for log output. Keeps just enough to
+ * help debugging while avoiding RGPD-sensitive PII in Vercel logs.
+ * Example: "marechal.parau@gmail.com" -> "mar***@gmail.com"
+ */
+function maskEmail(addr: string | null | undefined): string {
+  if (!addr) return "";
+  const [local, domain] = addr.split("@");
+  if (!domain) return "***";
+  const head = (local ?? "").slice(0, 3);
+  return `${head}***@${domain}`;
+}
+
+/**
  * Escape HTML to prevent XSS injection via user-controlled fields
  * (clientName, merchantName, serviceName, message, subject, etc.)
  * MUST be applied to every interpolated user value in email templates.
@@ -95,9 +108,17 @@ function layout(content: string) {
       ${content}
     </div>
     <!-- Footer -->
-    <div style="text-align:center;margin-top:24px;color:#9ca3af;font-size:12px;">
+    <div style="text-align:center;margin-top:24px;color:#9ca3af;font-size:12px;line-height:1.5;">
       <p style="margin:0;">BookEasy &mdash; Réservation en ligne en Polynésie française</p>
-      <p style="margin:4px 0 0;">Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+      <p style="margin:4px 0 0;">N° TAHITI D11783 &middot; RCS 26 270 A R.C.S. Papeete</p>
+      <p style="margin:8px 0 0;">
+        <a href="${BASE_URL}/profile" style="color:#6b7280;text-decoration:underline;">Gérer mes notifications</a>
+        &nbsp;&middot;&nbsp;
+        <a href="${BASE_URL}/legal/cgu" style="color:#6b7280;text-decoration:underline;">CGU</a>
+        &nbsp;&middot;&nbsp;
+        <a href="${BASE_URL}/legal/confidentialite" style="color:#6b7280;text-decoration:underline;">Confidentialité</a>
+      </p>
+      <p style="margin:8px 0 0;font-size:11px;">Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
     </div>
   </div>
 </body>
@@ -513,8 +534,12 @@ export async function sendMerchantWelcome(to: string, name: string) {
       subject: "🎉 Bienvenue sur BookEasy Pro",
       html,
       text: htmlToText(html),
+      headers: {
+        "List-Unsubscribe": `<mailto:${REPLY_TO}?subject=Unsubscribe>, <${BASE_URL}/profile>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
-    console.log("[EMAIL] Merchant welcome sent:", JSON.stringify({ to, id: result.data?.id, error: result.error?.message }));
+    console.log("[EMAIL] Merchant welcome sent:", JSON.stringify({ to: maskEmail(to), id: result.data?.id, error: result.error?.message }));
   } catch (err) {
     console.error("[EMAIL] Failed to send merchant welcome:", err instanceof Error ? err.message : err);
   }
@@ -603,73 +628,14 @@ export async function sendProUpgradeConfirmation(data: ProUpgradeData) {
         : `🚀 Abonnement Pro ${cycleLabel} activé — BookEasy`,
       html,
       text: htmlToText(html),
+      headers: {
+        "List-Unsubscribe": `<mailto:${REPLY_TO}?subject=Unsubscribe>, <${BASE_URL}/profile>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
-    console.log("[EMAIL] Pro upgrade sent:", JSON.stringify({ to: data.to, id: result.data?.id, error: result.error?.message }));
+    console.log("[EMAIL] Pro upgrade sent:", JSON.stringify({ to: maskEmail(data.to), id: result.data?.id, error: result.error?.message }));
   } catch (err) {
     console.error("[EMAIL] Failed to send pro upgrade:", err instanceof Error ? err.message : err);
-  }
-}
-
-/**
- * @deprecated Replaced by sendMerchantWelcome (no credentials in email).
- * Kept for any legacy code path; will be removed once verified unused.
- */
-export async function sendMerchantCredentials(to: string, name: string, tempPassword: string) {
-  if (!resend) {
-    console.log("[EMAIL] Resend not configured – skipping credentials email");
-    return;
-  }
-  if (!(await canSendTo(to))) {
-    console.log("[EMAIL] Skipped credentials — recipient bounced or complained");
-    return;
-  }
-
-  const html = layout(`
-    <div style="background:linear-gradient(135deg,#0066FF,#00B4D8);padding:40px 24px;text-align:center;">
-      <div style="font-size:48px;margin-bottom:12px;">🔐</div>
-      <h1 style="color:#fff;font-size:24px;margin:0;font-weight:700;">Votre compte professionnel</h1>
-      <p style="color:rgba(255,255,255,0.85);font-size:15px;margin:10px 0 0;">Vos identifiants de connexion</p>
-    </div>
-    <div style="padding:24px;">
-      <p style="margin:0 0 16px;color:#374151;font-size:14px;">Ia ora na <strong>${esc(name)}</strong> 👋</p>
-      <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;">
-        Votre compte professionnel BookEasy a été créé. Voici vos identifiants de connexion :
-      </p>
-      <div style="background:#f0f7ff;border-radius:12px;padding:20px;margin-bottom:20px;">
-        <table style="width:100%;border-collapse:collapse;font-size:14px;">
-          <tr>
-            <td style="padding:8px 0;color:#9ca3af;width:120px;">Email</td>
-            <td style="padding:8px 0;color:#0C1B2A;font-weight:600;">${esc(to)}</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;color:#9ca3af;">Mot de passe</td>
-            <td style="padding:8px 0;color:#0C1B2A;font-weight:700;font-family:monospace;font-size:16px;letter-spacing:1px;">${esc(tempPassword)}</td>
-          </tr>
-        </table>
-      </div>
-      <div style="background:#fef3c7;border-radius:12px;padding:16px;margin-bottom:20px;">
-        <p style="margin:0;color:#92400e;font-size:13px;line-height:1.5;">
-          ⚠️ <strong>Changez votre mot de passe</strong> dès votre première connexion pour sécuriser votre compte.
-        </p>
-      </div>
-      <div style="text-align:center;margin-top:8px;">
-        <a href="${BASE_URL}/login" style="display:inline-block;background:linear-gradient(135deg,#0066FF,#00B4D8);color:#fff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:600;font-size:15px;">Se connecter</a>
-      </div>
-    </div>
-  `);
-
-  try {
-    const result = await resend.emails.send({
-      from: FROM,
-      replyTo: REPLY_TO,
-      to,
-      subject: "🎉 Bienvenue sur BookEasy Pro — vos identifiants",
-      html,
-      text: htmlToText(html),
-    });
-    console.log("[EMAIL] Merchant welcome+credentials sent:", JSON.stringify({ to, id: result.data?.id, error: result.error?.message }));
-  } catch (err) {
-    console.error("[EMAIL] Failed to send credentials:", err instanceof Error ? err.message : err);
   }
 }
 
@@ -885,7 +851,7 @@ export async function sendNewBookingMerchant(data: NewBookingMerchantData) {
     return;
   }
 
-  const dateFormatted = new Date(data.date).toLocaleDateString("fr-FR", {
+  const dateFormatted = new Date(data.date + "T00:00:00").toLocaleDateString("fr-FR", {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
   const priceFormatted = data.price.toLocaleString("fr-FR") + " F CFP";

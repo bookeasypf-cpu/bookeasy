@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { decryptPatientNote } from "@/lib/patient-notes-crypto";
+import { exportLimiter, checkRateLimit, formatRateLimitError } from "@/lib/ratelimit";
 
 export async function GET() {
   const session = await getSession();
@@ -11,6 +12,14 @@ export async function GET() {
 
   const userId = session.user.id;
   const userEmail = session.user.email;
+
+  const { success, resetIn } = await checkRateLimit(exportLimiter, `export-${userId}`);
+  if (!success) {
+    return NextResponse.json(
+      { error: formatRateLimitError(resetIn, "exports de données") },
+      { status: 429 }
+    );
+  }
 
   // Strip gift card codes from booking.notes (legacy storage of secret codes)
   const stripGiftCardCodes = (notes: string | null) =>

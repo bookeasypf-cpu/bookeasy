@@ -65,7 +65,8 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.balance - a.balance);
 
     return NextResponse.json(balances);
-  } catch {
+  } catch (err) {
+    console.error("[xp/balance] error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

@@ -1,12 +1,25 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import MapViewLoader from "@/components/map/MapViewLoader";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Explorer la carte | BookEasy",
+export const metadata: Metadata = {
+  title: "Carte des professionnels en Polynésie française | BookEasy",
   description:
-    "Trouvez les meilleurs professionnels autour de vous en Polynésie française.",
+    "Explorez la carte interactive des professionnels BookEasy en Polynésie française. Coiffeurs, spas, instituts à Tahiti, Moorea, Bora-Bora et plus.",
+  alternates: { canonical: "https://bookeasy.me/map" },
+  openGraph: {
+    title: "Carte des professionnels — BookEasy Polynésie",
+    description:
+      "Explorez la carte interactive des professionnels BookEasy en Polynésie française.",
+    url: "https://bookeasy.me/map",
+    siteName: "BookEasy",
+    locale: "fr_FR",
+    type: "website",
+    images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
+  },
+  twitter: { card: "summary_large_image", images: ["/og-default.jpg"] },
 };
 
 interface MapPageProps {

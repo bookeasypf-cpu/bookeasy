@@ -63,7 +63,8 @@ export async function GET(request: NextRequest) {
     }));
 
     return NextResponse.json({ bookings: result });
-  } catch {
+  } catch (err) {
+    console.error("[calendar GET] error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

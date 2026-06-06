@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
-  title: "BookEasy — Réservation en ligne en Polynésie française | Tahiti",
+  title: "BookEasy — Réservation en ligne en Polynésie française",
   description:
-    "Réservez en ligne 24h/24 vos rendez-vous beauté, bien-être, santé et services partout en Polynésie française. Coiffeurs, spas, médecins, kinés, garages : tout réserver en quelques clics.",
+    "Réservez en ligne 24h/24 vos rendez-vous beauté, bien-être et services partout en Polynésie française. Coiffeurs, spas, instituts et plus en quelques clics.",
   alternates: { canonical: "https://bookeasy.me" },
   openGraph: {
     title: "BookEasy — Réservation en ligne en Polynésie française",
@@ -14,8 +14,12 @@ export const metadata: Metadata = {
     siteName: "BookEasy",
     locale: "fr_FR",
     type: "website",
+    images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og-default.jpg"],
+  },
 };
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -46,7 +50,11 @@ import { FAQ } from "@/components/ui/FAQ";
 import { FAQPageJsonLd } from "@/lib/jsonld";
 import Link from "next/link";
 
-export const dynamic = "force-dynamic";
+// Cache homepage for 5 minutes. The sector list, active merchant counts and
+// featured cards rarely change minute-to-minute; serving from cache shaves
+// 300–500 ms off TTFB compared to force-dynamic + 5 parallel Prisma calls
+// on every visit (Tahiti is ~200 ms RTT from us-east Neon).
+export const revalidate = 300;
 
 export default async function HomePage() {
   const [sectors, merchants, activeMerchantCount, activeSectorCount, recentReviews] = await Promise.all([

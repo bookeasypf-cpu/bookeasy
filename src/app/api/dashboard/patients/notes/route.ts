@@ -34,7 +34,8 @@ export async function GET(request: NextRequest) {
     }));
 
     return NextResponse.json({ notes });
-  } catch {
+  } catch (err) {
+    console.error("[patients/notes GET] error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -81,7 +82,8 @@ export async function POST(request: NextRequest) {
     // Return decrypted content so the client doesn't see ciphertext
     const note = { ...created, content: trimmed };
     return NextResponse.json({ note });
-  } catch {
+  } catch (err) {
+    console.error("[patients/notes POST] error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -116,7 +118,8 @@ export async function DELETE(request: NextRequest) {
     await prisma.patientNote.delete({ where: { id: noteId } });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error("[patients/notes DELETE] error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

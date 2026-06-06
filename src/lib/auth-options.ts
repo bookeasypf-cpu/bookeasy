@@ -122,34 +122,50 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
+      // Initial login — hydrate the token from the authorize() payload.
       if (user) {
         token.id = user.id;
+        token.name = user.name;
         token.image = user.image;
         token.role = (user as { role: string }).role || "CLIENT";
+        token.refreshedAt = Date.now();
+        return token;
       }
+
+      // Explicit refresh (called via update() from the client after a
+      // profile mutation) OR stale token (>5 min). Cap the DB hits to
+      // 1 every 5 minutes per active user — previously this ran on EVERY
+      // request to every authenticated page, adding ~20ms each.
+      const FIVE_MIN = 5 * 60 * 1000;
+      const lastRefresh = (token.refreshedAt as number | undefined) ?? 0;
+      const stale = Date.now() - lastRefresh > FIVE_MIN;
+
+      if (token.id && (trigger === "update" || stale)) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { name: true, image: true, role: true },
+          });
+          if (dbUser) {
+            token.name = dbUser.name;
+            token.image = dbUser.image;
+            token.role = dbUser.role;
+          }
+          token.refreshedAt = Date.now();
+        } catch (error) {
+          console.error("[auth] JWT refresh failed:", error instanceof Error ? error.message : "unknown");
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
-
-        // Always fetch latest image from database in case it was updated
-        if (token.id) {
-          try {
-            const dbUser = await prisma.user.findUnique({
-              where: { id: token.id as string },
-              select: { image: true, name: true },
-            });
-            if (dbUser) {
-              session.user.image = dbUser.image || undefined;
-              session.user.name = dbUser.name || session.user.name;
-            }
-          } catch (error) {
-            console.error("Session callback error fetching user:", error);
-          }
-        }
+        session.user.name = (token.name as string | null | undefined) ?? session.user.name;
+        session.user.image = (token.image as string | null | undefined) ?? undefined;
       }
       return session;
     },

@@ -10,6 +10,8 @@ import { ServiceWorkerProvider } from "@/components/providers/ServiceWorkerProvi
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { AnalyticsProvider } from "@/components/providers/AnalyticsProvider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -42,9 +44,21 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     type: "website",
     url: "https://bookeasy.me",
+    images: [
+      {
+        url: "/og-default.jpg",
+        width: 1200,
+        height: 630,
+        alt: "BookEasy — Réservation en ligne en Polynésie française",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
+    title: "BookEasy - Réservez vos rendez-vous en ligne",
+    description:
+      "Réservez vos rendez-vous beauté, bien-être et services en Polynésie française.",
+    images: ["/og-default.jpg"],
   },
 };
 
@@ -123,6 +137,8 @@ export default function RootLayout({
           {children}
           <ServiceWorkerProvider />
           <AnalyticsProvider />
+          <SpeedInsights />
+          <Analytics />
           <InstallBanner />
           <CookieBanner />
           <Toaster

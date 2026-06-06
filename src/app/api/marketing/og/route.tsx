@@ -19,6 +19,33 @@ import {
 
 export const runtime = "nodejs";
 
+type OgPalette = ReturnType<typeof getPalette>;
+
+type OgMerchant = {
+  businessName: string;
+  city: string | null;
+  sector: { slug: string | null; name: string } | null;
+};
+
+type OgService = {
+  name: string;
+  duration: number;
+  price: number;
+  currency: string;
+};
+
+type RenderHeroProps = {
+  merchant: OgMerchant;
+  palette: OgPalette;
+  bgPhoto: string;
+};
+
+type RenderUIProps = RenderHeroProps & {
+  service: OgService | undefined;
+  avgRating: string;
+  reviewCount: number;
+};
+
 const SECTOR_FALLBACK_PHOTOS: Record<string, string> = {
   spa: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1080&q=80&auto=format&fit=crop",
   "institut-beaute": "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1080&q=80&auto=format&fit=crop",
@@ -109,7 +136,7 @@ export async function GET(request: NextRequest) {
 }
 
 // ───────── TEMPLATE 1 : HERO MAGAZINE ─────────
-function renderHero({ merchant, palette, bgPhoto }: any) {
+function renderHero({ merchant, palette, bgPhoto }: RenderHeroProps) {
   return (
     <div style={{ width: "100%", height: "100%", display: "flex", position: "relative" }}>
       <img src={bgPhoto} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
@@ -130,7 +157,7 @@ function renderHero({ merchant, palette, bgPhoto }: any) {
 }
 
 // ───────── TEMPLATE 2 : UI SHOWCASE ─────────
-function renderUI({ merchant, palette, bgPhoto, service, avgRating, reviewCount }: any) {
+function renderUI({ merchant, palette, bgPhoto, service, avgRating, reviewCount }: RenderUIProps) {
   const priceLabel = service ? `${service.duration} min · ${Math.round(service.price)} ${service.currency === "XPF" ? "XPF" : service.currency}` : "Disponible maintenant";
   return (
     <div style={{ width: "100%", height: "100%", display: "flex", position: "relative" }}>
@@ -163,7 +190,7 @@ function renderUI({ merchant, palette, bgPhoto, service, avgRating, reviewCount 
 }
 
 // ───────── TEMPLATE 3 : TESTIMONIAL ─────────
-function renderTestimonial({ merchant, palette, bgPhoto }: any) {
+function renderTestimonial({ merchant, palette, bgPhoto }: RenderHeroProps) {
   return (
     <div style={{ width: "100%", height: "100%", display: "flex", position: "relative" }}>
       <img src={bgPhoto} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />

@@ -187,9 +187,14 @@ export function Header() {
                   className="flex items-center gap-2 text-sm font-medium text-[#0C1B2A]/70 dark:text-gray-300 hover:text-[#0066FF] transition-colors rounded-full py-1 pl-1 pr-2"
                 >
                   {session.user.image ? (
-                    <div className="h-8 w-8 rounded-full overflow-hidden shadow-md flex-shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={session.user.image} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
+                    <div className="relative h-8 w-8 rounded-full overflow-hidden shadow-md flex-shrink-0">
+                      <Image
+                        src={session.user.image}
+                        alt={session.user.name || "Profile"}
+                        fill
+                        sizes="32px"
+                        className="object-cover"
+                      />
                     </div>
                   ) : (
                     <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-xs font-semibold shrink-0">
@@ -219,9 +224,14 @@ export function Header() {
                       <div className="px-3.5 py-2.5 border-b border-gray-100 dark:border-gray-700">
                         <div className="flex items-center gap-2 w-full">
                           {session.user.image && (
-                            <div className="h-6 w-6 rounded-full overflow-hidden flex-shrink-0">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={session.user.image} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
+                            <div className="relative h-6 w-6 rounded-full overflow-hidden flex-shrink-0">
+                              <Image
+                                src={session.user.image}
+                                alt={session.user.name || "Profile"}
+                                fill
+                                sizes="24px"
+                                className="object-cover"
+                              />
                             </div>
                           )}
                           <p className="text-sm font-semibold text-[#0C1B2A] dark:text-white truncate">
@@ -416,9 +426,14 @@ export function Header() {
                   onClick={() => setMobileOpen(false)}
                 >
                   {session.user.image ? (
-                    <div className="h-7 w-7 rounded-full overflow-hidden shadow-md flex-shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={session.user.image} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
+                    <div className="relative h-7 w-7 rounded-full overflow-hidden shadow-md flex-shrink-0">
+                      <Image
+                        src={session.user.image}
+                        alt={session.user.name || "Profile"}
+                        fill
+                        sizes="28px"
+                        className="object-cover"
+                      />
                     </div>
                   ) : (
                     <div className="h-7 w-7 rounded-full bg-gradient-to-br from-[#0066FF] to-[#00B4D8] flex items-center justify-center text-white text-[10px] font-semibold">

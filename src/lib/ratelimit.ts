@@ -97,6 +97,17 @@ export const passwordResetLimiter = new Ratelimit({
 });
 
 /**
+ * RGPD data export rate limit
+ * Decryption of patient notes + heavy DB fetch — protect against spam.
+ * Limit: 3 exports per hour per user
+ */
+export const exportLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(3, "1 h"),
+  analytics: true,
+});
+
+/**
  * Public enumeration rate limit
  * Used on public endpoints that confirm existence of codes/IDs
  * (referrals/validate, merchants/availability) — prevents bulk

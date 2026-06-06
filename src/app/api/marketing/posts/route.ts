@@ -1,7 +1,7 @@
 /**
  * CRUD basique pour le tracking des posts marketing publiés + KPIs.
  *
- * Protégé par NEXTAUTH_SECRET en header x-admin-key (même pattern que notify-test).
+ * Protégé par ADMIN_API_KEY en header x-admin-key (timingSafeEqual).
  * Permet à Mara de consigner manuellement les KPIs après publication.
  *
  *  GET /api/marketing/posts                      — liste tous les posts
@@ -11,10 +11,10 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isValidAdminKey } from "@/lib/admin-auth";
 
 function checkAuth(req: NextRequest): boolean {
-  const key = req.headers.get("x-admin-key");
-  return Boolean(key && key === process.env.NEXTAUTH_SECRET);
+  return isValidAdminKey(req);
 }
 
 export async function GET(req: NextRequest) {

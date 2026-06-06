@@ -16,7 +16,8 @@ export async function GET() {
       orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
     });
     return NextResponse.json(schedule);
-  } catch {
+  } catch (err) {
+    console.error("[availability GET] error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -61,7 +62,8 @@ export async function PUT(request: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error("[availability PUT] error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

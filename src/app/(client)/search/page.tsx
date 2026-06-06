@@ -9,9 +9,24 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Recherche - BookEasy",
+  title: "Rechercher un professionnel en Polynésie française | BookEasy",
   description:
-    "Trouvez et réservez les meilleurs professionnels beauté, bien-être et services en Polynésie française.",
+    "Trouvez et réservez les meilleurs coiffeurs, spas, instituts de beauté et professionnels bien-être en Polynésie française. Réservation 24h/24, paiement sécurisé.",
+  alternates: { canonical: "https://bookeasy.me/search" },
+  openGraph: {
+    title: "Rechercher un professionnel — BookEasy Polynésie",
+    description:
+      "Trouvez les meilleurs professionnels beauté, bien-être et services en Polynésie française.",
+    url: "https://bookeasy.me/search",
+    siteName: "BookEasy",
+    locale: "fr_FR",
+    type: "website",
+    images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og-default.jpg"],
+  },
 };
 
 interface SearchPageProps {

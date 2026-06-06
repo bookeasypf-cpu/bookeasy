@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Mes favoris | BookEasy",
   description: "Vos professionnels favoris sur BookEasy.",
+  robots: { index: false, follow: false },
 };
 
 export default async function FavoritesPage() {

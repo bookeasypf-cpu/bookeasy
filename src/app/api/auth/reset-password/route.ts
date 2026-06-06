@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { resetPasswordSchema, zodFirstError } from "@/lib/validations";
+import { passwordResetLimiter, checkRateLimit, formatRateLimitError } from "@/lib/ratelimit";
 
 export async function POST(req: Request) {
   try {
@@ -10,6 +11,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: zodFirstError(parsed.error) }, { status: 400 });
     }
     const { token, password } = parsed.data;
+
+    // Bucket on a token prefix (never on the email — unknown at this point).
+    // 8 chars give enough uniqueness per legitimate token while keeping a
+    // single bucket per attacker trying many random tokens from the same IP.
+    const { success, resetIn } = await checkRateLimit(
+      passwordResetLimiter,
+      `reset-use-${token.slice(0, 8)}`
+    );
+    if (!success) {
+      return NextResponse.json(
+        { error: formatRateLimitError(resetIn, "tentatives") },
+        { status: 429 }
+      );
+    }
 
     // Find token
     const verificationToken = await prisma.verificationToken.findUnique({

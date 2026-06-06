@@ -72,7 +72,7 @@ export default function Confidentialite() {
       <h2>5. Base légale</h2>
       <ul>
         <li><strong>Exécution du contrat :</strong> gestion des comptes, réservations, cartes cadeaux, programme XP</li>
-        <li><strong>Consentement :</strong> géolocalisation, cookies non essentiels, newsletter</li>
+        <li><strong>Consentement :</strong> géolocalisation, cookies de mesure d&apos;audience (PostHog)</li>
         <li><strong>Intérêt légitime :</strong> amélioration du service, sécurité, prévention de la fraude</li>
         <li><strong>Obligation légale :</strong> conservation des données de facturation, réponse aux demandes judiciaires</li>
       </ul>
@@ -122,9 +122,24 @@ export default function Confidentialite() {
 
       <h2>9. Cookies</h2>
       <p>
-        BookEasy n&apos;utilise <strong>que des cookies strictement nécessaires</strong> au
-        fonctionnement du service. Aucun cookie publicitaire ni de mesure d&apos;audience
-        tiers n&apos;est déposé. Le consentement préalable n&apos;est donc pas requis (art. 82 LIL).
+        BookEasy distingue deux catégories de traceurs :
+      </p>
+      <ul>
+        <li>
+          <strong>Traceurs strictement nécessaires</strong> (authentification, protection CSRF,
+          mémorisation du choix sur la bannière, préférences d&apos;affichage) : ils ne requièrent pas
+          de consentement préalable (art. 82 LIL).
+        </li>
+        <li>
+          <strong>Traceurs de mesure d&apos;audience</strong> (PostHog, hébergé en Union européenne) :
+          ils sont activés <strong>uniquement après votre consentement explicite</strong> donné via
+          le bandeau cookies. Aucune donnée n&apos;est transmise tant que vous n&apos;avez pas accepté.
+          Vous pouvez retirer ce consentement à tout moment en supprimant le choix dans votre
+          navigateur ou en utilisant le bandeau.
+        </li>
+      </ul>
+      <p>
+        Aucun cookie publicitaire ni traceur tiers commercial n&apos;est déposé.
       </p>
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1em", fontSize: "0.9em" }}>
         <thead>

@@ -162,7 +162,8 @@ export async function POST(request: Request) {
       expiresAt: redemption.expiresAt,
       newBalance: balance - reward.xpCost,
     });
-  } catch {
+  } catch (err) {
+    console.error("[xp/redeem] error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

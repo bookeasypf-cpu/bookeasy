@@ -33,7 +33,8 @@ export async function GET() {
       coverImage: merchant.coverImage,
       photos: merchant.photos,
     });
-  } catch {
+  } catch (err) {
+    console.error("[photos GET] error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

@@ -11,9 +11,21 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Secteurs d'activité - BookEasy",
+  title: "Tous les secteurs d'activité en Polynésie française | BookEasy",
   description:
-    "Découvrez tous les secteurs d'activité disponibles sur BookEasy : coiffeurs, barbers, esthéticiennes, spas, coachs sportifs et bien plus en Polynésie française.",
+    "Découvrez tous les secteurs disponibles sur BookEasy : coiffeurs, barbers, esthéticiennes, spas, coachs sportifs, instituts. Réservez en ligne partout en Polynésie française.",
+  alternates: { canonical: "https://bookeasy.me/sectors" },
+  openGraph: {
+    title: "Tous les secteurs — BookEasy Polynésie",
+    description:
+      "Coiffeurs, barbers, spas, esthéticiennes, coachs — réservez votre RDV en ligne en Polynésie française.",
+    url: "https://bookeasy.me/sectors",
+    siteName: "BookEasy",
+    locale: "fr_FR",
+    type: "website",
+    images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
+  },
+  twitter: { card: "summary_large_image", images: ["/og-default.jpg"] },
 };
 
 export default async function SectorsPage() {

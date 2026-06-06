@@ -10,10 +10,15 @@ import { MAX_FOUNDER_SLOTS, type BillingCycle } from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
+    // Read the raw body to preserve the exact byte sequence used by PayZen
+    // when computing the HMAC signature. Using req.formData() risks
+    // re-normalizing values (URL-encoding edge cases) and breaking signature
+    // verification on legitimate IPNs.
+    const rawBody = await req.text();
+    const params = new URLSearchParams(rawBody);
     const body: Record<string, string> = {};
-    formData.forEach((value, key) => {
-      body[key] = value.toString();
+    params.forEach((value, key) => {
+      body[key] = value;
     });
 
     const receivedSignature = body.signature;
