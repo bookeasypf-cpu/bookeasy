@@ -7,6 +7,7 @@ import { DAYS_OF_WEEK } from "@/lib/constants";
 import { Plus, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useMerchantProfile } from "@/components/providers/MerchantProfileProvider";
+import { HolidaysSection } from "@/components/dashboard/HolidaysSection";
 
 interface ScheduleSlot {
   id?: string;
@@ -221,6 +222,10 @@ export default function DashboardAvailabilityPage() {
           );
         })}
       </div>
+
+      {/* Jours fériés PF — section séparée, ne dépend pas du dirty state
+          des horaires hebdo. Toggle individuel par jour, sauvegarde inline. */}
+      <HolidaysSection />
     </div>
   );
 }
