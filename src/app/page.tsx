@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "BookEasy — Réservation en ligne en Polynésie française",
     description:
-      "Réservez en ligne 24h/24 vos rendez-vous partout en Polynésie française.",
+      "Coiffeurs, barbers, spas, instituts, esthéticiennes en Polynésie française. Trouvez et réservez votre rendez-vous en 30 secondes, 24h/24.",
     url: "https://bookeasy.me",
     siteName: "BookEasy",
     locale: "fr_FR",
