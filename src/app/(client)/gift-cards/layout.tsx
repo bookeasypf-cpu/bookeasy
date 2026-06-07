@@ -13,14 +13,14 @@ export const metadata: Metadata = {
     siteName: "BookEasy",
     locale: "fr_FR",
     type: "website",
-    images: [{ url: "/og-cover.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/og-cover.jpg?v=3", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Cartes cadeaux BookEasy",
     description:
       "Offrez une carte cadeau utilisable chez tous les professionnels BookEasy en Polynésie française.",
-    images: ["/og-cover.jpg"],
+    images: ["/og-cover.jpg?v=3"],
   },
 };
 
