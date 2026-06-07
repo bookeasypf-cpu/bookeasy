@@ -10,7 +10,6 @@ import { ServiceWorkerProvider } from "@/components/providers/ServiceWorkerProvi
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { AnalyticsProvider } from "@/components/providers/AnalyticsProvider";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({
@@ -137,7 +136,6 @@ export default function RootLayout({
           {children}
           <ServiceWorkerProvider />
           <AnalyticsProvider />
-          <SpeedInsights />
           <Analytics />
           <InstallBanner />
           <CookieBanner />
