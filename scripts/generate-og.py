@@ -338,15 +338,18 @@ draw.text((trust_right - tb_w, H - 52), trust_text_bot,
 # ─────────────────────────────────────────────────────────
 # EXPORT
 # ─────────────────────────────────────────────────────────
-img.save(OUT_JPG, "JPEG", quality=90, optimize=True, progressive=True)
+# Baseline JPEG (NOT progressive) — some WhatsApp versions fail to render
+# progressive JPEGs in link previews even when Content-Type is image/jpeg.
+img.save(OUT_JPG, "JPEG", quality=90, optimize=True, progressive=False)
 size_kb = os.path.getsize(OUT_JPG) / 1024
 print(f"✓ Generated: {OUT_JPG}")
 print(f"  Size: {size_kb:.1f} KB")
 print(f"  Dimensions: {W}x{H}")
+print(f"  Baseline JPEG (no progressive)")
 
 if size_kb > 200:
     for q in [85, 80, 75]:
-        img.save(OUT_JPG, "JPEG", quality=q, optimize=True, progressive=True)
+        img.save(OUT_JPG, "JPEG", quality=q, optimize=True, progressive=False)
         size_kb = os.path.getsize(OUT_JPG) / 1024
         if size_kb <= 200:
             print(f"  Re-encoded at q={q}: {size_kb:.1f} KB")

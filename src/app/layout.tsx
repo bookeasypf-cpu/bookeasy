@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     url: "https://bookeasy.me",
     images: [
       {
-        url: "/og-cover.jpg?v=3",
+        url: "/og-cover.jpg?v=4",
         width: 1200,
         height: 630,
         alt: "BookEasy — Réservation en ligne en Polynésie française",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     title: "BookEasy - Réservez vos rendez-vous en ligne",
     description:
       "Réservez vos rendez-vous beauté, bien-être et services en Polynésie française.",
-    images: ["/og-cover.jpg?v=3"],
+    images: ["/og-cover.jpg?v=4"],
   },
 };
 
