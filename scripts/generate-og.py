@@ -23,8 +23,12 @@ TYPE_DIM      = (160, 180, 210)
 TYPE_MUTED    = (110, 130, 160)
 CYAN_BRAND    = (0, 180, 216)       # #00B4D8 — brand secondary
 BLUE_BRAND    = (0, 102, 255)       # #0066FF — brand primary
-GOLD          = (252, 195, 95)      # warm CTA
+GOLD          = (252, 195, 95)      # warm CTA (legacy v2)
 GOLD_DEEP     = (220, 162, 60)
+# Direction A — Lagon turquoise (replaces gold for CTA v3)
+LAGOON        = (34, 211, 238)      # #22D3EE — Polynesian lagoon
+LAGOON_DEEP   = (14, 165, 200)      # darker lagoon for shadow
+LAGOON_GLOW   = (103, 232, 249)     # #67E8F9 — light splash
 CARD_BG       = (255, 255, 255)
 CARD_SHADOW   = (0, 0, 0)
 
@@ -64,6 +68,34 @@ GRID = 28
 for x in range(GRID, W, GRID):
     for y in range(GRID, H, GRID):
         draw.ellipse([x-1, y-1, x+1, y+1], fill=(255, 255, 255, 10))
+
+# Direction B — Subtle Polynesian wave motif, placed in the lower-left
+# negative space between subtitle and CTA. Inspired by Maohi tatau chevrons.
+# Opacity 5% — reads as texture, not decoration. Stays out of the calendar card.
+wave_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+wdraw = ImageDraw.Draw(wave_layer)
+_WAVE_LEFT = 70  # mirrors LEFT_PAD defined later in the file
+WAVE_BASE_X = _WAVE_LEFT
+# Position: below the subtitle, above the CTA pill (vertical breathing room)
+WAVE_BASE_Y = H - 200
+CHEVRON_W = 14
+CHEVRON_H = 6
+for row in range(3):
+    y_offset = WAVE_BASE_Y + row * (CHEVRON_H + 3)
+    x_offset = WAVE_BASE_X + (row % 2) * (CHEVRON_W // 2)
+    for col in range(20):
+        cx = x_offset + col * CHEVRON_W
+        if cx + CHEVRON_W > _WAVE_LEFT + 280:
+            break
+        wdraw.line(
+            [(cx, y_offset + CHEVRON_H), (cx + CHEVRON_W // 2, y_offset),
+             (cx + CHEVRON_W, y_offset + CHEVRON_H)],
+            fill=(103, 232, 249, 18),
+            width=1,
+        )
+wave_layer = wave_layer.filter(ImageFilter.GaussianBlur(0.3))
+img.paste(wave_layer, (0, 0), wave_layer)
+draw = ImageDraw.Draw(img, "RGBA")
 
 # ─────────────────────────────────────────────────────────
 # TYPOGRAPHY
@@ -115,23 +147,23 @@ draw.text((tag_x1 + 30, tag_y1 + 6), tag_text, font=font_chip, fill=TYPE_WHITE)
 # ─────────────────────────────────────────────────────────
 # HEADLINE block (left side)
 # ─────────────────────────────────────────────────────────
-# Eyebrow text
-eyebrow = "RÉSERVATION EN LIGNE"
-draw.text((LEFT_PAD, 175), eyebrow, font=font_chip, fill=CYAN_BRAND)
+# Eyebrow text — territorial signature
+eyebrow = "RÉSERVATION EN LIGNE  ·  POLYNÉSIE"
+draw.text((LEFT_PAD, 175), eyebrow, font=font_chip, fill=LAGOON)
 
-# H1 (2 lines)
-line1 = "Réservez en"
-line2 = "30 secondes."
+# H1 (2 lines) — D direction: pain point local + identity
+line1 = "Réservez."
+line2 = "Sans appeler."
 h_y = 205
 draw.text((LEFT_PAD, h_y), line1, font=font_h1, fill=TYPE_WHITE)
-# Second line with gradient-like dual color
+# Second line — slight lagoon tint on the period to anchor the punctuation
 line2_y = h_y + 95
 draw.text((LEFT_PAD, line2_y), line2, font=font_h2, fill=TYPE_WHITE)
 
-# Subtitle (4-line value prop)
+# Subtitle — rhythm + 24h/24 benefit at the end
 sub_y = line2_y + 115
-sub_text = "Coiffeurs, barbers, spas, instituts, esthéticiennes."
-sub2_text = "Trouvez et réservez votre rendez-vous 24h/24."
+sub_text = "Coiffeurs · Spas · Bien-être · Esthétique"
+sub2_text = "Partout en Polynésie française, 24h/24."
 draw.text((LEFT_PAD, sub_y), sub_text, font=font_sub, fill=TYPE_DIM)
 draw.text((LEFT_PAD, sub_y + 36), sub2_text, font=font_sub, fill=TYPE_DIM)
 
@@ -151,24 +183,24 @@ pill_h = 64
 pill_x = LEFT_PAD
 pill_y = H - pill_h - 70
 
-# Gold gradient pill — fake gradient with 2 stacked rects
-# Outer shadow (soft drop)
+# Lagoon gradient pill — Direction A
+# Outer cyan glow (drop shadow with lagoon color)
 shadow = Image.new("RGBA", (pill_w + 40, pill_h + 40), (0, 0, 0, 0))
 sdraw = ImageDraw.Draw(shadow)
 sdraw.rounded_rectangle([20, 20, pill_w + 20, pill_h + 20], radius=pill_h // 2,
-                        fill=(252, 195, 95, 80))
-shadow = shadow.filter(ImageFilter.GaussianBlur(14))
+                        fill=(34, 211, 238, 90))
+shadow = shadow.filter(ImageFilter.GaussianBlur(16))
 img.paste(shadow, (pill_x - 20, pill_y - 10), shadow)
 draw = ImageDraw.Draw(img, "RGBA")
 
-# Pill body — solid gold with subtle bottom shade
+# Pill body — solid lagoon with subtle top highlight
 draw.rounded_rectangle([pill_x, pill_y, pill_x + pill_w, pill_y + pill_h],
-                       radius=pill_h // 2, fill=GOLD)
-# Tiny inner highlight on top
+                       radius=pill_h // 2, fill=LAGOON)
+# Top highlight band for dimensionality
 draw.rounded_rectangle([pill_x + 2, pill_y + 2, pill_x + pill_w - 2, pill_y + pill_h // 2],
-                       radius=pill_h // 2, fill=(255, 220, 140, 60))
+                       radius=pill_h // 2, fill=(167, 243, 255, 70))
 
-# Center text vertically — compensate font baseline
+# Center text vertically — compensate font baseline. Use deep navy for max contrast.
 text_y = pill_y + (pill_h - chh) // 2 - cbbox[1]
 draw.text((pill_x + pill_pad_x, text_y), cta_text,
           font=font_cta, fill=INK_BG_TOP)
@@ -199,6 +231,9 @@ draw = ImageDraw.Draw(img, "RGBA")
 # Card body
 draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h],
                        radius=24, fill=CARD_BG)
+# Direction A — fine lagoon accent line at the top of the card (signature)
+draw.rounded_rectangle([card_x + 24, card_y + 12, card_x + 80, card_y + 14],
+                       radius=2, fill=LAGOON)
 
 # Card header — month label
 mh_y = card_y + 28
@@ -287,16 +322,16 @@ for i, t in enumerate(["09:00", "10:30", "14:00", "15:30"]):
 # ─────────────────────────────────────────────────────────
 # BOTTOM RIGHT : Trust badge — clean text-only
 # ─────────────────────────────────────────────────────────
-trust_text_top = "PAIEMENT SÉCURISÉ"
+# Trust badge — local insight ("faster than a phone call")
+trust_text_top = "+ RAPIDE QU'UN APPEL"
 trust_text_bot = "Confirmation instantanée"
-# Right-aligned to the card right edge
 trust_right = card_x + card_w
 ttbox = draw.textbbox((0, 0), trust_text_top, font=font_chip)
 tt_w = ttbox[2] - ttbox[0]
 tbbox = draw.textbbox((0, 0), trust_text_bot, font=font_mono)
 tb_w = tbbox[2] - tbbox[0]
 draw.text((trust_right - tt_w, H - 78), trust_text_top,
-          font=font_chip, fill=GOLD)
+          font=font_chip, fill=LAGOON)
 draw.text((trust_right - tb_w, H - 52), trust_text_bot,
           font=font_mono, fill=TYPE_DIM)
 
