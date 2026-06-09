@@ -54,19 +54,29 @@ export function WriteReview({ merchantId }: { merchantId: string }) {
     });
     if (result.error) {
       toast.error(result.error);
-    } else {
-      if (result.xpEarned && result.xpEarned > 0) {
-        toast.success(`Merci ! +${result.xpEarned} XP gagnés`);
-      } else {
-        toast.success("Merci pour votre avis !");
-      }
-      setOpen(false);
-      setRating(0);
-      setComment("");
-      setEligible((prev) => prev.filter((b) => b.id !== selectedBooking));
-      router.refresh();
+      setSubmitting(false);
+      return;
     }
+
+    // Feedback instantané : on ferme le formulaire et on toast AVANT
+    // d'attendre router.refresh(). Le user voit la confirmation tout
+    // de suite — la liste des avis se met à jour en arrière-plan.
+    if (result.xpEarned && result.xpEarned > 0) {
+      toast.success(`Merci ! +${result.xpEarned} XP gagnés`);
+    } else {
+      toast.success("Merci pour votre avis !");
+    }
+    setOpen(false);
+    setRating(0);
+    setComment("");
+    setEligible((prev) => prev.filter((b) => b.id !== selectedBooking));
     setSubmitting(false);
+
+    // router.refresh() est lent sur cette page (LocalBusiness JSON-LD +
+    // photos + reviews + services se re-render). On le déclenche en
+    // background pour ne pas bloquer le feedback UX. Si le user reste,
+    // il verra son avis apparaître ; si il navigue, c'est sans impact.
+    router.refresh();
   }
 
   if (!open) {

@@ -34,16 +34,22 @@ export function ReviewForm({ bookingId, merchantName, serviceName }: ReviewFormP
     });
     if (result.error) {
       toast.error(result.error);
-    } else {
-      if (result.xpEarned && result.xpEarned > 0) {
-        toast.success(`Merci ! +${result.xpEarned} XP gagnés`);
-      } else {
-        toast.success("Merci pour votre avis !");
-      }
-      setOpen(false);
-      router.refresh();
+      setSubmitting(false);
+      return;
     }
+
+    // Feedback instantané : fermeture + toast AVANT le router.refresh()
+    // qui re-render toute la liste de bookings (lourd).
+    if (result.xpEarned && result.xpEarned > 0) {
+      toast.success(`Merci ! +${result.xpEarned} XP gagnés`);
+    } else {
+      toast.success("Merci pour votre avis !");
+    }
+    setOpen(false);
     setSubmitting(false);
+
+    // Refresh en background — sans bloquer le retour UX.
+    router.refresh();
   }
 
   if (!open) {
