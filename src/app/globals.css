@@ -39,6 +39,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Empêche tout scroll horizontal involontaire au niveau page. Si un
+   element deborde (mot long, URL, position absolue mal calee), la page
+   reste centree au lieu de se decaler. On utilise `clip` plutot que
+   `hidden` pour preserver le comportement des position:sticky/fixed
+   (sticky-CTA mobile sur la fiche merchant). */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100vw;
+}
+
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
