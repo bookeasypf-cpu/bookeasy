@@ -1,5 +1,4 @@
 import { cache } from "react";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -36,6 +35,7 @@ import { DAYS_OF_WEEK } from "@/lib/constants";
 import Link from "next/link";
 import { WriteReview } from "./WriteReview";
 import { PhotoLightbox } from "@/components/ui/PhotoLightbox";
+import { CoverImageZoomable } from "@/components/ui/CoverImageZoomable";
 
 // Open/closed status computed at request time against Pacific/Tahiti
 // (no DST). Used in the hero info card to give visitors an immediate
@@ -276,13 +276,9 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
       {/* Hero Section */}
       <div className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
         {merchant.coverImage ? (
-          <Image
+          <CoverImageZoomable
             src={merchant.coverImage}
             alt={merchant.businessName}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#0066FF] via-[#0052CC] to-[#00B4D8]">
@@ -294,8 +290,9 @@ export default async function MerchantPage({ params }: MerchantPageProps) {
           </div>
         )}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0C1B2A] via-[#0C1B2A]/40 to-transparent" />
+        {/* Gradient overlay — pointer-events-none pour que le tap sur
+            l'image atteigne le button de zoom dessous (CoverImageZoomable). */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0C1B2A] via-[#0C1B2A]/40 to-transparent pointer-events-none" />
 
         {/* Back button + Favorite */}
         <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
