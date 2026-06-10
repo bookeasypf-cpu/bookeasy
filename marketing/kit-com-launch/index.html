@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kit de communication — Lancement BookEasy</title>
+<style>
+  :root {
+    --bg: #0a1626;
+    --bg-elev: #0f1f36;
+    --bg-card: #142a47;
+    --border: rgba(34, 211, 238, 0.18);
+    --border-strong: rgba(34, 211, 238, 0.4);
+    --ink: #f6f9fc;
+    --ink-dim: #a8bdd6;
+    --ink-mute: #6a7e98;
+    --lagoon: #22d3ee;
+    --lagoon-deep: #0ea5c8;
+    --lagoon-glow: rgba(34, 211, 238, 0.15);
+    --cyan: #00b4d8;
+    --green: #22c55e;
+    --warn: #fbbf24;
+    --r-sm: 8px;
+    --r-md: 14px;
+    --r-lg: 20px;
+    --r-pill: 999px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 80px;
+  }
+  /* HEADER */
+  .hero {
+    position: relative;
+    padding: 60px 24px 50px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at top, rgba(34, 211, 238, 0.12), transparent 60%),
+      linear-gradient(180deg, #08111e 0%, #0a1626 100%);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+  }
+  .brand {
+    font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+    margin-bottom: 18px;
+  }
+  .brand .easy { color: var(--cyan); }
+  .eyebrow {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: var(--r-pill);
+    background: var(--lagoon-glow);
+    color: var(--lagoon);
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    border: 1px solid var(--border-strong);
+    margin-bottom: 22px;
+  }
+  h1 {
+    font-size: clamp(36px, 6vw, 56px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.05;
+    margin-bottom: 16px;
+  }
+  h1 .accent { color: var(--lagoon); }
+  .hero-sub {
+    font-size: 17px;
+    color: var(--ink-dim);
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .stamp {
+    display: inline-block;
+    margin-top: 26px;
+    padding: 8px 18px;
+    border-radius: var(--r-pill);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--ink-dim);
+    font-size: 13px;
+  }
+  /* MAIN */
+  main { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+  section {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  section:first-of-type { border-top: none; padding-top: 40px; }
+  h2 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: var(--lagoon-glow);
+    color: var(--lagoon);
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 16px;
+    font-weight: 700;
+    border: 1px solid var(--border-strong);
+  }
+  h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 24px 0 12px;
+    color: var(--ink);
+  }
+  p { margin-bottom: 14px; color: var(--ink-dim); }
+  p strong { color: var(--ink); }
+  ul, ol { margin: 12px 0 18px 24px; }
+  li { margin-bottom: 8px; color: var(--ink-dim); }
+  .lead { font-size: 17px; color: var(--ink); margin-bottom: 24px; }
+  /* CAPTION CARD */
+  .caption {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 24px 22px;
+    margin: 16px 0 24px;
+    position: relative;
+  }
+  .caption-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .caption-label {
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 1.2px;
+    color: var(--lagoon);
+    text-transform: uppercase;
+  }
+  .copy-btn {
+    background: var(--lagoon);
+    color: #0a1626;
+    border: none;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: var(--r-pill);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+  }
+  .copy-btn:hover { background: var(--lagoon-deep); transform: translateY(-1px); }
+  .copy-btn.ok { background: var(--green); color: white; }
+  .caption-body {
+    font-family: "SF Mono", "Menlo", Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .hashtags {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 13px;
+    color: var(--lagoon);
+    line-height: 1.7;
+  }
+  /* ASSETS GRID */
+  .assets {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .asset {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .asset:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+  .asset img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid var(--border);
+  }
+  .asset-info {
+    padding: 14px 16px;
+  }
+  .asset-title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .asset-meta {
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+  }
+  .asset-dl {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 12px;
+    background: var(--lagoon);
+    color: #0a1626;
+    border-radius: var(--r-pill);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  /* TABLE */
+  .timing-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    background: var(--bg-card);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .timing-table th,
+  .timing-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .timing-table th {
+    background: rgba(34, 211, 238, 0.08);
+    color: var(--lagoon);
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .timing-table tr:last-child td { border-bottom: none; }
+  .timing-table tr:hover td { background: rgba(34, 211, 238, 0.04); }
+  /* BOX */
+  .box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 20px 22px;
+    margin: 16px 0 20px;
+  }
+  .box.warn { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.06); }
+  .box.tip { border-color: var(--border-strong); background: var(--lagoon-glow); }
+  .box-title {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--ink);
+    font-size: 15px;
+  }
+  /* PRINT */
+  @media print {
+    body { background: white; color: #1a1a1a; }
+    .hero { background: white; color: #0a1626; border: none; }
+    .hero::after { display: none; }
+    h1 { color: #0a1626; }
+    .hero-sub, p, li { color: #444; }
+    .caption, .box, .timing-table { background: #f8f9fb; border: 1px solid #ddd; }
+    .copy-btn, .asset-dl { display: none; }
+    section { page-break-inside: avoid; }
+  }
+  /* MOBILE */
+  @media (max-width: 640px) {
+    .hero { padding: 40px 18px 30px; }
+    h1 { font-size: 32px; }
+    main { padding: 0 16px; }
+    h2 { font-size: 22px; }
+    h2 .num { width: 36px; height: 36px; font-size: 14px; }
+    .caption { padding: 18px 16px; }
+    .caption-body { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="brand">Book<span class="easy">Easy</span></div>
+  <div class="eyebrow">KIT DE COMMUNICATION · LANCEMENT</div>
+  <h1>Tout ce dont tu as besoin pour <span class="accent">lancer&nbsp;BookEasy.</span></h1>
+  <p class="hero-sub">Captions prêtes à coller, visuels téléchargeables, conseils de timing et arguments clés. Un seul fichier, tout est dedans.</p>
+  <div class="stamp">📅 Version lancement · 🇵🇫 Polynésie française</div>
+</header>
+
+<main>
+
+<!-- ─────────────────────────────────────── -->
+<section id="mission">
+  <h2><span class="num">01</span>La mission BookEasy</h2>
+  <p class="lead">BookEasy.me, c'est la <strong>première plateforme polynésienne</strong> de réservation en ligne pensée pour les pros beauté, bien-être et services. Notre promesse : <strong>réserver. sans appeler. 24h/24.</strong></p>
+  <p>Le constat est simple : en Polynésie, le secteur compte plus de <strong>1500 professionnels</strong>, et 80% des réservations passent encore par téléphone. Résultat : appels manqués = clientes perdues = chiffre d'affaires fantôme.</p>
+  <p>BookEasy résout ça avec :</p>
+  <ul>
+    <li>📆 Réservation en ligne 24h/24</li>
+    <li>🔔 Notifications SMS / email automatiques (zéro lapin)</li>
+    <li>🌐 <strong>Visibilité Google locale + carte interactive</strong> (SEO inclus)</li>
+    <li>🤖 <strong>Indexation préparée pour la recherche IA</strong> (GEO 2026-prêt)</li>
+    <li>💳 Paiements XPF via PayZen (banques polynésiennes)</li>
+    <li>📊 Dashboard analytics pour les pros</li>
+    <li>🎁 10 places fondateurs au lancement → tarif Pro à vie</li>
+  </ul>
+
+  <div class="box tip">
+    <div class="box-title">🎯 Les 3 arguments clés (à marteler)</div>
+    <p style="margin: 0;">1. <strong>Plus jamais d'appels manqués</strong> (gain CA direct)<br>
+    2. <strong>Visibilité Google + carte locale incluse</strong> (les clientes te trouvent)<br>
+    3. <strong>Conçu pour la Polynésie</strong> (XPF, fuseau Tahiti, support FR)</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── -->
+<section id="visuels">
+  <h2><span class="num">02</span>Les 4 visuels du lancement</h2>
+  <p class="lead">Tous les visuels sont au format <strong>JPEG baseline</strong> (compatible WhatsApp, Messenger, tous réseaux). Clique sur "Télécharger" pour les enregistrer.</p>
+
+  <div class="assets">
+    <div class="asset">
+      <img src="./profile-square.jpg" alt="Profil — B monogramme lagoon" />
+      <div class="asset-info">
+        <div class="asset-title">Photo de profil</div>
+        <div class="asset-meta">1080×1080 · Facebook + Instagram</div>
+        <a href="./profile-square.jpg" download class="asset-dl">⬇ Télécharger</a>
+      </div>
+    </div>
+    <div class="asset">
+      <img src="./facebook-cover.jpg" alt="Cover Facebook" />
+      <div class="asset-info">
+        <div class="asset-title">Couverture Facebook</div>
+        <div class="asset-meta">1640×856 · Page Facebook HD</div>
+        <a href="./facebook-cover.jpg" download class="asset-dl">⬇ Télécharger</a>
+      </div>
+    </div>
+    <div class="asset">
+      <img src="./instagram-launch.jpg" alt="Post Instagram lancement" />
+      <div class="asset-info">
+        <div class="asset-title">Post Instagram — Lancement</div>
+        <div class="asset-meta">1080×1080 · 1er post Insta</div>
+        <a href="./instagram-launch.jpg" download class="asset-dl">⬇ Télécharger</a>
+      </div>
+    </div>
+    <div class="asset">
+      <img src="./founders-offer.jpg" alt="Offre 10 fondateurs" />
+      <div class="asset-info">
+        <div class="asset-title">Story — 10 places fondateurs</div>
+        <div class="asset-meta">1080×1080 · Story Instagram</div>
+        <a href="./founders-offer.jpg" download class="asset-dl">⬇ Télécharger</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="box-title">💡 Comment les utiliser</div>
+    <ul style="margin: 0 0 0 20px;">
+      <li><strong>profile-square.jpg</strong> → photo de profil Facebook ET Instagram</li>
+      <li><strong>facebook-cover.jpg</strong> → couverture de la page Facebook BookEasy</li>
+      <li><strong>instagram-launch.jpg</strong> → 1er post Instagram (caption section 03)</li>
+      <li><strong>founders-offer.jpg</strong> → story Instagram urgence + post si tu veux</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── -->
+<section id="facebook">
+  <h2><span class="num">03</span>Facebook — Post de lancement</h2>
+  <p class="lead">Format long, storytelling, hashtags PF. À poster avec la <strong>cover en visuel</strong>.</p>
+
+  <div class="caption">
+    <div class="caption-head">
+      <div class="caption-label">📘 Post Facebook</div>
+      <button class="copy-btn" data-target="cap-fb">Copier</button>
+    </div>
+    <div class="caption-body" id="cap-fb">🌊 Ia Orana ! BookEasy ouvre ses portes aujourd'hui.
+
+Pendant des mois, j'ai écouté des coiffeurs, esthéticiennes et professionnels du bien-être me dire la même chose :
+
+« Je perds des clientes parce que j'ai pas le temps de répondre au téléphone. »
+« Je veux qu'on me réserve à 22h, quand je dors. »
+« Y'a rien de pensé pour nous, en Polynésie. »
+
+Alors j'ai construit BookEasy.me 👇
+
+✅ Réservation en ligne 24h/24, sans appel
+✅ Calendrier synchro automatique
+✅ Rappels SMS / email pour zéro lapin
+✅ Visibilité Google locale incluse (vos clientes vous trouvent)
+✅ Présence sur la carte interactive BookEasy
+✅ Pensé pour le fenua : XPF, fuseau Tahiti, support FR
+✅ Préparé pour la recherche IA (ChatGPT, Perplexity)
+✅ Gratuit pour démarrer
+
+🎁 OFFRE FONDATEURS — Les 10 premiers professionnels qui s'inscrivent passent en Plan Pro à tarif fondateur à vie.
+
+👉 Inscription pro : bookeasy.me
+
+Si t'es coiffeur·se, masseur·se, esthéticien·ne, prothésiste ongulaire, barbier… on te facilite la vie. Vraiment.
+
+Partage si ça peut aider un·e pro autour de toi 🙏</div>
+    <div class="hashtags">
+      #BookEasy #Tahiti #PolynesieFrancaise #Reservation #Beaute #BienEtre #Coiffeur #Spa #Esthetique #Massage #Entrepreneur #StartupPF #FaitEnPolynesie #ConsommezLocal #Papeete #Moorea
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── -->
+<section id="instagram">
+  <h2><span class="num">04</span>Instagram — Post de lancement</h2>
+  <p class="lead">Format hook + bullets + CTA. À poster avec <strong>instagram-launch.jpg</strong>. Caption sous 2200 caractères.</p>
+
+  <div class="caption">
+    <div class="caption-head">
+      <div class="caption-label">📸 Post Instagram</div>
+      <button class="copy-btn" data-target="cap-ig">Copier</button>
+    </div>
+    <div class="caption-body" id="cap-ig">Réservez. Sans appeler. 🌊
+
+BookEasy, c'est né d'un constat tout simple :
+en Polynésie, on est en 2026 mais on réserve encore son rendez-vous… par téléphone.
+
+Aujourd'hui ça change.
+
+✨ Réservation 24h/24
+✨ Confirmation instantanée
+✨ Visibilité Google locale incluse
+✨ Pensé pour le fenua
+✨ Gratuit pour démarrer
+
+Pour les pros 👉 bookeasy.me
+Pour les clients : bientôt la réservation la plus simple de Polynésie.
+
+🎁 Les 10 premiers pros inscrits passent en Pro à tarif fondateur à vie.
+
+Tag un·e pro qui galère encore avec le téléphone 👇</div>
+    <div class="hashtags">
+      #BookEasy #Tahiti #Polynesie #PolynesieFrancaise #PF #Reservation #ReservationEnLigne #Coiffeur #CoiffeurTahiti #Spa #SpaTahiti #BienEtre #Esthetique #Massage #Beaute #BeauteTahiti #Entrepreneur #StartupPF #FaitEnPolynesie #ConsommezLocal #Papeete #Moorea #BoraBora #SaaS #Tech #Innovation #FenuaTahiti #PoeMaohi #Iaorana #Maeva
+    </div>
+    <p style="margin-top: 12px; font-size: 12px; color: var(--ink-mute);">↑ 30 hashtags = max Instagram. Mix volume/niche optimal pour discovery.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── -->
+<section id="stories">
+  <h2><span class="num">05</span>Instagram Stories — 3 slides</h2>
+  <p class="lead">À étaler sur la journée pour rester en haut du feed des followers. Utilise <strong>founders-offer.jpg</strong> pour la slide 3.</p>
+
+  <div class="caption">
+    <div class="caption-head">
+      <div class="caption-label">📱 Story 1 — Teaser (matin)</div>
+      <button class="copy-btn" data-target="cap-st1">Copier</button>
+    </div>
+    <div class="caption-body" id="cap-st1">Fond : instagram-launch.jpg
+
+Texte (sticker Bold blanc) :
+« Ça y est. »
+
+Sticker bas :
+↓ swipe up ↓</div>
+  </div>
+
+  <div class="caption">
+    <div class="caption-head">
+      <div class="caption-label">📱 Story 2 — Promesse (midi)</div>
+      <button class="copy-btn" data-target="cap-st2">Copier</button>
+    </div>
+    <div class="caption-body" id="cap-st2">Fond : navy uni OU screenshot homepage bookeasy.me
+
+Texte centré :
+
+🌊 BookEasy.me
+
+Réserver un coiffeur, un spa, un massage…
+sans appeler, sans attendre.
+
+Disponible aujourd'hui en Polynésie française.
+
+Sticker LINK → bookeasy.me</div>
+  </div>
+
+  <div class="caption">
+    <div class="caption-head">
+      <div class="caption-label">📱 Story 3 — Urgence pros (soir)</div>
+      <button class="copy-btn" data-target="cap-st3">Copier</button>
+    </div>
+    <div class="caption-body" id="cap-st3">Fond : founders-offer.jpg (l'image "10 places fondateurs")
+
+Texte ajouté :
+
+Pros 👇
+Inscription gratuite
++ 10 premiers en Pro à VIE
+
+⏰ Limité aux 10 premiers
+
+Sticker LINK : « Réserver ma place » → bookeasy.me</div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── -->
+<section id="whatsapp">
+  <h2><span class="num">06</span>WhatsApp — Message direct (DM)</h2>
+  <p class="lead">À envoyer aux contacts pros, groupes pros, contacts proches. <strong>Personnalise le [Prénom]</strong> à chaque envoi.</p>
+
+  <div class="caption">
+    <div class="caption-head">
+      <div class="caption-label">💬 WhatsApp DM</div>
+      <button class="copy-btn" data-target="cap-wa">Copier</button>
+    </div>
+    <div class="caption-body" id="cap-wa">Salut [Prénom] 👋
+
+Je lance aujourd'hui *BookEasy* — la 1ère plateforme polynésienne de réservation en ligne pour pros beauté & bien-être.
+
+Vu que tu connais bien le milieu, je voulais t'en parler en avant-première.
+
+En 2 lignes :
+🌊 Tes clientes réservent en ligne 24h/24
+🌊 Plus de loupé d'appels = plus de CA
+🌊 Visibilité Google + carte locale incluse
+🌊 Gratuit pour démarrer + offre fondateur à vie
+
+Le site : *bookeasy.me*
+
+Si tu veux que je t'aide à configurer ton compte en 5 min, dis-moi 🙏
+
+Mauruuru !</div>
+  </div>
+
+  <div class="box warn">
+    <div class="box-title">⚠️ Bonnes pratiques WhatsApp</div>
+    <ul style="margin: 0 0 0 20px;">
+      <li>Pas plus de <strong>5 à 10 DM par heure</strong> (sinon flag spam)</li>
+      <li>Toujours personnaliser : prénom + 1 phrase contexte</li>
+      <li>Réponds <strong>en moins d'une heure</strong> à tout retour</li>
+      <li>Évite les emojis excessifs dans le 1er message</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── -->
+<section id="linkedin">
+  <h2><span class="num">07</span>LinkedIn — Post pro</h2>
+  <p class="lead">Format storytelling pro + valeur métier + ask. Cible : réseau professionnel, intros, recommandations.</p>
+
+  <div class="caption">
+    <div class="caption-head">
+      <div class="caption-label">💼 LinkedIn</div>
+      <button class="copy-btn" data-target="cap-li">Copier</button>
+    </div>
+    <div class="caption-body" id="cap-li">🚀 Lancement officiel : BookEasy.me
+
+Aujourd'hui je rends public le projet sur lequel je travaille depuis des mois.
+
+Le constat : En Polynésie française, le secteur beauté & bien-être (1500+ professionnels) fonctionne encore à 80% par téléphone pour les réservations.
+
+Résultat : appels manqués = clients perdus.
+
+La solution : BookEasy.me
+Une plateforme de réservation en ligne pensée pour le fenua — XPF, fuseau Tahiti, support FR, paiement PayZen via banques polynésiennes.
+
+✅ Réservation 24h/24
+✅ Calendrier synchro
+✅ Notifications automatiques (SMS / email)
+✅ SEO local Google + carte interactive
+✅ Données structurées pour la recherche IA (GEO)
+✅ Dashboard analytics pour les pros
+
+Stack technique : Next.js 16, React 19, Prisma 7, Vercel, Neon, Resend, Upstash, NextAuth.
+
+Solo founder, build-in-public. Ouvert aux retours, intros, contacts pros 🙏
+
+👉 bookeasy.me</div>
+    <div class="hashtags">
+      #StartupPF #Tahiti #PolynesieFrancaise #SaaS #Reservation #BeauteBienEtre #BuildInPublic #FaitEnPolynesie
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── -->
+<section id="seo-geo">
+  <h2><span class="num">08</span>SEO + GEO — L'argument tueur</h2>
+  <p class="lead">Si on doit retenir <strong>UN seul</strong> angle de différenciation pour convaincre les pros sceptiques, c'est celui-ci.</p>
+
+  <h3>🔍 SEO local — Visibilité Google native</h3>
+  <p>Quand une cliente cherche <strong>"coiffeur Papeete"</strong> ou <strong>"spa Tahiti"</strong> sur Google, BookEasy place automatiquement le salon dans les résultats locaux. Pas besoin de payer une agence SEO, c'est inclus.</p>
+
+  <h3>📍 Carte interactive BookEasy</h3>
+  <p>Chaque pro est positionné sur la carte interactive du fenua. Les clientes peuvent filtrer par île, quartier, prestation. Découverte 100% locale.</p>
+
+  <h3>🤖 GEO — Prêt pour la recherche par IA</h3>
+  <p>Les données BookEasy sont structurées au format <strong>Schema.org</strong> (le format que ChatGPT, Perplexity, Gemini lisent). Quand un touriste demande "recommande-moi un salon à Moorea" à ChatGPT, les pros BookEasy ont une chance d'être cités. <strong>2026 : la recherche IA explose. Les pros qui s'y préparent maintenant gagnent.</strong></p>
+
+  <div class="box tip">
+    <div class="box-title">💎 Pitch SEO/GEO en 30 secondes</div>
+    <p style="margin: 0;">« Avec BookEasy, ton salon apparaît sur Google ET sur la carte fenua, et tes données sont préparées pour que ChatGPT et les futures IA de recherche te recommandent. Tu prends 5 ans d'avance sans rien faire. »</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── -->
+<section id="timing">
+  <h2><span class="num">09</span>Timing optimal — Quand poster</h2>
+  <p class="lead">L'algorithme récompense les posts au bon moment. Voici les créneaux PF (UTC-10).</p>
+
+  <table class="timing-table">
+    <thead>
+      <tr>
+        <th>Canal</th>
+        <th>Meilleur créneau</th>
+        <th>Pourquoi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>📧 Emails batch</strong></td>
+        <td>7h–8h ⭐</td>
+        <td>Pros lisent en arrivant au cabinet</td>
+      </tr>
+      <tr>
+        <td><strong>📘 Facebook</strong></td>
+        <td>8h30 ou 18h–20h</td>
+        <td>Pause matin / fin de journée</td>
+      </tr>
+      <tr>
+        <td><strong>📸 Instagram post</strong></td>
+        <td>11h30 ou 19h–21h</td>
+        <td>Scroll midi + soirée</td>
+      </tr>
+      <tr>
+        <td><strong>📱 Stories</strong></td>
+        <td>9h · 13h · 17h · 20h</td>
+        <td>Étalées = reste en haut du feed</td>
+      </tr>
+      <tr>
+        <td><strong>💬 WhatsApp DM</strong></td>
+        <td>9h–11h</td>
+        <td>Pas trop tôt, pas heure repas</td>
+      </tr>
+      <tr>
+        <td><strong>💼 LinkedIn</strong></td>
+        <td>8h ou 12h</td>
+        <td>Pause café / déjeuner</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="box">
+    <div class="box-title">🗓 Le planning idéal — Jour J</div>
+    <ol style="margin: 0 0 0 20px;">
+      <li><strong>07h00</strong> — Send batch emails</li>
+      <li><strong>08h30</strong> — Post Facebook</li>
+      <li><strong>09h00</strong> — Story Insta n°1 (teaser)</li>
+      <li><strong>09h00–11h00</strong> — WhatsApp DM par groupes de 5–10</li>
+      <li><strong>11h30</strong> — Post Instagram</li>
+      <li><strong>12h00</strong> — Post LinkedIn</li>
+      <li><strong>13h00</strong> — Story Insta n°2 (promesse)</li>
+      <li><strong>17h00</strong> — Story Insta n°3 (10 fondateurs)</li>
+      <li><strong>20h00</strong> — Story récap (combien de places restantes)</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── -->
+<section id="faq">
+  <h2><span class="num">10</span>Objections fréquentes — Réponses prêtes</h2>
+  <p class="lead">Si un pro hésite, voici les 5 objections classiques et leurs réponses. À avoir sous la main pour les DM.</p>
+
+  <h3>❓ « Combien ça coûte ? »</h3>
+  <p>« Gratuit pour démarrer (jusqu'à 30 réservations/mois). Si tu fais plus, Plan Pro à <strong>4 990 XPF/mois</strong> (ou <strong>49 900 XPF/an</strong>). Les <strong>10 premiers inscrits</strong> gardent ce tarif à vie. »</p>
+
+  <h3>❓ « Et si mes clientes préfèrent appeler ? »</h3>
+  <p>« BookEasy <strong>complète</strong> ton téléphone, il ne le remplace pas. Les clientes peuvent toujours t'appeler. Mais celles qui veulent réserver à 22h ou pendant que tu coupes une autre cliente, elles le feront en ligne. = Plus de CA, pas moins. »</p>
+
+  <h3>❓ « C'est compliqué à configurer ? »</h3>
+  <p>« 5 minutes chrono. Tu crées ton compte, tu ajoutes tes prestations (1 ligne par service), tes horaires d'ouverture, c'est fini. Si tu veux, je le fais avec toi en visio. »</p>
+
+  <h3>❓ « Y'a déjà des concurrents non ? »</h3>
+  <p>« En métropole oui (Treatwell, Planity). En Polynésie, <strong>aucun ne gère le XPF, le fuseau Tahiti, et le paiement PayZen via OSB</strong>. BookEasy est conçu ici, pour ici. Et on est <strong>ouverts aux feedbacks</strong> des 10 premiers pros pour façonner les features. »</p>
+
+  <h3>❓ « Et les paiements ? »</h3>
+  <p>« 2 options : tes clientes paient sur place (cash, CB, virement) — c'est gratuit ; OU paiement en ligne via PayZen (banques polynésiennes) — commission classique CB. À toi de choisir. »</p>
+</section>
+
+<!-- ─────────────────────────────────────── -->
+<section id="checklist">
+  <h2><span class="num">11</span>Checklist finale — Avant de poster</h2>
+  <div class="box">
+    <ul style="margin: 0 0 0 20px;">
+      <li>☐ Photo de profil uploadée sur Facebook + Instagram</li>
+      <li>☐ Couverture Facebook uploadée</li>
+      <li>☐ Bio Instagram + lien <strong>bookeasy.me</strong></li>
+      <li>☐ Bio Facebook + lien <strong>bookeasy.me</strong></li>
+      <li>☐ 1er post Facebook programmé pour 8h30</li>
+      <li>☐ 1er post Instagram programmé pour 11h30</li>
+      <li>☐ Story 1 préparée (teaser)</li>
+      <li>☐ Story 2 préparée (promesse)</li>
+      <li>☐ Story 3 préparée (10 fondateurs)</li>
+      <li>☐ Liste de 10 contacts pour DM WhatsApp prête</li>
+      <li>☐ Post LinkedIn prêt (si applicable)</li>
+      <li>☐ Téléphone chargé · notifications activées</li>
+    </ul>
+  </div>
+
+  <div class="box tip">
+    <div class="box-title">🎯 Le mantra du jour</div>
+    <p style="margin: 0;"><strong>Répondre vite + remercier souvent + partager les wins.</strong> Si quelqu'un commente, like, partage : un cœur, un merci, un MP. La traction se fait dans les 48 premières heures. On y va. 🚀</p>
+  </div>
+</section>
+
+<footer style="text-align: center; margin-top: 60px; padding: 30px 20px; border-top: 1px solid var(--border); color: var(--ink-mute); font-size: 13px;">
+  <p>Préparé avec 🌊 pour le lancement de <strong>BookEasy</strong> · 2026<br>
+  <span style="font-family: 'SF Mono', Consolas, monospace; font-size: 11px;">bookeasy.me</span></p>
+</footer>
+
+</main>
+
+<script>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      const text = target.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const original = btn.textContent;
+        btn.textContent = '✓ Copié';
+        btn.classList.add('ok');
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.classList.remove('ok');
+        }, 1800);
+      }).catch(() => {
+        // Fallback
+        const range = document.createRange();
+        range.selectNode(target);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        btn.textContent = '✓ Sélectionné';
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

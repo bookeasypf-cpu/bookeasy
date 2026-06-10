@@ -375,9 +375,115 @@ def make_instagram_launch():
     print(f"✓ IG launch: {out} ({os.path.getsize(out) / 1024:.1f} KB)")
 
 
+# ════════════════════════════════════════════════════════════
+# 4. FOUNDERS OFFER — 1080x1080 (Story Instagram urgency)
+# ════════════════════════════════════════════════════════════
+def make_founders_offer():
+    W = H = 1080
+    img = Image.new("RGB", (W, H), INK_BG_MID)
+    vertical_gradient(img, INK_BG_TOP, INK_BG_MID, INK_BG_DEEP)
+    lagoon_glow(img, W // 2, H // 2 - 60, max_r=520, intensity=0.20)
+    dot_grid(img, opacity=10, step=28)
+
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    font_brand   = ImageFont.truetype(f"{FONTS}/BricolageGrotesque-Bold.ttf", 38)
+    font_eyebrow = ImageFont.truetype(f"{FONTS}/GeistMono-Bold.ttf", 22)
+    font_giant   = ImageFont.truetype(f"{FONTS}/BricolageGrotesque-Bold.ttf", 380)
+    font_h2      = ImageFont.truetype(f"{FONTS}/BricolageGrotesque-Bold.ttf", 64)
+    font_sub     = ImageFont.truetype(f"{FONTS}/InstrumentSans-Regular.ttf", 30)
+    font_mono    = ImageFont.truetype(f"{FONTS}/GeistMono-Regular.ttf", 24)
+
+    LEFT_PAD = 90
+
+    # Brand top
+    draw.text((LEFT_PAD, 80), "Book", font=font_brand, fill=TYPE_WHITE)
+    book_bbox = draw.textbbox((0, 0), "Book", font=font_brand)
+    draw.text((LEFT_PAD + (book_bbox[2] - book_bbox[0]), 80), "Easy",
+              font=font_brand, fill=CYAN_BRAND)
+
+    # Eyebrow + underline (centered)
+    eyebrow = "OFFRE FONDATEURS"
+    eb_box = draw.textbbox((0, 0), eyebrow, font=font_eyebrow)
+    eb_w = eb_box[2] - eb_box[0]
+    eb_x = (W - eb_w) // 2
+    draw.text((eb_x, 210), eyebrow, font=font_eyebrow, fill=LAGOON)
+    draw.rounded_rectangle([eb_x, 246, eb_x + eb_w, 250],
+                           radius=2, fill=LAGOON)
+
+    # GIANT "10" — center spectacular
+    ten_text = "10"
+    ten_box = draw.textbbox((0, 0), ten_text, font=font_giant)
+    tw, th = ten_box[2] - ten_box[0], ten_box[3] - ten_box[1]
+    tx = (W - tw) // 2 - ten_box[0]
+    ty = 300
+
+    # Shadow for depth
+    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    sdraw = ImageDraw.Draw(shadow)
+    sdraw.text((tx + 8, ty + 12), ten_text, font=font_giant, fill=(0, 0, 0, 140))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(12))
+    img.paste(shadow, (0, 0), shadow)
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Main "10" with strong lagoon outer glow
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    gdraw = ImageDraw.Draw(glow)
+    gdraw.text((tx, ty), ten_text, font=font_giant, fill=(34, 211, 238, 90))
+    glow = glow.filter(ImageFilter.GaussianBlur(18))
+    img.paste(glow, (0, 0), glow)
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    draw.text((tx, ty), ten_text, font=font_giant, fill=TYPE_WHITE)
+
+    # Subtitle "places fondateurs"
+    h2_text = "places fondateurs"
+    h2_box = draw.textbbox((0, 0), h2_text, font=font_h2)
+    h2w = h2_box[2] - h2_box[0]
+    draw.text(((W - h2w) // 2, 720), h2_text, font=font_h2, fill=TYPE_WHITE)
+
+    # Sub
+    sub_text = "Plan Pro à tarif fondateur · à vie"
+    sub_box = draw.textbbox((0, 0), sub_text, font=font_sub)
+    sw = sub_box[2] - sub_box[0]
+    draw.text(((W - sw) // 2, 800), sub_text, font=font_sub, fill=LAGOON)
+
+    # 10 dots row at the bottom — visual scarcity counter
+    dot_row_y = 900
+    dot_count = 10
+    dot_r = 12
+    dot_gap = 30
+    total_w = dot_count * (dot_r * 2) + (dot_count - 1) * dot_gap
+    dot_start_x = (W - total_w) // 2
+    for i in range(dot_count):
+        cx = dot_start_x + i * (dot_r * 2 + dot_gap) + dot_r
+        # All 10 still available — full lagoon dots with glow
+        for r in range(dot_r + 12, dot_r, -2):
+            alpha = max(0, 70 - (r - dot_r) * 5)
+            draw.ellipse([cx - r, dot_row_y - r, cx + r, dot_row_y + r],
+                         fill=(34, 211, 238, alpha))
+        draw.ellipse([cx - dot_r, dot_row_y - dot_r, cx + dot_r, dot_row_y + dot_r],
+                     fill=LAGOON)
+
+    # Domain CTA
+    domain = "bookeasy.me"
+    dom_box = draw.textbbox((0, 0), domain, font=font_mono)
+    dw_w = dom_box[2] - dom_box[0]
+    draw.text(((W - dw_w) // 2, 970), domain, font=font_mono, fill=TYPE_DIM)
+
+    # Maohi chevrons subtle bottom corners
+    maohi_chevrons(img, x=40, y=H - 50, width=200, opacity=22)
+    maohi_chevrons(img, x=W - 240, y=H - 50, width=200, opacity=22)
+
+    out = f"{OUT_DIR}/founders-offer.jpg"
+    img.save(out, "JPEG", quality=92, optimize=True, progressive=False)
+    print(f"✓ Founders: {out} ({os.path.getsize(out) / 1024:.1f} KB)")
+
+
 if __name__ == "__main__":
     print("Generating BookEasy social assets...\n")
     make_profile()
     make_facebook_cover()
     make_instagram_launch()
+    make_founders_offer()
     print("\n✅ All assets ready in public/social/")
