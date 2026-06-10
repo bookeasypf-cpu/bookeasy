@@ -14,11 +14,11 @@ export const metadata: Metadata = {
     siteName: "BookEasy",
     locale: "fr_FR",
     type: "website",
-    images: [{ url: "/og-cover.jpg?v=4", width: 1200, height: 630 }],
+    images: [{ url: "/og-cover.jpg?v=5", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/og-cover.jpg?v=4"],
+    images: ["/og-cover.jpg?v=5"],
   },
 };
 import { Header } from "@/components/layout/Header";
