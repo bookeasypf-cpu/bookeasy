@@ -209,8 +209,9 @@ async function main() {
 
   const testimonialCopy = variant.copyTemplate(magicMetric);
 
-  // Generate output
-  const slug = (merchant.slug || prospectName)
+  // Generate output — le model Merchant n'a pas de champ `slug`, on derive
+  // un slug du nom commercial (ou du nom de prospect en fallback).
+  const slug = (merchant.businessName || prospectName)
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "-")
     .replace(/-+/g, "-")
